@@ -3,9 +3,17 @@ import { walletReadClient, AGENT_WALLET_ABI, AGENT_WALLET_ADDRESS } from "./shar
 import { getChain } from "../../chain"
 import type { WalletState } from "../types"
 
+const ONE_DAY_SECONDS = 86400n
+
+// Mirrors AgentWallet's own lazy daily-reset condition (see runtime/src/executor.ts) so
+// this second implementation doesn't quote a stale ethDailySpent from before the next reset.
+function effectiveDailySpent(dailySpent: bigint, lastReset: bigint, nowSeconds: bigint): bigint {
+  return nowSeconds >= lastReset + ONE_DAY_SECONDS ? 0n : dailySpent
+}
+
 export async function readState(): Promise<WalletState> {
   try {
-    const [balanceWei, agent, guardian, paused, ethTxLimit, ethDailyLimit, ethDailySpent, pendingLimitChange, pendingCall] = await Promise.all([
+    const [balanceWei, agent, guardian, paused, ethTxLimit, ethDailyLimit, ethDailySpentRaw, ethLastReset, pendingLimitChange, pendingCall] = await Promise.all([
       walletReadClient.getBalance({ address: AGENT_WALLET_ADDRESS }),
       walletReadClient.readContract({ address: AGENT_WALLET_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "agent" }),
       walletReadClient.readContract({ address: AGENT_WALLET_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "guardian" }),
@@ -13,9 +21,13 @@ export async function readState(): Promise<WalletState> {
       walletReadClient.readContract({ address: AGENT_WALLET_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "ethTxLimit" }),
       walletReadClient.readContract({ address: AGENT_WALLET_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "ethDailyLimit" }),
       walletReadClient.readContract({ address: AGENT_WALLET_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "ethDailySpent" }),
+      walletReadClient.readContract({ address: AGENT_WALLET_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "ethLastReset" }),
       walletReadClient.readContract({ address: AGENT_WALLET_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "pendingLimitChange" }),
       walletReadClient.readContract({ address: AGENT_WALLET_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "pendingCall" })
     ])
+
+    const nowSeconds = BigInt(Math.floor(Date.now() / 1000))
+    const ethDailySpent = effectiveDailySpent(ethDailySpentRaw, ethLastReset, nowSeconds)
 
     return {
       contractAddress: AGENT_WALLET_ADDRESS,

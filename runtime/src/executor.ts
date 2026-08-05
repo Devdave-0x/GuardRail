@@ -15,6 +15,15 @@ import type { ToolName } from "./tools"
 const AGENT_WALLET_ADDRESS = requireAddress("AGENT_CONTRACT_ADDRESS")
 const NATIVE_SYMBOL = getChain().nativeCurrency.symbol
 const ZERO_SELECTOR = "0x00000000" as const
+const ONE_DAY_SECONDS = 86400n
+
+// AgentWallet resets ethDailySpent lazily, inside execute(), only when a new spend
+// happens after 24h have passed since ethLastReset. Off-chain reads of ethDailySpent
+// can be stale until that next spend. Mirror the contract's own reset condition here
+// so callers see what would actually be enforced right now.
+function effectiveDailySpent(dailySpent: bigint, lastReset: bigint, nowSeconds: bigint): bigint {
+  return nowSeconds >= lastReset + ONE_DAY_SECONDS ? 0n : dailySpent
+}
 
 const AGENT_WALLET_ABI = [
   { name: "agent", type: "function", stateMutability: "view", inputs: [], outputs: [{ type: "address" }] },
@@ -23,6 +32,7 @@ const AGENT_WALLET_ABI = [
   { name: "ethTxLimit", type: "function", stateMutability: "view", inputs: [], outputs: [{ type: "uint256" }] },
   { name: "ethDailyLimit", type: "function", stateMutability: "view", inputs: [], outputs: [{ type: "uint256" }] },
   { name: "ethDailySpent", type: "function", stateMutability: "view", inputs: [], outputs: [{ type: "uint256" }] },
+  { name: "ethLastReset", type: "function", stateMutability: "view", inputs: [], outputs: [{ type: "uint256" }] },
   {
     name: "pendingLimitChange",
     type: "function",
@@ -198,7 +208,7 @@ function fail(tool: ToolName, code: string, message: string, details?: Record<st
 }
 
 async function readWalletState() {
-  const [balanceWei, agent, guardian, paused, ethTxLimit, ethDailyLimit, ethDailySpent, pendingLimitChange, pendingCall] =
+  const [balanceWei, agent, guardian, paused, ethTxLimit, ethDailyLimit, ethDailySpentRaw, ethLastReset, pendingLimitChange, pendingCall] =
     await Promise.all([
       publicClient.getBalance({ address: AGENT_WALLET_ADDRESS }),
       publicClient.readContract({ address: AGENT_WALLET_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "agent" }),
@@ -207,6 +217,7 @@ async function readWalletState() {
       publicClient.readContract({ address: AGENT_WALLET_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "ethTxLimit" }),
       publicClient.readContract({ address: AGENT_WALLET_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "ethDailyLimit" }),
       publicClient.readContract({ address: AGENT_WALLET_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "ethDailySpent" }),
+      publicClient.readContract({ address: AGENT_WALLET_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "ethLastReset" }),
       publicClient.readContract({
         address: AGENT_WALLET_ADDRESS,
         abi: AGENT_WALLET_ABI,
@@ -215,6 +226,8 @@ async function readWalletState() {
       publicClient.readContract({ address: AGENT_WALLET_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "pendingCall" })
     ])
 
+  const nowSeconds = BigInt(Math.floor(Date.now() / 1000))
+  const ethDailySpent = effectiveDailySpent(ethDailySpentRaw, ethLastReset, nowSeconds)
   const remainingDailyWei = ethDailyLimit > ethDailySpent ? ethDailyLimit - ethDailySpent : 0n
 
   return {

@@ -24,6 +24,7 @@ export const AGENT_WALLET_ABI = [
   { name: "ethTxLimit", type: "function", stateMutability: "view", inputs: [], outputs: [{ type: "uint256" }] },
   { name: "ethDailyLimit", type: "function", stateMutability: "view", inputs: [], outputs: [{ type: "uint256" }] },
   { name: "ethDailySpent", type: "function", stateMutability: "view", inputs: [], outputs: [{ type: "uint256" }] },
+  { name: "ethLastReset", type: "function", stateMutability: "view", inputs: [], outputs: [{ type: "uint256" }] },
   { name: "tokenPolicy", type: "function", stateMutability: "view", inputs: [{ name: "", type: "address" }], outputs: [{ name: "dailyLimit", type: "uint256" }, { name: "dailySpent", type: "uint256" }, { name: "lastReset", type: "uint256" }, { name: "enabled", type: "bool" }] },
   { name: "pendingLimitChange", type: "function", stateMutability: "view", inputs: [], outputs: [{ name: "txLimit", type: "uint256" }, { name: "dailyLimit", type: "uint256" }, { name: "unlockTime", type: "uint256" }, { name: "queued", type: "bool" }] },
   { name: "pendingCall", type: "function", stateMutability: "view", inputs: [], outputs: [{ name: "target", type: "address" }, { name: "selector", type: "bytes4" }, { name: "checkRecipient", type: "bool" }, { name: "checkAmount", type: "bool" }, { name: "maxAmount", type: "uint256" }, { name: "unlockTime", type: "uint256" }, { name: "queued", type: "bool" }] },

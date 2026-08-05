@@ -72,9 +72,10 @@ Environment:
 
 Hard constraints to respect:
 - If paused, no transfers should proceed.
-- ETH transfers must be within per-transaction and daily limits.
+- Native-token (${nativeSymbol}) transfers must be within per-transaction and daily limits.
 - Target + selector must be whitelisted by policy.
 - Token transfers may have token-specific daily limits.
+- Always refer to the native currency as "${nativeSymbol}" — never "ETH" unless ${nativeSymbol} literally is ETH. Use the exact figures given in the wallet context below, do not rename or convert the unit.
 
 Behavior rules:
 - For pure conversation (greetings/help/explanations), reply naturally and do not call tools.
@@ -89,8 +90,17 @@ const CONTRACT_READ_ABI = [
   { name: "paused", type: "function", stateMutability: "view", inputs: [], outputs: [{ type: "bool" }] },
   { name: "ethTxLimit", type: "function", stateMutability: "view", inputs: [], outputs: [{ type: "uint256" }] },
   { name: "ethDailyLimit", type: "function", stateMutability: "view", inputs: [], outputs: [{ type: "uint256" }] },
-  { name: "ethDailySpent", type: "function", stateMutability: "view", inputs: [], outputs: [{ type: "uint256" }] }
+  { name: "ethDailySpent", type: "function", stateMutability: "view", inputs: [], outputs: [{ type: "uint256" }] },
+  { name: "ethLastReset", type: "function", stateMutability: "view", inputs: [], outputs: [{ type: "uint256" }] }
 ] as const
+
+const ONE_DAY_SECONDS = 86400n
+
+// Mirrors AgentWallet's own lazy daily-reset condition (see runtime/src/executor.ts) so the
+// AI's wallet context doesn't quote a stale ethDailySpent from before the next reset fires.
+function effectiveDailySpent(dailySpent: bigint, lastReset: bigint, nowSeconds: bigint): bigint {
+  return nowSeconds >= lastReset + ONE_DAY_SECONDS ? 0n : dailySpent
+}
 
 const CONVERSATIONAL_ONLY = /^(hi|hello|hey|gm|gn|yo|sup|thanks|thank you|who are you|what can you do|help)\b/i
 const ACTION_HINTS = /\b(send|transfer|swap|approve|execute|status|tx|hash|balance|limit|whitelist|pending|history|wallet)\b/i
@@ -114,16 +124,19 @@ function safeParseJson(input: string): Record<string, unknown> {
 
 async function getWalletContext(): Promise<string> {
   try {
-    const [balance, agent, guardian, paused, ethTxLimit, ethDailyLimit, ethDailySpent] = await Promise.all([
+    const [balance, agent, guardian, paused, ethTxLimit, ethDailyLimit, ethDailySpentRaw, ethLastReset] = await Promise.all([
       publicClient.getBalance({ address: agentWalletAddress }),
       publicClient.readContract({ address: agentWalletAddress, abi: CONTRACT_READ_ABI, functionName: "agent" }),
       publicClient.readContract({ address: agentWalletAddress, abi: CONTRACT_READ_ABI, functionName: "guardian" }),
       publicClient.readContract({ address: agentWalletAddress, abi: CONTRACT_READ_ABI, functionName: "paused" }),
       publicClient.readContract({ address: agentWalletAddress, abi: CONTRACT_READ_ABI, functionName: "ethTxLimit" }),
       publicClient.readContract({ address: agentWalletAddress, abi: CONTRACT_READ_ABI, functionName: "ethDailyLimit" }),
-      publicClient.readContract({ address: agentWalletAddress, abi: CONTRACT_READ_ABI, functionName: "ethDailySpent" })
+      publicClient.readContract({ address: agentWalletAddress, abi: CONTRACT_READ_ABI, functionName: "ethDailySpent" }),
+      publicClient.readContract({ address: agentWalletAddress, abi: CONTRACT_READ_ABI, functionName: "ethLastReset" })
     ])
 
+    const nowSeconds = BigInt(Math.floor(Date.now() / 1000))
+    const ethDailySpent = effectiveDailySpent(ethDailySpentRaw, ethLastReset, nowSeconds)
     const remaining = ethDailyLimit > ethDailySpent ? ethDailyLimit - ethDailySpent : 0n
 
     return [
