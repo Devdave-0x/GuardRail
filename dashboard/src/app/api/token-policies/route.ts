@@ -8,7 +8,7 @@ export const revalidate = 0;
 // AgentWallet has no on-chain function to list every token that's ever had a policy —
 // the only way to discover them is to scan the events it emits when one is set/revoked,
 // then read current state for each. Falls back to the deploy block if not overridden.
-const DEPLOY_BLOCK = BigInt(process.env.NEXT_PUBLIC_DEPLOY_BLOCK || '15562282');
+const DEPLOY_BLOCK = BigInt(process.env.NEXT_PUBLIC_DEPLOY_BLOCK || '18842904');
 
 const TOKEN_POLICY_SET_EVENT = parseAbiItem('event TokenPolicySet(address indexed token, uint256 dailyLimit)');
 const TOKEN_POLICY_REVOKED_EVENT = parseAbiItem('event TokenPolicyRevoked(address indexed token)');
