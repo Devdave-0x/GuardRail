@@ -5,8 +5,8 @@ import { Providers } from '@/components/shared/Providers';
 import { Navbar } from '@/components/shared/Navbar';
 
 export const metadata: Metadata = {
-  title: 'ETH Agent Dashboard',
-  description: 'Ethereum AI Agent wallet management — Sepolia testnet',
+  title: 'GuardRail Dashboard',
+  description: 'On-chain AI agent wallet management — BOT Chain testnet',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
