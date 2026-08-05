@@ -81,7 +81,7 @@ function errorResult(message: string, details?: unknown) {
 }
 
 const server = new Server(
-  { name: "eth-agent", version: "1.0.0" },
+  { name: "guardrail", version: "1.0.0" },
   {
     capabilities: {
       tools: {}
