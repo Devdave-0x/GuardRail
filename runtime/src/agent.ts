@@ -199,7 +199,7 @@ export type AgentEvent =
   | { type: "done"; content?: string }
 
 export async function runAgent(goal: string, emit?: (event: AgentEvent) => void): Promise<void> {
-  emit?.({ type: "status", content: "ETH Agent is thinking..." })
+  emit?.({ type: "status", content: "GuardRail is thinking..." })
 
   try {
     const providers = buildProviders()
