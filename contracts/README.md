@@ -105,7 +105,12 @@ This is the same audited `AgentWallet` contract already live on Sepolia
 (`0x4fbE2CeFEC5ef766634C83CFAd0338fEfBB65b35`) — this is a migration/multi-chain
 deployment, not a new project.
 
+**One intentional difference on this deployment:** `TIMELOCK` is set to `1 minutes`
+instead of the standard `10 minutes`, for faster demo/testnet iteration. It's a
+compile-time constant, so this only affects this specific BOT Chain build — the
+Sepolia deployment above is unaffected.
+
 - **Chain:** BOT Chain testnet (chain ID `968`)
-- **Contract address:** `0x3d157f7df3551b1423cb804f818792a978a9635c`
-- **Explorer:** https://scan.bohr.life/address/0x3d157f7df3551b1423cb804f818792a978a9635c
-- **Deployment tx:** `0x81d709689159bda38d55bc170795bc32cfcf177d093b87bb57b77f8baf207a54`
+- **Contract address:** `0x2e86509caAdFbEbbe223E51ee7d70Fcb7ba60B01`
+- **Explorer:** https://scan.bohr.life/address/0x2e86509caAdFbEbbe223E51ee7d70Fcb7ba60B01 (source verified)
+- **Deployment tx:** `0x37bbf9f5a0f69854f98535cb448817a2d3205f63103514accce515c6b1605713`
