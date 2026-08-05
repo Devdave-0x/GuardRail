@@ -4,15 +4,25 @@ import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprot
 import { executeToolCall } from "./executor"
 import { runtimeTools, toolMap, type ToolName } from "./tools"
 
+// eth-agent-kit (packages/eth-agent-kit) is a separate, Sepolia-only SDK — it throws for
+// any other CHAIN_ID. It used to be silently preferred over the native runtime below
+// whenever AGENT_CONTRACT_ADDRESS/AGENT_PRIVATE_KEY/RPC_URL were all set, with both paths
+// logging the identical "connected over stdio" line, making it impossible to tell from
+// logs alone which implementation was actually serving tool calls. It's now opt-in only,
+// via USE_ETH_AGENT_KIT=true, and failures are logged instead of swallowed.
 async function tryStartKitServer(): Promise<boolean> {
+  if (process.env.USE_ETH_AGENT_KIT !== "true") {
+    return false
+  }
+
   try {
-    // Optional local workspace integration with eth-agent-kit
     const kit = await import("eth-agent-kit")
     const contractAddress = process.env.AGENT_CONTRACT_ADDRESS as `0x${string}` | undefined
     const privateKey = process.env.AGENT_PRIVATE_KEY as `0x${string}` | undefined
     const rpcUrl = process.env.RPC_URL ?? process.env.ALCHEMY_RPC_URL
 
     if (!contractAddress || !privateKey || !rpcUrl) {
+      console.error("[mcp-server] USE_ETH_AGENT_KIT=true but AGENT_CONTRACT_ADDRESS/AGENT_PRIVATE_KEY/RPC_URL missing — falling back to native runtime")
       return false
     }
 
