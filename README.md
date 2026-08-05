@@ -147,7 +147,7 @@ without the identity layer.
 - **Terminal 3 Network** — TEE-backed verifiable identity
 
 ### Anna Executa Plugin
-Run ETH Agent as an Anna platform plugin:
+Run GuardRail as an Anna platform plugin:
 ```bash
 node anna-executa/index.js
 ```
