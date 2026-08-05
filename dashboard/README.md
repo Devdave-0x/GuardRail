@@ -49,10 +49,11 @@ src/
 │   ├── layout.tsx             # Root layout with providers
 │   ├── globals.css            # Terminal theme styles
 │   └── api/
-│       ├── contract/route.ts  # GET: all contract state
-│       ├── events/route.ts    # GET: Executed events
-│       ├── agent/route.ts     # POST: stream agent goals
-│       └── guardian/route.ts  # POST: build guardian calldata
+│       ├── contract/route.ts       # GET: all contract state
+│       ├── events/route.ts         # GET: Executed events
+│       ├── agent/route.ts          # POST: stream agent goals
+│       ├── guardian/route.ts       # POST: build guardian calldata
+│       └── token-policies/route.ts # GET: discover token policies via event scan
 ├── components/
 │   ├── panels/
 │   │   ├── OverviewPanel.tsx
