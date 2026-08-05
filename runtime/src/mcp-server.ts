@@ -129,7 +129,7 @@ async function main() {
   try {
     transport = new StdioServerTransport()
     await server.connect(transport)
-    console.error("[mcp-server] eth-agent connected over stdio")
+    console.error("[mcp-server] using native runtime (chain-aware, see src/chain.ts) — connected over stdio")
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     console.error(`[mcp-server] startup error: ${message}`)
