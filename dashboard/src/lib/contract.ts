@@ -14,7 +14,7 @@ export const botChainTestnet = defineChain({
 });
 
 export const CONTRACT_ADDRESS = (process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
-  '0x3d157f7df3551b1423cb804f818792a978a9635c') as `0x${string}`;
+  '0x2e86509caAdFbEbbe223E51ee7d70Fcb7ba60B01') as `0x${string}`;
 
 export const CHAIN_ID = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || '968');
 
