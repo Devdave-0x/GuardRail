@@ -1,14 +1,18 @@
-# ETH Agent Dashboard
+# GuardRail Dashboard
 
-Full-stack dashboard for the **AgentWallet** smart contract deployed on Ethereum Sepolia testnet.
+Full-stack dashboard for the **AgentWallet** smart contract deployed on BOT Chain testnet.
 
 ## Contract Details
 
 | Field | Value |
 |---|---|
-| Contract | `0xE49A6044D47De19504B73aA36F31899843B05259` |
-| Network | Ethereum Sepolia (chainId: 11155111) |
+| Contract | `0x2e86509caAdFbEbbe223E51ee7d70Fcb7ba60B01` |
+| Network | BOT Chain testnet (chainId: 968) |
+| RPC | `https://rpc.bohr.life` |
+| Explorer | `https://scan.bohr.life` |
 | Guardian | `0xd9100b701e21fC578BFD937AC2DbDfb5bbD42572` |
+
+The same `AgentWallet` contract is also live on Sepolia (see the root [README](../README.md)'s Deployments table), but this dashboard only targets BOT Chain — it is not chain-switchable.
 
 ## Stack
 
