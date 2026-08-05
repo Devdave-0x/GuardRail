@@ -82,13 +82,15 @@ src/
 
 | Panel | Description |
 |---|---|
-| Overview | Contract address, ETH balance, roles, network, pause status |
-| Spending Limits | Per-TX + daily ETH limits, progress bar, pending limit changes |
-| Transaction History | Live `Executed` event feed from Sepolia with Etherscan links |
-| Whitelist Manager | Queue/apply/cancel call policy with 10min timelock |
-| Token Policy | ERC-20 daily limits, spend tracking, guardian set/revoke |
+| Overview | Contract address, BOT balance, roles, network, pause status |
+| Spending Limits | Per-TX + daily BOT limits, progress bar, pending limit changes |
+| Transaction History | Live `Executed` event feed from BOT Chain with explorer links |
+| Whitelist Manager | Queue/apply/cancel call policy with 1min timelock (this BOT Chain deployment; shortened from the standard 10min for faster demo iteration) |
+| Token Policy | ERC-20 daily limits, spend tracking, guardian set/revoke — auto-discovers known policies via `TokenPolicySet`/`TokenPolicyRevoked` event scan, not just manual lookup |
 | Agent Chat | Stream goals to runtime, see tool calls + tx hashes |
 | Guardian Control | Pause/unpause, withdraw, transfer roles, queue limit changes |
+
+Daily-spend figures account for `AgentWallet`'s lazy 24h reset (`ethLastReset`) — the panel shows what would actually be enforced right now, not a stale pre-reset value.
 
 ## Agent Runtime Integration
 
