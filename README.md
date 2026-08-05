@@ -92,7 +92,7 @@ AgentWallet enforces all agent actions on-chain:
 - Whitelisted target addresses and function selectors
 - Token-specific daily limits
 - Guardian pause/unpause kill switch
-- 10-minute timelock on limit increases
+- Timelock on limit increases and new whitelist entries (10 minutes on Sepolia; 1 minute on the BOT Chain testnet deployment, shortened for faster demo iteration — `TIMELOCK` is a compile-time constant, baked in per deployment)
 - 2-step role transfers
 
 The runtime automatically targets the configured chain via `CHAIN_ID` — Sepolia and BOT Chain testnet are supported today (`runtime/src/chain.ts`), and more EVM chains can be added there without touching the contract or agent logic.
