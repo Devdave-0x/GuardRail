@@ -35,17 +35,17 @@ export default function DashboardPage() {
       {/* Footer */}
       <div className="border-t border-border pt-4 pb-8 flex items-center justify-between text-text-muted text-xs font-mono">
         <div className="flex items-center gap-4">
-          <span>ETH Agent Dashboard</span>
+          <span>GuardRail Dashboard</span>
           <span className="text-border-bright">|</span>
           <span>AgentWallet v1</span>
           <span className="text-border-bright">|</span>
           <a
-            href="https://scan.bohr.life/address/0x3d157f7df3551b1423cb804f818792a978a9635c"
+            href="https://scan.bohr.life/address/0x2e86509caAdFbEbbe223E51ee7d70Fcb7ba60B01"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-blue-bright transition-colors"
           >
-            0x3d15...635c ↗
+            0x2e86...0B01 ↗
           </a>
         </div>
         <div className="flex items-center gap-2">
