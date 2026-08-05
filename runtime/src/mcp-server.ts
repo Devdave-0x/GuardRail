@@ -38,8 +38,11 @@ async function tryStartKitServer(): Promise<boolean> {
     })
 
     await agent.startMCPServer()
+    console.error("[mcp-server] using eth-agent-kit (Sepolia only) — connected over stdio")
     return true
-  } catch {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    console.error(`[mcp-server] eth-agent-kit failed to start, falling back to native runtime: ${message}`)
     return false
   }
 }
