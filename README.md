@@ -104,13 +104,13 @@ The same audited `AgentWallet` contract is live on two networks:
 | Network | Chain ID | Contract Address | Explorer |
 |---|---|---|---|
 | Ethereum Sepolia | 11155111 | `0x4fbE2CeFEC5ef766634C83CFAd0338fEfBB65b35` | [Etherscan](https://sepolia.etherscan.io/address/0x4fbE2CeFEC5ef766634C83CFAd0338fEfBB65b35) |
-| BOT Chain testnet | 968 | `0x3d157f7df3551b1423cb804f818792a978a9635c` | [scan.bohr.life](https://scan.bohr.life/address/0x3d157f7df3551b1423cb804f818792a978a9635c) |
+| BOT Chain testnet | 968 | `0x2e86509caAdFbEbbe223E51ee7d70Fcb7ba60B01` | [scan.bohr.life](https://scan.bohr.life/address/0x2e86509caAdFbEbbe223E51ee7d70Fcb7ba60B01) |
 
 Deploy your own: see contracts/README.md
 
 ## T3N Verifiable Identity Layer
 
-ETH Agent integrates with Terminal 3 Network for
+GuardRail integrates with Terminal 3 Network for
 cryptographically verifiable agent identity.
 
 Every agent session:
