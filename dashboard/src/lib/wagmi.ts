@@ -22,7 +22,7 @@ const popularWallets = [
 ];
 
 export const wagmiConfig = getDefaultConfig({
-  appName: 'ETH Agent Dashboard',
+  appName: 'GuardRail Dashboard',
   projectId: walletConnectProjectId || 'eth-agent-local-dev',
   chains: [botChainTestnet],
   transports: {
