@@ -32,7 +32,7 @@ const CHAT_STORAGE_KEY = 'eth-agent-chat-history-v2';
 const defaultWelcomeMessage: Message = {
   id: 'welcome',
   role: 'agent',
-  content: 'ETH Agent online. Connect to your MCP server or type a goal below. I can execute on-chain actions within my policy limits.',
+  content: 'GuardRail online. Connect to your MCP server or type a goal below. I can execute on-chain actions within my policy limits.',
   timestamp: new Date(),
 };
 
