@@ -18,7 +18,7 @@ export function Navbar() {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5">
             <div className="w-2 h-2 rounded-full bg-green animate-pulse" />
-            <span className="font-mono text-xs font-bold text-green tracking-widest uppercase">ETH Agent</span>
+            <span className="font-mono text-xs font-bold text-green tracking-widest uppercase">GuardRail</span>
           </div>
           <span className="text-border-bright text-xs">|</span>
           <span className="font-mono text-xs text-text-muted">BOT Chain Testnet</span>
