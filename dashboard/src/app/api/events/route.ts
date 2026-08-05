@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createPublicClient, http, parseAbiItem } from 'viem';
-import { sepolia } from 'viem/chains';
-import { CONTRACT_ADDRESS, RPC_URLS } from '@/lib/contract';
+import { CONTRACT_ADDRESS, RPC_URLS, botChainTestnet } from '@/lib/contract';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,7 +32,7 @@ const BIGINT_ZERO = BigInt(0);
 const BIGINT_ONE = BigInt(1);
 const QUICKNODE_MIN_RANGE = BigInt(5);
 const DEFAULT_LOG_RANGE = BigInt(2_000);
-const LOOKBACK_BLOCKS = BigInt(50_400); // ~7 days on Sepolia
+const LOOKBACK_BLOCKS = BigInt(115_000); // ~24h at BOT Chain's measured ~0.75s block time (verified live: block 15579907 -> 18804935 spans 3,225,028 blocks / 2,422,588s)
 const MAX_CHUNKS_PER_REQUEST = 80; // hard bound to keep latency predictable
 const MAX_EVENT_CACHE = 500;
 
@@ -82,8 +81,8 @@ export async function GET(req: NextRequest) {
 
     const providerStates: ProviderState[] = RPC_URLS.map((url) => ({
       client: createPublicClient({
-        chain: sepolia,
-        transport: http(url, { timeout: 5_000, retryCount: 0 }),
+        chain: botChainTestnet,
+        transport: http(url, { timeout: 12_000, retryCount: 0 }),
       }),
       // QuickNode discover plans can enforce very small eth_getLogs ranges.
       maxLogRange: url.includes('quiknode.pro') ? QUICKNODE_MIN_RANGE : DEFAULT_LOG_RANGE,
@@ -109,13 +108,17 @@ export async function GET(req: NextRequest) {
         ? latestBlock - LOOKBACK_BLOCKS
         : BIGINT_ZERO;
 
-    const previousHead = cacheHeadBlock;
+    // Load-balanced RPC gateways (e.g. BOT Chain's public endpoint) can report a
+    // latestBlock lower than a previous request if it lands on a different backend
+    // node. Treat that as "start fresh" rather than letting stale cache state make
+    // scanStartBlock > scanCursor, which would silently skip the scan loop entirely.
+    const previousHead = cacheHeadBlock !== null && latestBlock < cacheHeadBlock ? null : cacheHeadBlock;
 
     // Initialize scan state once, then only extend it as new blocks arrive.
-    if (cacheHeadBlock === null) {
+    if (previousHead === null) {
       cacheHeadBlock = latestBlock;
       scanCursor = latestBlock;
-    } else if (latestBlock > cacheHeadBlock) {
+    } else if (latestBlock > previousHead) {
       cacheHeadBlock = latestBlock;
       scanCursor = latestBlock;
     }

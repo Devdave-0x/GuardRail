@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createPublicClient, http, formatEther } from 'viem';
-import { sepolia } from 'viem/chains';
-import { CONTRACT_ADDRESS, AGENT_WALLET_ABI, RPC_URLS } from '@/lib/contract';
+import { CONTRACT_ADDRESS, AGENT_WALLET_ABI, RPC_URLS, botChainTestnet } from '@/lib/contract';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -33,8 +32,8 @@ function unavailableContractState(error: unknown) {
     dailySpentPercent: 0,
     pendingLimitChange: null,
     pendingCall: null,
-    network: "Sepolia",
-    chainId: 11155111,
+    network: "BOT Chain Testnet",
+    chainId: 968,
     rpcUnavailable: true,
     error: errorMessage(error),
   };
@@ -43,7 +42,7 @@ function unavailableContractState(error: unknown) {
 async function readContractState() {
   const clients = RPC_URLS.map((url) =>
     createPublicClient({
-      chain: sepolia,
+      chain: botChainTestnet,
       transport: http(url, { timeout: 8_000, retryCount: 0 }),
     })
   );
@@ -68,7 +67,8 @@ async function readContractState() {
   const paused = await withFallback((client) => client.readContract({ address: CONTRACT_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "paused" }));
   const ethTxLimit = await withFallback((client) => client.readContract({ address: CONTRACT_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "ethTxLimit" }));
   const ethDailyLimit = await withFallback((client) => client.readContract({ address: CONTRACT_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "ethDailyLimit" }));
-  const ethDailySpent = await withFallback((client) => client.readContract({ address: CONTRACT_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "ethDailySpent" }));
+  const ethDailySpentRaw = await withFallback((client) => client.readContract({ address: CONTRACT_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "ethDailySpent" }));
+  const ethLastReset = await withFallback((client) => client.readContract({ address: CONTRACT_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "ethLastReset" }));
   const pendingLimitChangeRaw = await withFallback((client) => client.readContract({ address: CONTRACT_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "pendingLimitChange" }));
   const pendingCallRaw = await withFallback((client) => client.readContract({ address: CONTRACT_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "pendingCall" }));
 
@@ -77,6 +77,13 @@ async function readContractState() {
 
   const bigintZero = BigInt(0);
   const percentScale = BigInt(10_000);
+  const oneDaySeconds = BigInt(86_400);
+
+  // AgentWallet resets ethDailySpent lazily, inside execute(), only when a new spend
+  // happens after 24h have passed since ethLastReset. Mirror that condition here so the
+  // dashboard doesn't show a stale spend/percent from before the next reset actually fires.
+  const nowSeconds = BigInt(Math.floor(Date.now() / 1000));
+  const ethDailySpent = nowSeconds >= (ethLastReset as bigint) + oneDaySeconds ? bigintZero : (ethDailySpentRaw as bigint);
 
   const dailySpentPercent = ethDailyLimit > bigintZero
     ? Number((ethDailySpent * percentScale) / ethDailyLimit) / 100
@@ -117,8 +124,8 @@ async function readContractState() {
       queued: true,
       unlockTimeMs: Number(pcUnlockTime) * 1000,
     } : null,
-    network: 'Sepolia',
-    chainId: 11155111,
+    network: 'BOT Chain Testnet',
+    chainId: 968,
   };
 }
 

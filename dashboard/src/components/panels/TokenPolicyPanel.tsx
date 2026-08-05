@@ -1,13 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Panel, Badge, ProgressBar, Button, Input } from '@/components/shared';
 import { useAccount, useWriteContract } from 'wagmi';
 import { CONTRACT_ADDRESS, AGENT_WALLET_ABI } from '@/lib/contract';
 import { useContractState } from '@/hooks/useContractState';
 import { parseEther, createPublicClient, fallback, http } from 'viem';
-import { sepolia } from 'viem/chains';
-import { RPC_URLS } from '@/lib/contract';
+import { RPC_URLS, botChainTestnet } from '@/lib/contract';
 import { formatAddress } from '@/lib/utils';
 
 interface TokenPolicyEntry {
@@ -25,6 +24,7 @@ export function TokenPolicyPanel() {
   const { writeContractAsync, isPending } = useWriteContract();
 
   const [policies, setPolicies] = useState<TokenPolicyEntry[]>([]);
+  const [policiesLoading, setPoliciesLoading] = useState(true);
   const [newToken, setNewToken] = useState('');
   const [newLimit, setNewLimit] = useState('');
   const [txStatus, setTxStatus] = useState<string | null>(null);
@@ -34,12 +34,37 @@ export function TokenPolicyPanel() {
 
   const isGuardian = walletAddress?.toLowerCase() === contractData?.guardian?.toLowerCase();
 
+  // AgentWallet has no "list all policies" function — discover every token that's ever
+  // had one via the TokenPolicySet/TokenPolicyRevoked events it emits, then read current
+  // state for each. Without this, the panel only shows whatever's been manually looked up.
+  const fetchKnownPolicies = useCallback(async () => {
+    setPoliciesLoading(true);
+    try {
+      const res = await fetch('/api/token-policies', { cache: 'no-store' });
+      const json = await res.json();
+      const fetched: TokenPolicyEntry[] = json.policies ?? [];
+      setPolicies((prev) => {
+        const merged = new Map(prev.map((p) => [p.token.toLowerCase(), p]));
+        for (const policy of fetched) merged.set(policy.token.toLowerCase(), policy);
+        return [...merged.values()];
+      });
+    } catch {
+      // Non-fatal — manual lookup still works if the discovery scan fails.
+    } finally {
+      setPoliciesLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchKnownPolicies();
+  }, [fetchKnownPolicies]);
+
   const handleLookup = async () => {
     if (!lookupToken) return;
     setLookupLoading(true);
     try {
       const client = createPublicClient({
-        chain: sepolia,
+        chain: botChainTestnet,
         transport: fallback(RPC_URLS.map((url) => http(url))),
       });
       const result = await client.readContract({
@@ -85,6 +110,7 @@ export function TokenPolicyPanel() {
       setTxStatus('✓ Token policy set.');
       setNewToken('');
       setNewLimit('');
+      fetchKnownPolicies();
     } catch (err) {
       setTxStatus(`Error: ${String(err).slice(0, 80)}`);
     }
@@ -100,7 +126,7 @@ export function TokenPolicyPanel() {
         args: [token as `0x${string}`],
       });
       setTxStatus('✓ Policy revoked.');
-      setPolicies(prev => prev.filter(p => p.token !== token));
+      fetchKnownPolicies();
     } catch (err) {
       setTxStatus(`Error: ${String(err).slice(0, 80)}`);
     }
@@ -162,6 +188,16 @@ export function TokenPolicyPanel() {
         )}
 
         {/* Tracked policies */}
+        {policiesLoading && policies.length === 0 && (
+          <div className="text-text-muted text-xs font-mono">Scanning for token policies...</div>
+        )}
+
+        {!policiesLoading && policies.filter(p => p.enabled).length === 0 && (
+          <div className="text-text-muted text-xs font-mono flex items-center gap-2">
+            <span className="text-green">✓</span> No active token policies
+          </div>
+        )}
+
         {policies.length > 0 && (
           <div className="space-y-2">
             <p className="text-text-muted text-xs font-mono uppercase tracking-wider">Active Policies</p>
@@ -199,7 +235,7 @@ export function TokenPolicyPanel() {
               placeholder="0x..."
             />
             <Input
-              label="Daily Limit (ETH units)"
+              label="Daily Limit (BOT units)"
               value={newLimit}
               onChange={setNewLimit}
               placeholder="100.0"

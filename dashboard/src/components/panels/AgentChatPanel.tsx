@@ -117,8 +117,8 @@ export function AgentChatPanel() {
           const value = parseEther(pendingDirectTransfer.amount);
           addMessage({ role: 'status', content: 'Awaiting wallet confirmation...' });
           const hash = await sendTransactionAsync({ to: pendingDirectTransfer.to, value });
-          addMessage({ role: 'tool', content: 'Transaction submitted', toolName: 'direct_send_eth', txHash: hash });
-          addMessage({ role: 'agent', content: `Sent ${pendingDirectTransfer.amount} ETH from connected wallet ${connectedAddress} to ${pendingDirectTransfer.to}.` });
+          addMessage({ role: 'tool', content: 'Transaction submitted', toolName: 'direct_send_bot', txHash: hash });
+          addMessage({ role: 'agent', content: `Sent ${pendingDirectTransfer.amount} BOT from connected wallet ${connectedAddress} to ${pendingDirectTransfer.to}.` });
         } catch (error) {
           addMessage({ role: 'error', content: `Direct transfer failed: ${String(error)}` });
         } finally {
@@ -133,11 +133,11 @@ export function AgentChatPanel() {
         return;
       }
 
-      addMessage({ role: 'status', content: `Pending transfer: ${pendingDirectTransfer.amount} ETH to ${pendingDirectTransfer.to}. Type "confirm" to send or "cancel".` });
+      addMessage({ role: 'status', content: `Pending transfer: ${pendingDirectTransfer.amount} BOT to ${pendingDirectTransfer.to}. Type "confirm" to send or "cancel".` });
       return;
     }
 
-    const directEthTransfer = goal.match(/\b(?:transfer|send)\s+([0-9]+(?:\.[0-9]+)?)\s*eth\s+(?:to\s+)?(0x[a-fA-F0-9]{40})\b/i);
+    const directEthTransfer = goal.match(/\b(?:transfer|send)\s+([0-9]+(?:\.[0-9]+)?)\s*(?:eth|bot)\s+(?:to\s+)?(0x[a-fA-F0-9]{40})\b/i);
     if (directEthTransfer) {
       const [, amount, to] = directEthTransfer;
       if (!isAddress(to)) {
@@ -146,24 +146,24 @@ export function AgentChatPanel() {
       }
 
       setPendingDirectTransfer({ to: to as `0x${string}`, amount });
-      addMessage({ role: 'status', content: `Review transfer: send ${amount} ETH from ${connectedAddress} to ${to}. Type "confirm" to proceed or "cancel".` });
+      addMessage({ role: 'status', content: `Review transfer: send ${amount} BOT from ${connectedAddress} to ${to}. Type "confirm" to proceed or "cancel".` });
       return;
     }
 
     const addressInGoal = goal.match(/0x[a-fA-F0-9]{40}/);
-    const asksForBalance = /\b(?:check|get|read|show)?\s*(?:the\s+)?(?:eth\s+)?bal(?:ance)?\b/i.test(goal)
+    const asksForBalance = /\b(?:check|get|read|show)?\s*(?:the\s+)?(?:eth\s+|bot\s+)?bal(?:ance)?\b/i.test(goal)
       || /\bbalance\b/i.test(goal);
 
     if (addressInGoal && asksForBalance) {
       const target = addressInGoal[0] as `0x${string}`;
       const balance = await publicClient.getBalance({ address: target });
-      addMessage({ role: 'agent', content: `Address ${target} has ${formatEther(balance)} ETH on Sepolia.` });
+      addMessage({ role: 'agent', content: `Address ${target} has ${formatEther(balance)} BOT on BOT Chain.` });
       return;
     }
 
     if (asksForBalance) {
       const balance = await publicClient.getBalance({ address: connectedAddress });
-      addMessage({ role: 'agent', content: `Connected wallet ${connectedAddress} balance is ${formatEther(balance)} ETH on Sepolia.` });
+      addMessage({ role: 'agent', content: `Connected wallet ${connectedAddress} balance is ${formatEther(balance)} BOT on BOT Chain.` });
       return;
     }
 
@@ -176,17 +176,17 @@ export function AgentChatPanel() {
       addMessage({
         role: 'agent',
         content:
-          'Absolutely. In Direct mode I can:\n• Check your connected wallet balance\n• Check ETH balance of any address\n• Send ETH from your connected wallet (with confirm/cancel safety)\n\nTry: "send 0.001 ETH to 0x..."',
+          'Absolutely. In Direct mode I can:\n• Check your connected wallet balance\n• Check BOT balance of any address\n• Send BOT from your connected wallet (with confirm/cancel safety)\n\nTry: "send 0.001 BOT to 0x..."',
       });
       return;
     }
 
     if (conversational) {
-      addMessage({ role: 'agent', content: 'Hey! I can help with direct ETH sends and balance checks. Tell me what you want to do.' });
+      addMessage({ role: 'agent', content: 'Hey! I can help with direct BOT sends and balance checks. Tell me what you want to do.' });
       return;
     }
 
-    addMessage({ role: 'agent', content: 'I can help with direct wallet actions. Try: "send <amount> ETH to 0x...", "my ETH bal", or "bal of 0x...". Sends always require "confirm" before execution.' });
+    addMessage({ role: 'agent', content: 'I can help with direct wallet actions. Try: "send <amount> BOT to 0x...", "my BOT bal", or "bal of 0x...". Sends always require "confirm" before execution.' });
   };
 
   const sendGoal = async () => {
@@ -373,7 +373,7 @@ export function AgentChatPanel() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={streaming ? 'Processing...' : mode === 'agentwallet' ? 'Enter a goal... (e.g. "send 0.001 ETH to 0x...")' : 'Direct mode: "send 0.001 ETH to 0x..."'}
+            placeholder={streaming ? 'Processing...' : mode === 'agentwallet' ? 'Enter a goal... (e.g. "send 0.001 BOT to 0x...")' : 'Direct mode: "send 0.001 BOT to 0x..."'}
             disabled={streaming}
             className="flex-1 bg-transparent border-none outline-none text-xs font-mono text-text-primary placeholder-text-muted disabled:opacity-50"
           />

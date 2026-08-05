@@ -97,7 +97,7 @@ export function TransactionHistoryPanel() {
                     </td>
                     <td className="px-4 py-2">
                       {event.value !== '0' ? (
-                        <span className="text-green">{formatETH(BigInt(event.value))} ETH</span>
+                        <span className="text-green">{formatETH(BigInt(event.value))} BOT</span>
                       ) : (
                         <span className="text-text-muted">0</span>
                       )}
@@ -105,7 +105,7 @@ export function TransactionHistoryPanel() {
                     <td className="px-4 py-2">
                       {event.action === 'Executed' ? (
                         event.selector === '0x00000000' ? (
-                          <Badge variant="blue">ETH Transfer</Badge>
+                          <Badge variant="blue">BOT Transfer</Badge>
                         ) : (
                           <span className="text-text-secondary">{formatSelector(event.selector)}</span>
                         )

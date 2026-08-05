@@ -192,7 +192,7 @@ export function WhitelistManagerPanel() {
             </div>
             {queueCheckAmount && (
               <Input
-                label="Max Amount (ETH)"
+                label="Max Amount (BOT)"
                 value={queueMaxAmount}
                 onChange={setQueueMaxAmount}
                 placeholder="0.01"

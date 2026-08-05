@@ -173,7 +173,7 @@ export function GuardianControlPanel() {
         {section === 'withdraw' && (
           <div className="border border-orange/30 bg-orange/5 rounded p-3 space-y-3 animate-slide-in">
             <Input label="Recipient Address" value={withdrawTo} onChange={setWithdrawTo} placeholder="0x..." />
-            <Input label="Amount (ETH)" value={withdrawAmount} onChange={setWithdrawAmount} placeholder="0.01" type="number" />
+            <Input label="Amount (BOT)" value={withdrawAmount} onChange={setWithdrawAmount} placeholder="0.01" type="number" />
             <Button
               variant="warn"
               size="sm"
@@ -224,8 +224,8 @@ export function GuardianControlPanel() {
         {section === 'limits' && (
           <div className="border border-border rounded p-3 space-y-3 animate-slide-in">
             <p className="text-text-muted text-xs font-mono">To increase limits, a 10-minute timelock applies</p>
-            <Input label="New Per-TX Limit (ETH)" value={newTxLimit} onChange={setNewTxLimit} placeholder="0.01" type="number" />
-            <Input label="New Daily Limit (ETH)" value={newDailyLimit} onChange={setNewDailyLimit} placeholder="0.1" type="number" />
+            <Input label="New Per-TX Limit (BOT)" value={newTxLimit} onChange={setNewTxLimit} placeholder="0.01" type="number" />
+            <Input label="New Daily Limit (BOT)" value={newDailyLimit} onChange={setNewDailyLimit} placeholder="0.1" type="number" />
             <div className="flex gap-2 flex-wrap">
               <Button
                 variant="warn"

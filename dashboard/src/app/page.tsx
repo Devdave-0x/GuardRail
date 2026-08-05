@@ -40,17 +40,17 @@ export default function DashboardPage() {
           <span>AgentWallet v1</span>
           <span className="text-border-bright">|</span>
           <a
-            href="https://sepolia.etherscan.io/address/0xE49A6044D47De19504B73aA36F31899843B05259"
+            href="https://scan.bohr.life/address/0x3d157f7df3551b1423cb804f818792a978a9635c"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-blue-bright transition-colors"
           >
-            0xE49A...5259 ↗
+            0x3d15...635c ↗
           </a>
         </div>
         <div className="flex items-center gap-2">
           <span className="w-1.5 h-1.5 rounded-full bg-green animate-pulse" />
-          <span>Sepolia Testnet</span>
+          <span>BOT Chain Testnet</span>
         </div>
       </div>
     </div>

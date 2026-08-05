@@ -1,7 +1,22 @@
-export const CONTRACT_ADDRESS = (process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
-  '0xE49A6044D47De19504B73aA36F31899843B05259') as `0x${string}`;
+import { defineChain } from 'viem';
 
-export const CHAIN_ID = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || '11155111');
+export const botChainTestnet = defineChain({
+  id: 968,
+  name: 'BOT Chain Testnet',
+  nativeCurrency: { name: 'BOT', symbol: 'BOT', decimals: 18 },
+  rpcUrls: {
+    default: { http: ['https://rpc.bohr.life'] },
+  },
+  blockExplorers: {
+    default: { name: 'BOT Chain Explorer', url: 'https://scan.bohr.life' },
+  },
+  testnet: true,
+});
+
+export const CONTRACT_ADDRESS = (process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
+  '0x3d157f7df3551b1423cb804f818792a978a9635c') as `0x${string}`;
+
+export const CHAIN_ID = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || '968');
 
 const splitRpcUrls = (value?: string) =>
   (value || '')
@@ -25,8 +40,7 @@ export const RPC_URLS = Array.from(
     ALCHEMY_RPC_URL,
     ANKR_RPC_URL,
     QUICKNODE_RPC_URL,
-    'https://eth-sepolia.g.alchemy.com/v2/demo',
-    'https://sepolia.drpc.org',
+    'https://rpc.bohr.life',
   ].filter(Boolean))
 );
 

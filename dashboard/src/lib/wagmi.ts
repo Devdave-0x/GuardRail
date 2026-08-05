@@ -9,8 +9,7 @@ import {
   walletConnectWallet,
 } from '@rainbow-me/rainbowkit/wallets';
 import { fallback, http } from 'viem';
-import { sepolia } from 'wagmi/chains';
-import { RPC_URLS } from './contract';
+import { RPC_URLS, botChainTestnet } from './contract';
 
 const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID?.trim();
 const hasWalletConnectProjectId = Boolean(walletConnectProjectId && !/^0+$/.test(walletConnectProjectId));
@@ -25,9 +24,9 @@ const popularWallets = [
 export const wagmiConfig = getDefaultConfig({
   appName: 'ETH Agent Dashboard',
   projectId: walletConnectProjectId || 'eth-agent-local-dev',
-  chains: [sepolia],
+  chains: [botChainTestnet],
   transports: {
-    [sepolia.id]: fallback(RPC_URLS.map((url) => http(url))),
+    [botChainTestnet.id]: fallback(RPC_URLS.map((url) => http(url))),
   },
   wallets: [
     {
