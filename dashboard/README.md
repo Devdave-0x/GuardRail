@@ -31,8 +31,8 @@ npm install
 
 # 2. Configure environment
 cp .env.local.example .env.local
-# Edit .env.local:
-#   NEXT_PUBLIC_ALCHEMY_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/YOUR_KEY
+# Defaults already point at the live BOT Chain deployment above.
+# Override NEXT_PUBLIC_RPC_URL if you want to use a different RPC provider.
 
 # 3. Run dev server
 npm run dev
