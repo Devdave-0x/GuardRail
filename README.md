@@ -1,4 +1,4 @@
-# ETH Agent
+# GuardRail
 
 > Autonomous Ethereum AI agent framework for EVM chains.
 > Like Starknet Agent Kit, but for Ethereum.
