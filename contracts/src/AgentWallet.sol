@@ -52,7 +52,7 @@ contract AgentWallet is ReentrancyGuard {
   mapping(address => mapping(bytes4 => CallPolicy)) private _callPolicy;
 
   // ── Timelocked queues ──────────────────────────────────────────────────
-  uint256 public constant TIMELOCK = 10 minutes;
+  uint256 public constant TIMELOCK = 1 minutes;
 
   struct PendingLimitChange {
     uint256 txLimit;
