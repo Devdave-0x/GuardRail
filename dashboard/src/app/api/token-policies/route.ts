@@ -5,12 +5,16 @@ import { CONTRACT_ADDRESS, RPC_URLS, AGENT_WALLET_ABI, botChainTestnet } from '@
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-// AgentWallet has no on-chain function to list every token that's ever had a policy —
-// the only way to discover them is to scan the events it emits when one is set/revoked,
-// then read current state for each. Falls back to the deploy block if not overridden.
+/*
+ * AgentWallet has no on-chain function to list every token that's ever had a policy.
+ * The only way to discover them is to scan the events it emits when one is set/revoked,
+ * then read current state for each. Falls back to the deploy block if not overridden.
+ */
 const DEPLOY_BLOCK = BigInt(process.env.NEXT_PUBLIC_DEPLOY_BLOCK || '18842904');
 
-const TOKEN_POLICY_SET_EVENT = parseAbiItem('event TokenPolicySet(address indexed token, uint256 dailyLimit)');
+const TOKEN_POLICY_SET_EVENT = parseAbiItem(
+  'event TokenPolicySet(address indexed token, uint256 dailyLimit)',
+);
 const TOKEN_POLICY_REVOKED_EVENT = parseAbiItem('event TokenPolicyRevoked(address indexed token)');
 
 function errorMessage(error: unknown) {
@@ -20,10 +24,15 @@ function errorMessage(error: unknown) {
 export async function GET() {
   try {
     const clients = RPC_URLS.map((url) =>
-      createPublicClient({ chain: botChainTestnet, transport: http(url, { timeout: 12_000, retryCount: 1 }) })
+      createPublicClient({
+        chain: botChainTestnet,
+        transport: http(url, { timeout: 12_000, retryCount: 1 }),
+      }),
     );
 
-    const withFallback = async <T,>(fn: (client: (typeof clients)[number]) => Promise<T>): Promise<T> => {
+    const withFallback = async <T>(
+      fn: (client: (typeof clients)[number]) => Promise<T>,
+    ): Promise<T> => {
       let lastError: unknown;
       for (const client of clients) {
         try {
@@ -39,10 +48,20 @@ export async function GET() {
 
     const [setLogs, revokedLogs] = await Promise.all([
       withFallback((client) =>
-        client.getLogs({ address: CONTRACT_ADDRESS, event: TOKEN_POLICY_SET_EVENT, fromBlock: DEPLOY_BLOCK, toBlock: latestBlock })
+        client.getLogs({
+          address: CONTRACT_ADDRESS,
+          event: TOKEN_POLICY_SET_EVENT,
+          fromBlock: DEPLOY_BLOCK,
+          toBlock: latestBlock,
+        }),
       ),
       withFallback((client) =>
-        client.getLogs({ address: CONTRACT_ADDRESS, event: TOKEN_POLICY_REVOKED_EVENT, fromBlock: DEPLOY_BLOCK, toBlock: latestBlock })
+        client.getLogs({
+          address: CONTRACT_ADDRESS,
+          event: TOKEN_POLICY_REVOKED_EVENT,
+          fromBlock: DEPLOY_BLOCK,
+          toBlock: latestBlock,
+        }),
       ),
     ]);
 
@@ -62,7 +81,7 @@ export async function GET() {
             abi: AGENT_WALLET_ABI,
             functionName: 'tokenPolicy',
             args: [token as `0x${string}`],
-          })
+          }),
         )) as [bigint, bigint, bigint, boolean];
         const [dailyLimit, dailySpent, lastReset, enabled] = result;
         return {
@@ -72,7 +91,7 @@ export async function GET() {
           lastReset: lastReset.toString(),
           enabled,
         };
-      })
+      }),
     );
 
     return NextResponse.json({ policies, latestBlock: latestBlock.toString() });

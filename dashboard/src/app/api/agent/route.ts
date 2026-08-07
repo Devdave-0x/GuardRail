@@ -93,7 +93,10 @@ export async function POST(req: NextRequest) {
             });
 
             child.on('error', (error) => {
-              sendChunk({ type: 'error', content: `Failed to start runtime process: ${error.message}` });
+              sendChunk({
+                type: 'error',
+                content: `Failed to start runtime process: ${error.message}`,
+              });
               resolve();
             });
 

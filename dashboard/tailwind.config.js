@@ -56,8 +56,8 @@ module.exports = {
       },
       animation: {
         'pulse-green': 'pulse-green 2s ease-in-out infinite',
-        'scan': 'scan 8s linear infinite',
-        'blink': 'blink 1.2s step-end infinite',
+        scan: 'scan 8s linear infinite',
+        blink: 'blink 1.2s step-end infinite',
         'slide-in': 'slide-in 0.3s ease-out',
         'fade-in': 'fade-in 0.4s ease-out',
       },
@@ -66,11 +66,11 @@ module.exports = {
           '0%, 100%': { boxShadow: '0 0 0px rgba(0,255,136,0)' },
           '50%': { boxShadow: '0 0 12px rgba(0,255,136,0.4)' },
         },
-        'scan': {
+        scan: {
           '0%': { backgroundPosition: '0 -100%' },
           '100%': { backgroundPosition: '0 200%' },
         },
-        'blink': {
+        blink: {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0' },
         },

@@ -1,0 +1,134 @@
+{
+  // === Editor core
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "never"
+  },
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "editor.rulers": [80],
+  "editor.wordWrap": "off",
+  "editor.linkedEditing": true,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active",
+  "editor.inlayHints.enabled": "on",
+  "editor.suggest.preview": true,
+  "editor.acceptSuggestionOnEnter": "smart",
+  "editor.quickSuggestionsDelay": 100,
+  "editor.stickyScroll.enabled": true,
+
+  // === Files
+  "files.eol": "\n",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.exclude": {
+    "**/.git": true,
+    "**/.next": true,
+    "**/node_modules": true,
+    "**/dist": true
+  },
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.next/**": true,
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/contracts/lib/**": true
+  },
+
+  // === Search
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.next": true,
+    "**/dist": true,
+    "**/package-lock.json": true,
+    "**/contracts/lib": true,
+    "**/contracts/out": true,
+    "packages/create-eth-agent/templates": true
+  },
+
+  // === TypeScript
+  "js/ts.tsdk": "node_modules/typescript/lib",
+  "js/ts.enablePromptUseWorkspaceTsdk": true,
+  "js/ts.preferences.importModuleSpecifier": "non-relative",
+  "js/ts.preferences.quoteStyle": "single",
+  "js/ts.updateImportsOnFileMove.enabled": "always",
+  "js/ts.inlayHints.parameterNames.enabled": "literals",
+  "js/ts.inlayHints.variableTypes.enabled": false,
+  "js/ts.inlayHints.functionLikeReturnTypes.enabled": false,
+
+  // === ESLint
+  "eslint.enable": true,
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "eslint.workingDirectories": [{ "mode": "auto" }],
+  "eslint.run": "onSave",
+
+  // === Prettier
+  "prettier.requireConfig": true,
+  "prettier.configPath": ".prettierrc",
+  "[javascript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[javascriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[typescript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[typescriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[json]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[jsonc]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[css]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.wordWrap": "on"
+  },
+
+  // === Solidity
+  "[solidity]": { "editor.defaultFormatter": "NomicFoundation.hardhat-solidity" },
+
+  // === Tailwind CSS
+  "tailwindCSS.experimental.classRegex": [
+    ["cn\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"],
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+  ],
+  "tailwindCSS.includeLanguages": {
+    "typescript": "javascript",
+    "typescriptreact": "javascript"
+  },
+  "tailwindCSS.validate": true,
+
+  // === Terminal
+  "terminal.integrated.defaultProfile.linux": "bash",
+
+  // === Git
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+
+  // === Misc
+  "emmet.includeLanguages": { "typescriptreact": "html" },
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "*.ts": "${capture}.js, ${capture}.d.ts",
+    "*.tsx": "${capture}.module.css",
+    "package.json": "package-lock.json, .npmrc, .nvmrc, .node-version",
+    "next.config.*": "next-env.d.ts",
+    "tailwind.config.*": "postcss.config.*",
+    ".eslintrc.*": ".eslintignore, .prettierrc, .prettierignore, .editorconfig, .lintstagedrc*"
+  },
+  "cSpell.words": [
+    "AgentWallet",
+    "guardrail",
+    "permissionless",
+    "Sepolia",
+    "viem",
+    "wagmi",
+    "rainbowkit",
+    "eth",
+    "erc",
+    "calldata",
+    "multicall",
+    "nodenext",
+    "tsx"
+  ]
+}

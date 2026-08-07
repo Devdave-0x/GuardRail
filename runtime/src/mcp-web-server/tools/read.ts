@@ -1,33 +1,82 @@
-import { formatEther } from "viem"
-import { walletReadClient, AGENT_WALLET_ABI, AGENT_WALLET_ADDRESS } from "./shared"
-import { getChain } from "../../chain"
-import type { WalletState } from "../types"
+import { formatEther } from 'viem';
+import { walletReadClient, AGENT_WALLET_ABI, AGENT_WALLET_ADDRESS } from './shared.js';
+import { getChain } from '../../chain.js';
+import type { WalletState } from '../types.js';
 
-const ONE_DAY_SECONDS = 86400n
+const ONE_DAY_SECONDS = 86400n;
 
-// Mirrors AgentWallet's own lazy daily-reset condition (see runtime/src/executor.ts) so
-// this second implementation doesn't quote a stale ethDailySpent from before the next reset.
+/*
+ * Mirrors AgentWallet's own lazy daily-reset condition (see runtime/src/executor.ts) so
+ * this second implementation doesn't quote a stale ethDailySpent from before the next reset.
+ */
 function effectiveDailySpent(dailySpent: bigint, lastReset: bigint, nowSeconds: bigint): bigint {
-  return nowSeconds >= lastReset + ONE_DAY_SECONDS ? 0n : dailySpent
+  return nowSeconds >= lastReset + ONE_DAY_SECONDS ? 0n : dailySpent;
 }
 
 export async function readState(): Promise<WalletState> {
   try {
-    const [balanceWei, agent, guardian, paused, ethTxLimit, ethDailyLimit, ethDailySpentRaw, ethLastReset, pendingLimitChange, pendingCall] = await Promise.all([
+    const [
+      balanceWei,
+      agent,
+      guardian,
+      paused,
+      ethTxLimit,
+      ethDailyLimit,
+      ethDailySpentRaw,
+      ethLastReset,
+      pendingLimitChange,
+      pendingCall,
+    ] = await Promise.all([
       walletReadClient.getBalance({ address: AGENT_WALLET_ADDRESS }),
-      walletReadClient.readContract({ address: AGENT_WALLET_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "agent" }),
-      walletReadClient.readContract({ address: AGENT_WALLET_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "guardian" }),
-      walletReadClient.readContract({ address: AGENT_WALLET_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "paused" }),
-      walletReadClient.readContract({ address: AGENT_WALLET_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "ethTxLimit" }),
-      walletReadClient.readContract({ address: AGENT_WALLET_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "ethDailyLimit" }),
-      walletReadClient.readContract({ address: AGENT_WALLET_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "ethDailySpent" }),
-      walletReadClient.readContract({ address: AGENT_WALLET_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "ethLastReset" }),
-      walletReadClient.readContract({ address: AGENT_WALLET_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "pendingLimitChange" }),
-      walletReadClient.readContract({ address: AGENT_WALLET_ADDRESS, abi: AGENT_WALLET_ABI, functionName: "pendingCall" })
-    ])
+      walletReadClient.readContract({
+        address: AGENT_WALLET_ADDRESS,
+        abi: AGENT_WALLET_ABI,
+        functionName: 'agent',
+      }),
+      walletReadClient.readContract({
+        address: AGENT_WALLET_ADDRESS,
+        abi: AGENT_WALLET_ABI,
+        functionName: 'guardian',
+      }),
+      walletReadClient.readContract({
+        address: AGENT_WALLET_ADDRESS,
+        abi: AGENT_WALLET_ABI,
+        functionName: 'paused',
+      }),
+      walletReadClient.readContract({
+        address: AGENT_WALLET_ADDRESS,
+        abi: AGENT_WALLET_ABI,
+        functionName: 'ethTxLimit',
+      }),
+      walletReadClient.readContract({
+        address: AGENT_WALLET_ADDRESS,
+        abi: AGENT_WALLET_ABI,
+        functionName: 'ethDailyLimit',
+      }),
+      walletReadClient.readContract({
+        address: AGENT_WALLET_ADDRESS,
+        abi: AGENT_WALLET_ABI,
+        functionName: 'ethDailySpent',
+      }),
+      walletReadClient.readContract({
+        address: AGENT_WALLET_ADDRESS,
+        abi: AGENT_WALLET_ABI,
+        functionName: 'ethLastReset',
+      }),
+      walletReadClient.readContract({
+        address: AGENT_WALLET_ADDRESS,
+        abi: AGENT_WALLET_ABI,
+        functionName: 'pendingLimitChange',
+      }),
+      walletReadClient.readContract({
+        address: AGENT_WALLET_ADDRESS,
+        abi: AGENT_WALLET_ABI,
+        functionName: 'pendingCall',
+      }),
+    ]);
 
-    const nowSeconds = BigInt(Math.floor(Date.now() / 1000))
-    const ethDailySpent = effectiveDailySpent(ethDailySpentRaw, ethLastReset, nowSeconds)
+    const nowSeconds = BigInt(Math.floor(Date.now() / 1000));
+    const ethDailySpent = effectiveDailySpent(ethDailySpentRaw, ethLastReset, nowSeconds);
 
     return {
       contractAddress: AGENT_WALLET_ADDRESS,
@@ -43,7 +92,7 @@ export async function readState(): Promise<WalletState> {
         txLimit: pendingLimitChange[0],
         dailyLimit: pendingLimitChange[1],
         unlockTime: pendingLimitChange[2],
-        queued: pendingLimitChange[3]
+        queued: pendingLimitChange[3],
       },
       pendingCall: {
         target: pendingCall[0],
@@ -52,12 +101,12 @@ export async function readState(): Promise<WalletState> {
         checkAmount: pendingCall[3],
         maxAmount: pendingCall[4],
         unlockTime: pendingCall[5],
-        queued: pendingCall[6]
-      }
-    }
+        queued: pendingCall[6],
+      },
+    };
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error)
-    throw new Error(`Failed to read wallet state: ${message}`)
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to read wallet state: ${message}`);
   }
 }
 
@@ -73,12 +122,12 @@ export function serializeWalletState(state: WalletState): Record<string, unknown
       ...state.pendingLimitChange,
       txLimit: state.pendingLimitChange.txLimit.toString(),
       dailyLimit: state.pendingLimitChange.dailyLimit.toString(),
-      unlockTime: state.pendingLimitChange.unlockTime.toString()
+      unlockTime: state.pendingLimitChange.unlockTime.toString(),
     },
     pendingCall: {
       ...state.pendingCall,
       maxAmount: state.pendingCall.maxAmount.toString(),
-      unlockTime: state.pendingCall.unlockTime.toString()
-    }
-  }
+      unlockTime: state.pendingCall.unlockTime.toString(),
+    },
+  };
 }

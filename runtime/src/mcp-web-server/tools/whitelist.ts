@@ -1,15 +1,18 @@
-import { isAddress, type Hex } from "viem"
-import type { Address, WhitelistPolicyResult } from "../types"
-import { getStaticPolicy } from "../guard/policy"
+import { isAddress, type Hex } from 'viem';
+import type { Address, WhitelistPolicyResult } from '../types.js';
+import { getStaticPolicy } from '../guard/policy.js';
 
-export async function isWhitelisted(target: Address, selector: Hex): Promise<WhitelistPolicyResult> {
+export async function isWhitelisted(
+  target: Address,
+  selector: Hex,
+): Promise<WhitelistPolicyResult> {
   try {
     if (!isAddress(target)) {
-      return { allowed: false, checkRecipient: false, checkAmount: false, maxAmount: 0n }
+      return { allowed: false, checkRecipient: false, checkAmount: false, maxAmount: 0n };
     }
-    return getStaticPolicy(target, selector)
+    return getStaticPolicy(target, selector);
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error)
-    throw new Error(`Failed to evaluate whitelist policy: ${message}`)
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to evaluate whitelist policy: ${message}`);
   }
 }

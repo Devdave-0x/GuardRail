@@ -15,7 +15,15 @@ interface PanelProps {
   loading?: boolean;
 }
 
-export function Panel({ title, subtitle, children, className, status, actions, loading }: PanelProps) {
+export function Panel({
+  title,
+  subtitle,
+  children,
+  className,
+  status,
+  actions,
+  loading,
+}: PanelProps) {
   const statusColor = {
     ok: 'border-green/40',
     warn: 'border-orange/60',
@@ -24,24 +32,37 @@ export function Panel({ title, subtitle, children, className, status, actions, l
   }[status || 'ok'];
 
   return (
-    <div className={cn(
-      'relative bg-bg-panel border rounded-lg overflow-hidden',
-      statusColor,
-      className
-    )}>
+    <div
+      className={cn(
+        'relative overflow-hidden rounded-lg border bg-bg-panel',
+        statusColor,
+        className,
+      )}
+    >
       {/* Scanline effect */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.015]"
-        style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, #00ff88 2px, #00ff88 3px)' }} />
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.015]"
+        style={{
+          backgroundImage:
+            'repeating-linear-gradient(0deg, transparent, transparent 2px, #00ff88 2px, #00ff88 3px)',
+        }}
+      />
 
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+      <div className="flex items-center justify-between border-b border-border px-4 py-3">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-green text-xs font-mono font-bold tracking-wider uppercase">{title}</span>
-            {status === 'error' && <span className="w-1.5 h-1.5 rounded-full bg-red animate-pulse" />}
-            {status === 'warn' && <span className="w-1.5 h-1.5 rounded-full bg-orange animate-pulse" />}
+            <span className="font-mono text-xs font-bold uppercase tracking-wider text-green">
+              {title}
+            </span>
+            {status === 'error' && (
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red" />
+            )}
+            {status === 'warn' && (
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-orange" />
+            )}
           </div>
-          {subtitle && <p className="text-text-muted text-xs mt-0.5 font-mono">{subtitle}</p>}
+          {subtitle && <p className="mt-0.5 font-mono text-xs text-text-muted">{subtitle}</p>}
         </div>
         {actions && <div className="flex items-center gap-2">{actions}</div>}
       </div>
@@ -50,12 +71,14 @@ export function Panel({ title, subtitle, children, className, status, actions, l
       <div className="relative">
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="flex items-center gap-2 text-text-secondary text-xs font-mono">
+            <div className="flex items-center gap-2 font-mono text-xs text-text-secondary">
               <span className="animate-blink text-green">█</span>
               <span>LOADING...</span>
             </div>
           </div>
-        ) : children}
+        ) : (
+          children
+        )}
       </div>
     </div>
   );
@@ -80,7 +103,7 @@ export function Stat({ label, value, dim, color = 'default' }: StatProps) {
 
   return (
     <div className={cn('space-y-1', dim && 'opacity-60')}>
-      <p className="text-text-muted text-xs font-mono uppercase tracking-wider">{label}</p>
+      <p className="font-mono text-xs uppercase tracking-wider text-text-muted">{label}</p>
       <p className={cn('font-mono text-sm font-bold', valueColor)}>{value}</p>
     </div>
   );
@@ -94,7 +117,12 @@ interface AddressDisplayProps {
   className?: string;
 }
 
-export function AddressDisplay({ address, label, etherscan = true, className }: AddressDisplayProps) {
+export function AddressDisplay({
+  address,
+  label,
+  etherscan = true,
+  className,
+}: AddressDisplayProps) {
   const [copied, setCopied] = useState(false);
 
   const copy = async () => {
@@ -104,16 +132,20 @@ export function AddressDisplay({ address, label, etherscan = true, className }: 
   };
 
   return (
-    <div className={cn('flex items-center gap-2 group', className)}>
-      {label && <span className="text-text-muted text-xs font-mono">{label}:</span>}
-      <span className="text-text-primary text-xs font-mono">{formatAddress(address)}</span>
-      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button onClick={copy} className="text-text-muted hover:text-green transition-colors p-0.5">
+    <div className={cn('group flex items-center gap-2', className)}>
+      {label && <span className="font-mono text-xs text-text-muted">{label}:</span>}
+      <span className="font-mono text-xs text-text-primary">{formatAddress(address)}</span>
+      <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+        <button onClick={copy} className="p-0.5 text-text-muted transition-colors hover:text-green">
           {copied ? <Check size={11} /> : <Copy size={11} />}
         </button>
         {etherscan && (
-          <a href={getEtherscanLink(address, 'address')} target="_blank" rel="noopener noreferrer"
-            className="text-text-muted hover:text-blue-bright transition-colors p-0.5">
+          <a
+            href={getEtherscanLink(address, 'address')}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-0.5 text-text-muted transition-colors hover:text-blue-bright"
+          >
             <ExternalLink size={11} />
           </a>
         )}
@@ -147,8 +179,13 @@ export function Badge({ children, variant = 'green', pulse }: BadgeProps) {
   }[variant];
 
   return (
-    <span className={cn('inline-flex items-center gap-1.5 px-2 py-0.5 rounded border text-xs font-mono font-bold tracking-wider uppercase', styles)}>
-      {pulse && <span className={cn('w-1.5 h-1.5 rounded-full animate-pulse', pulseColor)} />}
+    <span
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded border px-2 py-0.5 font-mono text-xs font-bold uppercase tracking-wider',
+        styles,
+      )}
+    >
+      {pulse && <span className={cn('h-1.5 w-1.5 animate-pulse rounded-full', pulseColor)} />}
       {children}
     </span>
   );
@@ -163,23 +200,29 @@ interface ProgressBarProps {
   danger?: number;
 }
 
-export function ProgressBar({ value, label, showPercent = true, warn = 70, danger = 90 }: ProgressBarProps) {
+export function ProgressBar({
+  value,
+  label,
+  showPercent = true,
+  warn = 70,
+  danger = 90,
+}: ProgressBarProps) {
   const clamped = Math.min(100, Math.max(0, value));
   const color = clamped >= danger ? '#ff3333' : clamped >= warn ? '#ff6b35' : '#00ff88';
 
   return (
     <div className="space-y-1">
       {(label || showPercent) && (
-        <div className="flex justify-between items-center">
-          {label && <span className="text-xs text-text-muted font-mono">{label}</span>}
+        <div className="flex items-center justify-between">
+          {label && <span className="font-mono text-xs text-text-muted">{label}</span>}
           {showPercent && (
-            <span className="text-xs font-mono font-bold" style={{ color }}>
+            <span className="font-mono text-xs font-bold" style={{ color }}>
               {clamped.toFixed(1)}%
             </span>
           )}
         </div>
       )}
-      <div className="h-1.5 bg-bg-elevated rounded-full overflow-hidden border border-border">
+      <div className="h-1.5 overflow-hidden rounded-full border border-border bg-bg-elevated">
         <div
           className="h-full rounded-full transition-all duration-500"
           style={{ width: `${clamped}%`, backgroundColor: color, boxShadow: `0 0 6px ${color}60` }}
@@ -201,14 +244,26 @@ interface ButtonProps {
   type?: 'button' | 'submit';
 }
 
-export function Button({ children, onClick, variant = 'ghost', disabled, loading, size = 'md', className, type = 'button' }: ButtonProps) {
-  const base = 'font-mono font-bold tracking-wider uppercase transition-all duration-150 rounded border disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2';
+export function Button({
+  children,
+  onClick,
+  variant = 'ghost',
+  disabled,
+  loading,
+  size = 'md',
+  className,
+  type = 'button',
+}: ButtonProps) {
+  const base =
+    'font-mono font-bold tracking-wider uppercase transition-all duration-150 rounded border disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2';
   const sizes = { sm: 'px-3 py-1.5 text-xs', md: 'px-4 py-2 text-xs' };
   const variants = {
-    primary: 'bg-green/10 border-green/50 text-green hover:bg-green/20 hover:border-green hover:shadow-green-sm',
+    primary:
+      'bg-green/10 border-green/50 text-green hover:bg-green/20 hover:border-green hover:shadow-green-sm',
     danger: 'bg-red/10 border-red/50 text-red hover:bg-red/20 hover:border-red',
     warn: 'bg-orange/10 border-orange/50 text-orange hover:bg-orange/20 hover:border-orange',
-    ghost: 'bg-transparent border-border text-text-secondary hover:border-border-bright hover:text-text-primary',
+    ghost:
+      'bg-transparent border-border text-text-secondary hover:border-border-bright hover:text-text-primary',
   };
 
   return (
@@ -218,7 +273,13 @@ export function Button({ children, onClick, variant = 'ghost', disabled, loading
       disabled={disabled || loading}
       className={cn(base, sizes[size], variants[variant], className)}
     >
-      {loading ? <><span className="animate-blink">█</span> WAIT...</> : children}
+      {loading ? (
+        <>
+          <span className="animate-blink">█</span> WAIT...
+        </>
+      ) : (
+        children
+      )}
     </button>
   );
 }
@@ -233,16 +294,27 @@ interface InputProps {
   type?: string;
 }
 
-export function Input({ value, onChange, placeholder, label, className, type = 'text' }: InputProps) {
+export function Input({
+  value,
+  onChange,
+  placeholder,
+  label,
+  className,
+  type = 'text',
+}: InputProps) {
   return (
     <div className={cn('space-y-1', className)}>
-      {label && <label className="text-xs text-text-muted font-mono uppercase tracking-wider">{label}</label>}
+      {label && (
+        <label className="font-mono text-xs uppercase tracking-wider text-text-muted">
+          {label}
+        </label>
+      )}
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-bg-elevated border border-border rounded px-3 py-2 text-xs font-mono text-text-primary placeholder-text-muted focus:outline-none focus:border-green/50 focus:bg-bg-hover transition-colors"
+        className="w-full rounded border border-border bg-bg-elevated px-3 py-2 font-mono text-xs text-text-primary placeholder-text-muted transition-colors focus:border-green/50 focus:bg-bg-hover focus:outline-none"
       />
     </div>
   );

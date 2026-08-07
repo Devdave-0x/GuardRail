@@ -4,15 +4,15 @@ Full-stack dashboard for the **AgentWallet** smart contract deployed on BOT Chai
 
 ## Contract Details
 
-| Field | Value |
-|---|---|
+| Field    | Value                                        |
+| -------- | -------------------------------------------- |
 | Contract | `0x2e86509caAdFbEbbe223E51ee7d70Fcb7ba60B01` |
-| Network | BOT Chain testnet (chainId: 968) |
-| RPC | `https://rpc.bohr.life` |
-| Explorer | `https://scan.bohr.life` |
+| Network  | BOT Chain testnet (chainId: 968)             |
+| RPC      | `https://rpc.bohr.life`                      |
+| Explorer | `https://scan.bohr.life`                     |
 | Guardian | `0xd9100b701e21fC578BFD937AC2DbDfb5bbD42572` |
 
-The same `AgentWallet` contract is also live on Sepolia (see the root [README](../README.md)'s Deployments table), but this dashboard only targets BOT Chain — it is not chain-switchable.
+The same `AgentWallet` contract is also live on Sepolia (see the root [README](../README.md)'s Deployments table), but this dashboard only targets BOT Chain and is not chain-switchable.
 
 ## Stack
 
@@ -80,17 +80,17 @@ src/
 
 ## Panels
 
-| Panel | Description |
-|---|---|
-| Overview | Contract address, BOT balance, roles, network, pause status |
-| Spending Limits | Per-TX + daily BOT limits, progress bar, pending limit changes |
-| Transaction History | Live `Executed` event feed from BOT Chain with explorer links |
-| Whitelist Manager | Queue/apply/cancel call policy with 1min timelock (this BOT Chain deployment; shortened from the standard 10min for faster demo iteration) |
-| Token Policy | ERC-20 daily limits, spend tracking, guardian set/revoke — auto-discovers known policies via `TokenPolicySet`/`TokenPolicyRevoked` event scan, not just manual lookup |
-| Agent Chat | Stream goals to runtime, see tool calls + tx hashes |
-| Guardian Control | Pause/unpause, withdraw, transfer roles, queue limit changes |
+| Panel               | Description                                                                                                                                                                  |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Overview            | Contract address, BOT balance, roles, network, pause status                                                                                                                  |
+| Spending Limits     | Per-TX + daily BOT limits, progress bar, pending limit changes                                                                                                               |
+| Transaction History | Live `Executed` event feed from BOT Chain with explorer links                                                                                                                |
+| Whitelist Manager   | Queue/apply/cancel call policy with 1min timelock (this BOT Chain deployment; shortened from the standard 10min for faster demo iteration)                                   |
+| Token Policy        | ERC-20 daily limits, spend tracking, guardian set/revoke, plus auto-discovery of known policies via `TokenPolicySet`/`TokenPolicyRevoked` event scan, not just manual lookup |
+| Agent Chat          | Stream goals to runtime, see tool calls + tx hashes                                                                                                                          |
+| Guardian Control    | Pause/unpause, withdraw, transfer roles, queue limit changes                                                                                                                 |
 
-Daily-spend figures account for `AgentWallet`'s lazy 24h reset (`ethLastReset`) — the panel shows what would actually be enforced right now, not a stale pre-reset value.
+Daily-spend figures account for `AgentWallet`'s lazy 24h reset (`ethLastReset`), so the panel shows what would actually be enforced right now, not a stale pre-reset value.
 
 ## Agent Runtime Integration
 
@@ -108,24 +108,24 @@ dashboard UI -> /api/agent -> runtime bridge process -> AgentWallet/MCP logic ->
 
 ## Design System
 
-| Token | Value |
-|---|---|
-| Background | `#0a0a0a` |
-| Panel | `#0f0f0f` |
-| Green accent | `#00ff88` |
-| Blue accent | `#3b82f6` |
-| Warning orange | `#ff6b35` |
-| Danger red | `#ff3333` |
-| Font | Space Grotesk (UI) + Geist Mono (code/mono) |
+| Token          | Value                                       |
+| -------------- | ------------------------------------------- |
+| Background     | `#0a0a0a`                                   |
+| Panel          | `#0f0f0f`                                   |
+| Green accent   | `#00ff88`                                   |
+| Blue accent    | `#3b82f6`                                   |
+| Warning orange | `#ff6b35`                                   |
+| Danger red     | `#ff3333`                                   |
+| Font           | Space Grotesk (UI) + Geist Mono (code/mono) |
 
 ## Chat Execution Modes
 
 The chat panel supports two modes:
 
-| Mode | Who signs | Source of funds | Policy enforcement |
-|---|---|---|---|
-| `Direct Wallet` | Connected browser wallet | Connected wallet address | None from `AgentWallet` contract |
-| `AgentWallet` | Runtime agent (`AGENT_PRIVATE_KEY`) | Deployed `AgentWallet` contract | Yes (whitelist + per-tx + daily limits + guardian controls) |
+| Mode            | Who signs                           | Source of funds                 | Policy enforcement                                          |
+| --------------- | ----------------------------------- | ------------------------------- | ----------------------------------------------------------- |
+| `Direct Wallet` | Connected browser wallet            | Connected wallet address        | None from `AgentWallet` contract                            |
+| `AgentWallet`   | Runtime agent (`AGENT_PRIVATE_KEY`) | Deployed `AgentWallet` contract | Yes (whitelist + per-tx + daily limits + guardian controls) |
 
 ### Notes
 
@@ -138,9 +138,10 @@ The chat panel supports two modes:
 
 ## Guardian Actions
 
-All guardian write operations use the connected wallet via wagmi — **no private keys** are ever handled by the dashboard.
+All guardian write operations use the connected wallet via wagmi, so **no private keys** are ever handled by the dashboard.
 
 Actions requiring wallet signing:
+
 - Pause / Unpause
 - Emergency withdraw
 - Transfer agent/guardian roles

@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 :root {
   --bg: #0a0a0a;
   --bg-panel: #0f0f0f;
@@ -33,7 +32,11 @@ html {
 body {
   background-color: var(--bg);
   color: var(--text-primary);
-  font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  font-family:
+    'Space Grotesk',
+    system-ui,
+    -apple-system,
+    sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -98,7 +101,8 @@ button {
   cursor: pointer;
 }
 
-input, textarea {
+input,
+textarea {
   font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
 }
 
@@ -108,9 +112,16 @@ input, textarea {
 
 /* CRT flicker - very subtle */
 @keyframes crt-flicker {
-  0%, 100% { opacity: 1; }
-  98% { opacity: 1; }
-  99% { opacity: 0.97; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  98% {
+    opacity: 1;
+  }
+  99% {
+    opacity: 0.97;
+  }
 }
 
 .crt {

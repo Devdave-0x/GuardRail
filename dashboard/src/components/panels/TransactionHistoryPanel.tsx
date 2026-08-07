@@ -22,7 +22,7 @@ export function TransactionHistoryPanel() {
           e.target.toLowerCase().includes(filter.toLowerCase()) ||
           e.selector.toLowerCase().includes(filter.toLowerCase()) ||
           e.action.toLowerCase().includes(filter.toLowerCase()) ||
-          e.txHash.toLowerCase().includes(filter.toLowerCase())
+          e.txHash.toLowerCase().includes(filter.toLowerCase()),
       )
     : events;
 
@@ -33,24 +33,27 @@ export function TransactionHistoryPanel() {
       status={error ? 'warn' : 'ok'}
       loading={loading}
       actions={
-        <button onClick={refetch} className="text-text-muted hover:text-green transition-colors p-1">
+        <button
+          onClick={refetch}
+          className="p-1 text-text-muted transition-colors hover:text-green"
+        >
           <RefreshCw size={12} />
         </button>
       }
     >
-      <div className="flex flex-col h-full">
+      <div className="flex h-full flex-col">
         {/* Filter bar */}
-        <div className="px-4 py-2 border-b border-border">
+        <div className="border-b border-border px-4 py-2">
           <input
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             placeholder="Filter by target, action, selector, or tx hash..."
-            className="w-full bg-bg-elevated border border-border rounded px-3 py-1.5 text-xs font-mono text-text-primary placeholder-text-muted focus:outline-none focus:border-green/50 transition-colors"
+            className="w-full rounded border border-border bg-bg-elevated px-3 py-1.5 font-mono text-xs text-text-primary placeholder-text-muted transition-colors focus:border-green/50 focus:outline-none"
           />
         </div>
 
         {error && (
-          <div className="px-4 py-2 text-red text-xs font-mono border-b border-border">
+          <div className="border-b border-border px-4 py-2 font-mono text-xs text-red">
             Error: {error}
           </div>
         )}
@@ -58,38 +61,51 @@ export function TransactionHistoryPanel() {
         {/* Table */}
         <div className="overflow-x-auto">
           {filtered.length === 0 ? (
-            <div className="px-4 py-8 text-center text-text-muted text-xs font-mono">
+            <div className="px-4 py-8 text-center font-mono text-xs text-text-muted">
               {loading ? 'Loading...' : 'No transactions found'}
             </div>
           ) : (
-            <table className="w-full text-xs font-mono">
+            <table className="w-full font-mono text-xs">
               <thead>
                 <tr className="border-b border-border">
-                  <th className="text-left px-4 py-2 text-text-muted uppercase tracking-wider font-normal">Time</th>
-                  <th className="text-left px-4 py-2 text-text-muted uppercase tracking-wider font-normal">Target</th>
-                  <th className="text-left px-4 py-2 text-text-muted uppercase tracking-wider font-normal">Value</th>
-                  <th className="text-left px-4 py-2 text-text-muted uppercase tracking-wider font-normal">Action</th>
-                  <th className="text-left px-4 py-2 text-text-muted uppercase tracking-wider font-normal">Tx</th>
+                  <th className="px-4 py-2 text-left font-normal uppercase tracking-wider text-text-muted">
+                    Time
+                  </th>
+                  <th className="px-4 py-2 text-left font-normal uppercase tracking-wider text-text-muted">
+                    Target
+                  </th>
+                  <th className="px-4 py-2 text-left font-normal uppercase tracking-wider text-text-muted">
+                    Value
+                  </th>
+                  <th className="px-4 py-2 text-left font-normal uppercase tracking-wider text-text-muted">
+                    Action
+                  </th>
+                  <th className="px-4 py-2 text-left font-normal uppercase tracking-wider text-text-muted">
+                    Tx
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map((event, i) => (
                   <tr
                     key={`${event.txHash}-${event.logIndex}`}
-                    className="border-b border-border/50 hover:bg-bg-elevated transition-colors animate-fade-in"
+                    className="animate-fade-in border-b border-border/50 transition-colors hover:bg-bg-elevated"
                     style={{ animationDelay: `${i * 30}ms` }}
                   >
-                    <td className="px-4 py-2 text-text-muted whitespace-nowrap" suppressHydrationWarning>
+                    <td
+                      className="whitespace-nowrap px-4 py-2 text-text-muted"
+                      suppressHydrationWarning
+                    >
                       {mounted && event.timestamp
                         ? formatDistanceToNow(new Date(event.timestamp * 1000), { addSuffix: true })
                         : `#${event.blockNumber}`}
                     </td>
-                    <td className="px-4 py-2 text-text-primary whitespace-nowrap">
+                    <td className="whitespace-nowrap px-4 py-2 text-text-primary">
                       <a
                         href={getEtherscanLink(event.target, 'address')}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="hover:text-blue-bright transition-colors flex items-center gap-1 group"
+                        className="group flex items-center gap-1 transition-colors hover:text-blue-bright"
                       >
                         {formatAddress(event.target)}
                         <ExternalLink size={9} className="opacity-0 group-hover:opacity-100" />
@@ -107,7 +123,9 @@ export function TransactionHistoryPanel() {
                         event.selector === '0x00000000' ? (
                           <Badge variant="blue">BOT Transfer</Badge>
                         ) : (
-                          <span className="text-text-secondary">{formatSelector(event.selector)}</span>
+                          <span className="text-text-secondary">
+                            {formatSelector(event.selector)}
+                          </span>
                         )
                       ) : (
                         <Badge variant="green">{event.action}</Badge>
@@ -119,7 +137,7 @@ export function TransactionHistoryPanel() {
                           href={getEtherscanLink(event.txHash)}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-bright hover:underline flex items-center gap-1 group"
+                          className="group flex items-center gap-1 text-blue-bright hover:underline"
                         >
                           {event.txHash.slice(0, 8)}...
                           <ExternalLink size={9} className="opacity-0 group-hover:opacity-100" />
@@ -135,7 +153,7 @@ export function TransactionHistoryPanel() {
           )}
         </div>
 
-        <div className="px-4 py-2 border-t border-border text-text-muted text-xs font-mono flex justify-between">
+        <div className="flex justify-between border-t border-border px-4 py-2 font-mono text-xs text-text-muted">
           <span>{filtered.length} events</span>
           <span>Auto-refresh: 60s</span>
         </div>

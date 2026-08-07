@@ -34,14 +34,16 @@ const SERVER_RPC_URLS = splitRpcUrls(process.env.RPC_URLS || process.env.RPC_URL
 const PUBLIC_RPC_URLS = splitRpcUrls(process.env.NEXT_PUBLIC_RPC_URLS);
 
 export const RPC_URLS = Array.from(
-  new Set([
-    ...SERVER_RPC_URLS,
-    ...PUBLIC_RPC_URLS,
-    ALCHEMY_RPC_URL,
-    ANKR_RPC_URL,
-    QUICKNODE_RPC_URL,
-    'https://rpc.bohr.life',
-  ].filter(Boolean))
+  new Set(
+    [
+      ...SERVER_RPC_URLS,
+      ...PUBLIC_RPC_URLS,
+      ALCHEMY_RPC_URL,
+      ANKR_RPC_URL,
+      QUICKNODE_RPC_URL,
+      'https://rpc.bohr.life',
+    ].filter(Boolean),
+  ),
 );
 
 export const GUARDIAN_ADDRESS = (process.env.NEXT_PUBLIC_GUARDIAN_ADDRESS ||
@@ -49,15 +51,69 @@ export const GUARDIAN_ADDRESS = (process.env.NEXT_PUBLIC_GUARDIAN_ADDRESS ||
 
 export const AGENT_WALLET_ABI = [
   // View functions
-  { name: 'agent', type: 'function', stateMutability: 'view', inputs: [], outputs: [{ type: 'address' }] },
-  { name: 'pendingAgent', type: 'function', stateMutability: 'view', inputs: [], outputs: [{ type: 'address' }] },
-  { name: 'guardian', type: 'function', stateMutability: 'view', inputs: [], outputs: [{ type: 'address' }] },
-  { name: 'pendingGuardian', type: 'function', stateMutability: 'view', inputs: [], outputs: [{ type: 'address' }] },
-  { name: 'paused', type: 'function', stateMutability: 'view', inputs: [], outputs: [{ type: 'bool' }] },
-  { name: 'ethTxLimit', type: 'function', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint256' }] },
-  { name: 'ethDailyLimit', type: 'function', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint256' }] },
-  { name: 'ethDailySpent', type: 'function', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint256' }] },
-  { name: 'ethLastReset', type: 'function', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint256' }] },
+  {
+    name: 'agent',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ type: 'address' }],
+  },
+  {
+    name: 'pendingAgent',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ type: 'address' }],
+  },
+  {
+    name: 'guardian',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ type: 'address' }],
+  },
+  {
+    name: 'pendingGuardian',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ type: 'address' }],
+  },
+  {
+    name: 'paused',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ type: 'bool' }],
+  },
+  {
+    name: 'ethTxLimit',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ type: 'uint256' }],
+  },
+  {
+    name: 'ethDailyLimit',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ type: 'uint256' }],
+  },
+  {
+    name: 'ethDailySpent',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ type: 'uint256' }],
+  },
+  {
+    name: 'ethLastReset',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ type: 'uint256' }],
+  },
   {
     name: 'tokenPolicy',
     type: 'function',
@@ -115,7 +171,10 @@ export const AGENT_WALLET_ABI = [
     name: 'withdraw',
     type: 'function',
     stateMutability: 'nonpayable',
-    inputs: [{ name: 'to', type: 'address' }, { name: 'amount', type: 'uint256' }],
+    inputs: [
+      { name: 'to', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
     outputs: [],
   },
   {
@@ -160,33 +219,53 @@ export const AGENT_WALLET_ABI = [
     outputs: [],
   },
   { name: 'applyCall', type: 'function', stateMutability: 'nonpayable', inputs: [], outputs: [] },
-  { name: 'cancelCallQueue', type: 'function', stateMutability: 'nonpayable', inputs: [], outputs: [] },
+  {
+    name: 'cancelCallQueue',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [],
+    outputs: [],
+  },
   {
     name: 'removeCall',
     type: 'function',
     stateMutability: 'nonpayable',
-    inputs: [{ name: 'target', type: 'address' }, { name: 'selector', type: 'bytes4' }],
+    inputs: [
+      { name: 'target', type: 'address' },
+      { name: 'selector', type: 'bytes4' },
+    ],
     outputs: [],
   },
   {
     name: 'addRecipient',
     type: 'function',
     stateMutability: 'nonpayable',
-    inputs: [{ name: 'target', type: 'address' }, { name: 'sel', type: 'bytes4' }, { name: 'recipient', type: 'address' }],
+    inputs: [
+      { name: 'target', type: 'address' },
+      { name: 'sel', type: 'bytes4' },
+      { name: 'recipient', type: 'address' },
+    ],
     outputs: [],
   },
   {
     name: 'removeRecipient',
     type: 'function',
     stateMutability: 'nonpayable',
-    inputs: [{ name: 'target', type: 'address' }, { name: 'sel', type: 'bytes4' }, { name: 'recipient', type: 'address' }],
+    inputs: [
+      { name: 'target', type: 'address' },
+      { name: 'sel', type: 'bytes4' },
+      { name: 'recipient', type: 'address' },
+    ],
     outputs: [],
   },
   {
     name: 'setTokenPolicy',
     type: 'function',
     stateMutability: 'nonpayable',
-    inputs: [{ name: 'token', type: 'address' }, { name: '_dailyLimit', type: 'uint256' }],
+    inputs: [
+      { name: 'token', type: 'address' },
+      { name: '_dailyLimit', type: 'uint256' },
+    ],
     outputs: [],
   },
   {
@@ -200,16 +279,34 @@ export const AGENT_WALLET_ABI = [
     name: 'queueLimitChange',
     type: 'function',
     stateMutability: 'nonpayable',
-    inputs: [{ name: '_txLimit', type: 'uint256' }, { name: '_dailyLimit', type: 'uint256' }],
+    inputs: [
+      { name: '_txLimit', type: 'uint256' },
+      { name: '_dailyLimit', type: 'uint256' },
+    ],
     outputs: [],
   },
-  { name: 'applyLimitChange', type: 'function', stateMutability: 'nonpayable', inputs: [], outputs: [] },
-  { name: 'cancelLimitChange', type: 'function', stateMutability: 'nonpayable', inputs: [], outputs: [] },
+  {
+    name: 'applyLimitChange',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [],
+    outputs: [],
+  },
+  {
+    name: 'cancelLimitChange',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [],
+    outputs: [],
+  },
   {
     name: 'decreaseLimits',
     type: 'function',
     stateMutability: 'nonpayable',
-    inputs: [{ name: '_txLimit', type: 'uint256' }, { name: '_dailyLimit', type: 'uint256' }],
+    inputs: [
+      { name: '_txLimit', type: 'uint256' },
+      { name: '_dailyLimit', type: 'uint256' },
+    ],
     outputs: [],
   },
   // Events

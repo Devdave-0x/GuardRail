@@ -4,10 +4,7 @@ type T3nIdentity = {
 };
 
 type T3nSdk = {
-  T3nClient: new (options: {
-    wasmComponent: unknown;
-    handlers: { EthSign: unknown };
-  }) => {
+  T3nClient: new (options: { wasmComponent: unknown; handlers: { EthSign: unknown } }) => {
     handshake(): Promise<unknown>;
     authenticate(input: unknown): Promise<unknown>;
     getUsage(): Promise<{ balance: { available: unknown } }>;
@@ -20,13 +17,13 @@ type T3nSdk = {
 };
 
 async function loadT3NSdk(): Promise<T3nSdk> {
-  return await import("@terminal3/t3n-sdk") as unknown as T3nSdk;
+  return (await import('@terminal3/t3n-sdk')) as unknown as T3nSdk;
 }
 
 export async function initT3NIdentity(): Promise<T3nIdentity | null> {
   const apiKey = process.env.T3N_API_KEY!;
   if (!apiKey) {
-    console.warn("⚠️  T3N_API_KEY not set — skipping T3N identity init");
+    console.warn('⚠️  T3N_API_KEY not set, skipping T3N identity init');
     return null;
   }
 
@@ -40,7 +37,7 @@ export async function initT3NIdentity(): Promise<T3nIdentity | null> {
       metamask_sign,
     } = await loadT3NSdk();
 
-    setEnvironment("testnet");
+    setEnvironment('testnet');
 
     const address = eth_get_address(apiKey);
 
@@ -61,7 +58,7 @@ export async function initT3NIdentity(): Promise<T3nIdentity | null> {
 
     return { client, address };
   } catch (err) {
-    console.warn("⚠️  T3N identity init failed:", err);
+    console.warn('⚠️  T3N identity init failed:', err);
     return null;
   }
 }
@@ -70,11 +67,11 @@ export async function registerAgentDID(walletAddress: string, did: string) {
   const apiKey = process.env.T3N_API_KEY!;
   if (!apiKey) return;
 
-  const res = await fetch("https://staging.terminal3.io/v1/did/register", {
-    method: "POST",
+  const res = await fetch('https://staging.terminal3.io/v1/did/register', {
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
-      "x-api-token": apiKey,
+      'Content-Type': 'application/json',
+      'x-api-token': apiKey,
     },
     body: JSON.stringify({
       did,
@@ -83,6 +80,6 @@ export async function registerAgentDID(walletAddress: string, did: string) {
   });
 
   const data = await res.json();
-  console.log("📋 DID registered:", data);
+  console.log('📋 DID registered:', data);
   return data;
 }

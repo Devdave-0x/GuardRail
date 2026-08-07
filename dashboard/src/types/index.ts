@@ -80,7 +80,14 @@ export type GuardianAction =
   | { type: 'withdraw'; to: string; amount: string }
   | { type: 'transferAgent'; newAgent: string }
   | { type: 'transferGuardian'; newGuardian: string }
-  | { type: 'queueCall'; target: string; selector: string; checkRecipient: boolean; checkAmount: boolean; maxAmount: string }
+  | {
+      type: 'queueCall';
+      target: string;
+      selector: string;
+      checkRecipient: boolean;
+      checkAmount: boolean;
+      maxAmount: string;
+    }
   | { type: 'cancelCallQueue' }
   | { type: 'applyCall' }
   | { type: 'removeCall'; target: string; selector: string }

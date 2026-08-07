@@ -1,16 +1,16 @@
-import { runAgent } from "./bridge"
+import { runAgent } from './bridge.js';
 
-const goal = process.argv.slice(2).join(" ").trim()
+const goal = process.argv.slice(2).join(' ').trim();
 
 if (!goal) {
-  console.log(JSON.stringify({ type: "error", content: "Missing goal" }))
-  process.exit(1)
+  console.log(JSON.stringify({ type: 'error', content: 'Missing goal' }));
+  process.exit(1);
 }
 
 runAgent(goal, (chunk) => {
-  console.log(JSON.stringify(chunk))
+  console.log(JSON.stringify(chunk));
 }).catch((error) => {
-  const content = error instanceof Error ? error.message : String(error)
-  console.log(JSON.stringify({ type: "error", content }))
-  process.exit(1)
-})
+  const content = error instanceof Error ? error.message : String(error);
+  console.log(JSON.stringify({ type: 'error', content }));
+  process.exit(1);
+});

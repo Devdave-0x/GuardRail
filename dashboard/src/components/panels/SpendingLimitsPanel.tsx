@@ -1,6 +1,6 @@
 'use client';
 
-import { Panel, Stat, ProgressBar, Countdown, Badge } from '@/components/shared';
+import { Panel, ProgressBar, Countdown, Badge } from '@/components/shared';
 import { useContractState } from '@/hooks/useContractState';
 
 export function SpendingLimitsPanel() {
@@ -16,35 +16,39 @@ export function SpendingLimitsPanel() {
       status={loading ? 'ok' : panelStatus}
       loading={loading}
     >
-      <div className="p-4 space-y-5">
-        {error && (
-          <div className="text-red text-xs font-mono">Error loading limits</div>
-        )}
+      <div className="space-y-5 p-4">
+        {error && <div className="font-mono text-xs text-red">Error loading limits</div>}
 
         {/* Current limits */}
         <div className="grid grid-cols-2 gap-4">
-          <div className="bg-bg-elevated rounded p-3 border border-border">
-            <p className="text-text-muted text-xs font-mono uppercase tracking-wider mb-1">Per-TX Limit</p>
-            <p className="text-text-primary font-mono text-sm font-bold">
+          <div className="rounded border border-border bg-bg-elevated p-3">
+            <p className="mb-1 font-mono text-xs uppercase tracking-wider text-text-muted">
+              Per-TX Limit
+            </p>
+            <p className="font-mono text-sm font-bold text-text-primary">
               {data ? parseFloat(data.ethTxLimitFormatted).toFixed(6) : '—'}
             </p>
-            <p className="text-text-muted font-mono text-xs">BOT max/tx</p>
+            <p className="font-mono text-xs text-text-muted">BOT max/tx</p>
           </div>
-          <div className="bg-bg-elevated rounded p-3 border border-border">
-            <p className="text-text-muted text-xs font-mono uppercase tracking-wider mb-1">Daily Limit</p>
-            <p className="text-text-primary font-mono text-sm font-bold">
+          <div className="rounded border border-border bg-bg-elevated p-3">
+            <p className="mb-1 font-mono text-xs uppercase tracking-wider text-text-muted">
+              Daily Limit
+            </p>
+            <p className="font-mono text-sm font-bold text-text-primary">
               {data ? parseFloat(data.ethDailyLimitFormatted).toFixed(6) : '—'}
             </p>
-            <p className="text-text-muted font-mono text-xs">BOT/day</p>
+            <p className="font-mono text-xs text-text-muted">BOT/day</p>
           </div>
         </div>
 
         {/* Daily spend progress */}
         <div className="space-y-3">
-          <div className="flex justify-between items-center">
-            <p className="text-text-muted text-xs font-mono uppercase tracking-wider">Daily Spent</p>
+          <div className="flex items-center justify-between">
+            <p className="font-mono text-xs uppercase tracking-wider text-text-muted">
+              Daily Spent
+            </p>
             <div className="flex items-center gap-2">
-              <span className="text-text-secondary text-xs font-mono">
+              <span className="font-mono text-xs text-text-secondary">
                 {data ? parseFloat(data.ethDailySpentFormatted).toFixed(6) : '0.000000'}
                 {' / '}
                 {data ? parseFloat(data.ethDailyLimitFormatted).toFixed(6) : '0.000000'} BOT
@@ -53,12 +57,12 @@ export function SpendingLimitsPanel() {
           </div>
           <ProgressBar value={spentPercent} warn={70} danger={90} />
           {spentPercent >= 90 && (
-            <div className="text-red text-xs font-mono flex items-center gap-1">
+            <div className="flex items-center gap-1 font-mono text-xs text-red">
               <span className="animate-blink">▲</span> DAILY LIMIT CRITICAL
             </div>
           )}
           {spentPercent >= 70 && spentPercent < 90 && (
-            <div className="text-orange text-xs font-mono flex items-center gap-1">
+            <div className="flex items-center gap-1 font-mono text-xs text-orange">
               <span>▲</span> LIMIT APPROACHING
             </div>
           )}
@@ -66,33 +70,33 @@ export function SpendingLimitsPanel() {
 
         {/* Pending limit change */}
         {data?.pendingLimitChange && (
-          <div className="border border-orange/40 bg-orange/5 rounded p-3 space-y-2">
+          <div className="space-y-2 rounded border border-orange/40 bg-orange/5 p-3">
             <div className="flex items-center gap-2">
               <Badge variant="orange">⏳ Pending Limit Change</Badge>
             </div>
-            <div className="grid grid-cols-2 gap-3 mt-2">
+            <div className="mt-2 grid grid-cols-2 gap-3">
               <div>
-                <p className="text-text-muted text-xs font-mono">New Per-TX</p>
-                <p className="text-orange font-mono text-xs font-bold">
+                <p className="font-mono text-xs text-text-muted">New Per-TX</p>
+                <p className="font-mono text-xs font-bold text-orange">
                   {parseFloat(data.pendingLimitChange.txLimitFormatted).toFixed(6)} BOT
                 </p>
               </div>
               <div>
-                <p className="text-text-muted text-xs font-mono">New Daily</p>
-                <p className="text-orange font-mono text-xs font-bold">
+                <p className="font-mono text-xs text-text-muted">New Daily</p>
+                <p className="font-mono text-xs font-bold text-orange">
                   {parseFloat(data.pendingLimitChange.dailyLimitFormatted).toFixed(6)} BOT
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2 pt-1 border-t border-orange/20">
-              <span className="text-text-muted text-xs font-mono">Unlocks in:</span>
+            <div className="flex items-center gap-2 border-t border-orange/20 pt-1">
+              <span className="font-mono text-xs text-text-muted">Unlocks in:</span>
               <Countdown unlockTimeMs={data.pendingLimitChange.unlockTimeMs} />
             </div>
           </div>
         )}
 
         {!data?.pendingLimitChange && (
-          <div className="text-text-muted text-xs font-mono flex items-center gap-2">
+          <div className="flex items-center gap-2 font-mono text-xs text-text-muted">
             <span className="text-green">✓</span> No pending limit changes
           </div>
         )}

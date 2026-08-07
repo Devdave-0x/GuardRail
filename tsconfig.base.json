@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "strict": true,
+
+    /*
+     * Flags `strict` does not turn on. Each package extends this file, so the
+     * bar is the same everywhere. Options that depend on a package's module
+     * system (verbatimModuleSyntax, isolatedModules) stay in the package's own
+     * tsconfig, since runtime is ESM while the published packages are CommonJS.
+     */
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true
+  }
+}

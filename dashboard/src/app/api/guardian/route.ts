@@ -4,9 +4,11 @@ import { CONTRACT_ADDRESS, AGENT_WALLET_ABI } from '@/lib/contract';
 
 export const dynamic = 'force-dynamic';
 
-// This route builds calldata for guardian actions.
-// The frontend signs and sends the tx using wagmi (connected wallet).
-// We never handle private keys here.
+/*
+ * This route builds calldata for guardian actions.
+ * The frontend signs and sends the tx using wagmi (connected wallet).
+ * We never handle private keys here.
+ */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -108,7 +110,7 @@ export async function POST(req: NextRequest) {
     console.error('[/api/guardian]', error);
     return NextResponse.json(
       { error: 'Failed to build guardian action', details: String(error) },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
