@@ -93,10 +93,10 @@ export function WhitelistManagerPanel() {
       status={data?.pendingCall ? 'warn' : 'ok'}
       loading={loading}
     >
-      <div className="space-y-4 p-4">
+      <div className="flex flex-col gap-4 p-4">
         {/* Pending queued call */}
         {data?.pendingCall ? (
-          <div className="space-y-3 rounded border border-orange/40 bg-orange/5 p-3">
+          <div className="flex flex-col gap-3 rounded border border-orange/40 bg-orange/5 p-3">
             <div className="flex items-center justify-between">
               <Badge variant="orange">⏳ Queued Call</Badge>
               <Countdown unlockTimeMs={data.pendingCall.unlockTimeMs} />
@@ -154,7 +154,7 @@ export function WhitelistManagerPanel() {
 
         {/* Guardian: Queue new call form */}
         {isGuardian && !data?.pendingCall && (
-          <div className="space-y-3 rounded border border-border p-3">
+          <div className="flex flex-col gap-3 rounded border border-border p-3">
             <p className="font-mono text-xs uppercase tracking-wider text-text-secondary">
               Queue New Call
             </p>

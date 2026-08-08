@@ -369,7 +369,7 @@ export function AgentChatPanel() {
         {/* Message log */}
         <div
           ref={messageLogRef}
-          className="flex-1 space-y-2 overflow-y-auto px-4 py-3 font-mono text-xs"
+          className="flex flex-1 flex-col gap-2 overflow-y-auto px-4 py-3 font-mono text-xs"
         >
           {messages.map((msg) => (
             <div key={msg.id} className="animate-slide-in">

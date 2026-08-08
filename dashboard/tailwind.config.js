@@ -2,7 +2,31 @@
 module.exports = {
   content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
   theme: {
+    // Only two breakpoints by design. `md` is deliberately absent so it cannot be
+    // used by accident: see docs/Context.md. Reach for `sm` or `lg` instead.
+    screens: {
+      sm: '640px',
+      lg: '1024px',
+    },
     extend: {
+      maxWidth: {
+        // Single shared page width for both route groups. Never write max-w-[1600px].
+        container: '1600px',
+      },
+      /*
+        Spacing tokens back onto CSS variables defined in globals.css, which shift at the
+        sm and lg breakpoints. That makes `px-section-px` responsive on its own, so call
+        sites never repeat a px-4 sm:px-6 lg:px-8 ladder. The -tight and -loose suffixes
+        are rhythm scales, not breakpoints.
+      */
+      spacing: {
+        'section-px': 'var(--section-px)',
+        'section-py': 'var(--section-py)',
+        'section-py-tight': 'var(--section-py-tight)',
+        'section-py-loose': 'var(--section-py-loose)',
+        'panel-gap': 'var(--panel-gap)',
+        'stack-gap': 'var(--stack-gap)',
+      },
       colors: {
         bg: '#0a0a0a',
         'bg-panel': '#0f0f0f',

@@ -1,0 +1,12 @@
+export { DashboardPreviewSection } from './DashboardPreviewSection';
+export { FinalCtaSection } from './FinalCtaSection';
+export { GuardsSection } from './GuardsSection';
+export { HeroSection } from './HeroSection';
+export { HowItWorksSection } from './HowItWorksSection';
+export { IdentitySection } from './IdentitySection';
+export { LiveProductHero } from './LiveProductHero';
+export { LiveProofStrip } from './LiveProofStrip';
+export { ProblemSection } from './ProblemSection';
+export { QuickstartSection } from './QuickstartSection';
+export { StatsSection } from './StatsSection';
+export { ToolsSection } from './ToolsSection';

@@ -2,6 +2,7 @@
 
 import { RefreshCw } from 'lucide-react';
 import { Panel, Badge, AddressDisplay } from '@/components/shared';
+import { AnimatedNumber } from '@/components/shared/AnimatedNumber';
 import { useContractState } from '@/hooks/useContractState';
 import { CONTRACT_ADDRESS } from '@/lib/contract';
 
@@ -23,7 +24,7 @@ export function OverviewPanel() {
         </button>
       }
     >
-      <div className="space-y-5 p-4">
+      <div className="flex flex-col gap-5 p-4">
         {error && (
           <div className="rounded border border-red/30 bg-red/10 px-3 py-2 font-mono text-xs text-red">
             RPC ERROR: {error}
@@ -56,7 +57,7 @@ export function OverviewPanel() {
               BOT Balance
             </p>
             <p className="font-mono text-lg font-bold text-green">
-              {data ? parseFloat(data.balanceFormatted).toFixed(6) : '—'}
+              <AnimatedNumber value={data ? parseFloat(data.balanceFormatted) : NaN} />
             </p>
             <p className="font-mono text-xs text-text-muted">BOT</p>
           </div>
@@ -70,7 +71,7 @@ export function OverviewPanel() {
         </div>
 
         {/* Addresses */}
-        <div className="space-y-2 border-t border-border pt-2">
+        <div className="flex flex-col gap-2 border-t border-border pt-2">
           <p className="mb-2 font-mono text-xs uppercase tracking-wider text-text-muted">Roles</p>
           <div className="grid grid-cols-1 gap-2">
             <div className="flex items-center justify-between rounded bg-bg-elevated px-3 py-2">

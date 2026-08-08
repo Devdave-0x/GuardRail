@@ -139,9 +139,9 @@ export function TokenPolicyPanel() {
 
   return (
     <Panel title="Token Policy" subtitle="ERC-20 daily spend limits" loading={loading}>
-      <div className="space-y-4 p-4">
+      <div className="flex flex-col gap-4 p-4">
         {/* Lookup section */}
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <p className="font-mono text-xs uppercase tracking-wider text-text-muted">
             Lookup Token Policy
           </p>
@@ -161,7 +161,7 @@ export function TokenPolicyPanel() {
         {/* Lookup result */}
         {lookupResult && (
           <div
-            className={`space-y-2 rounded border p-3 ${lookupResult.enabled ? 'border-green/30 bg-green/5' : 'border-border bg-bg-elevated'}`}
+            className={`flex flex-col gap-2 rounded border p-3 ${lookupResult.enabled ? 'border-green/30 bg-green/5' : 'border-border bg-bg-elevated'}`}
           >
             <div className="flex items-center justify-between">
               <p className="font-mono text-xs text-text-muted">
@@ -214,7 +214,7 @@ export function TokenPolicyPanel() {
         )}
 
         {policies.length > 0 && (
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <p className="font-mono text-xs uppercase tracking-wider text-text-muted">
               Active Policies
             </p>
@@ -223,7 +223,7 @@ export function TokenPolicyPanel() {
               .map((policy) => (
                 <div
                   key={policy.token}
-                  className="space-y-2 rounded border border-green/20 bg-green/5 p-3"
+                  className="flex flex-col gap-2 rounded border border-green/20 bg-green/5 p-3"
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-mono text-xs text-text-primary">
@@ -258,7 +258,7 @@ export function TokenPolicyPanel() {
 
         {/* Guardian: set new policy */}
         {isGuardian && (
-          <div className="space-y-3 rounded border border-border p-3">
+          <div className="flex flex-col gap-3 rounded border border-border p-3">
             <p className="font-mono text-xs uppercase tracking-wider text-text-secondary">
               Set Token Policy
             </p>

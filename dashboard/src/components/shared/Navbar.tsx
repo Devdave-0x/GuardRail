@@ -13,7 +13,7 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-bg/95 backdrop-blur">
-      <div className="mx-auto flex h-12 max-w-[1600px] items-center justify-between px-4">
+      <div className="mx-auto flex h-12 max-w-container items-center justify-between px-section-px">
         {/* Logo */}
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5">
@@ -28,7 +28,7 @@ export function Navbar() {
 
         {/* Center: contract balance */}
         {contractBalance && (
-          <div className="hidden items-center gap-2 font-mono text-xs md:flex">
+          <div className="hidden items-center gap-2 font-mono text-xs lg:flex">
             <span className="text-text-muted">Vault Balance:</span>
             <span className="font-bold text-green">
               {parseFloat(formatEther(contractBalance.value)).toFixed(6)} BOT
@@ -52,7 +52,7 @@ export function Navbar() {
       </div>
 
       {/* Network status bar */}
-      <div className="flex items-center justify-between gap-4 border-t border-border/50 bg-bg px-4 py-1.5">
+      <div className="flex items-center justify-between gap-4 border-t border-border/50 bg-bg px-section-px py-1.5">
         <div className="flex shrink-0 items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-green" />
           <span className="font-mono text-xs text-text-muted">

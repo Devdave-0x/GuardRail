@@ -193,7 +193,7 @@ export function GuardianControlPanel() {
       status={data?.paused ? 'error' : 'ok'}
       loading={loading}
     >
-      <div className="space-y-4 p-4">
+      <div className="flex flex-col gap-4 p-4">
         {/* Guardian badge */}
         <div className="flex items-center gap-2">
           <ShieldCheck size={14} className="text-green" />
@@ -201,7 +201,7 @@ export function GuardianControlPanel() {
         </div>
 
         {/* Pause / Unpause */}
-        <div className="space-y-2 rounded border border-border p-3">
+        <div className="flex flex-col gap-2 rounded border border-border p-3">
           <p className="font-mono text-xs uppercase tracking-wider text-text-muted">
             Emergency Controls
           </p>
@@ -260,7 +260,7 @@ export function GuardianControlPanel() {
 
         {/* Withdraw form */}
         {section === 'withdraw' && (
-          <div className="animate-slide-in space-y-3 rounded border border-orange/30 bg-orange/5 p-3">
+          <div className="flex animate-slide-in flex-col gap-3 rounded border border-orange/30 bg-orange/5 p-3">
             <Input
               label="Recipient Address"
               value={withdrawTo}
@@ -288,7 +288,7 @@ export function GuardianControlPanel() {
 
         {/* Transfer agent form */}
         {section === 'agent' && (
-          <div className="animate-slide-in space-y-3 rounded border border-border p-3">
+          <div className="flex animate-slide-in flex-col gap-3 rounded border border-border p-3">
             <Input
               label="New Agent Address"
               value={newAgent}
@@ -312,7 +312,7 @@ export function GuardianControlPanel() {
 
         {/* Transfer guardian form */}
         {section === 'guardian' && (
-          <div className="animate-slide-in space-y-3 rounded border border-red/30 bg-red/5 p-3">
+          <div className="flex animate-slide-in flex-col gap-3 rounded border border-red/30 bg-red/5 p-3">
             <p className="inline-flex items-center gap-1 font-mono text-xs text-red">
               <AlertTriangle size={12} /> CAUTION: New guardian must accept before this takes effect
             </p>
@@ -336,7 +336,7 @@ export function GuardianControlPanel() {
 
         {/* Limits form */}
         {section === 'limits' && (
-          <div className="animate-slide-in space-y-3 rounded border border-border p-3">
+          <div className="flex animate-slide-in flex-col gap-3 rounded border border-border p-3">
             <p className="font-mono text-xs text-text-muted">
               To increase limits, a 10-minute timelock applies
             </p>

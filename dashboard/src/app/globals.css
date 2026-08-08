@@ -21,6 +21,43 @@
   --text-muted: #555555;
 }
 
+/*
+  Spacing tokens, responsive at the token level rather than at the call site. A section
+  writes `px-section-px py-section-py` once instead of repeating a px-4 sm:px-6 lg:px-8
+  ladder everywhere, and changing the page gutter is a one-line edit here.
+
+  Values come from theme() and breakpoints from @screen, so tailwind.config.js stays the
+  single source of truth. No pixel or rem literal is duplicated into this file.
+*/
+@layer base {
+  :root {
+    --section-px: theme('spacing.4');
+    --section-py-tight: theme('spacing.10');
+    --section-py: theme('spacing.16');
+    --section-py-loose: theme('spacing.20');
+    --panel-gap: theme('spacing.4');
+    --stack-gap: theme('spacing.3');
+  }
+
+  @screen sm {
+    :root {
+      --section-px: theme('spacing.6');
+      --section-py-tight: theme('spacing.14');
+      --section-py: theme('spacing.20');
+      --section-py-loose: theme('spacing.28');
+    }
+  }
+
+  @screen lg {
+    :root {
+      --section-px: theme('spacing.8');
+      --section-py-tight: theme('spacing.16');
+      --section-py: theme('spacing.28');
+      --section-py-loose: theme('spacing.36');
+    }
+  }
+}
+
 * {
   box-sizing: border-box;
 }
@@ -84,6 +121,102 @@ body::before {
 .font-mono-numbers {
   font-variant-numeric: tabular-nums;
   font-feature-settings: 'tnum';
+}
+
+/*
+  Visually hidden but announced by screen readers. Required by every animated-text
+  component: the animated spans are aria-hidden and the plain string sits in one of these.
+*/
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Skip link: hidden until focused, then pinned to the top left. */
+.skip-link:focus-visible {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 10000;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-panel);
+  border: 1px solid var(--green);
+  color: var(--green);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+}
+
+/*
+  Cursor-tracking edge glow. usePointerGlow writes --pointer-x / --pointer-y once per
+  frame from a single delegated listener, so any number of these cost one listener total
+  rather than a WebGL context each. See the WebGL budget in docs/Context.md.
+*/
+.edge-glow {
+  position: relative;
+  isolation: isolate;
+}
+
+.edge-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(
+    18rem circle at var(--pointer-x, -100%) var(--pointer-y, -100%),
+    var(--edge-glow-color, rgba(0, 255, 136, 0.6)),
+    transparent 40%
+  );
+  background-attachment: fixed;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.edge-glow:hover::before,
+.edge-glow:focus-within::before {
+  opacity: 1;
+}
+
+/*
+  Global reduced-motion backstop. Components also branch in JS via
+  usePrefersReducedMotion, which is what actually prevents rAF loops from starting.
+  This catches CSS transitions and keyframes that no component owns.
+*/
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 /* Table reset */

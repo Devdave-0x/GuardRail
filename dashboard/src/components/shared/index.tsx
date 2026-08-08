@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { Copy, Check, ExternalLink } from 'lucide-react';
 import { formatAddress, getEtherscanLink, cn } from '@/lib/utils';
+import { useCopyToClipboard, useCountdown } from '@/hooks';
 
-// ── Panel ──────────────────────────────────────────────────────────────────
-interface PanelProps {
+// === Panel
+export interface PanelProps {
   title: string;
   subtitle?: string;
   children: ReactNode;
@@ -13,6 +14,12 @@ interface PanelProps {
   status?: 'ok' | 'warn' | 'error' | 'info';
   actions?: ReactNode;
   loading?: boolean;
+  /*
+    Cursor-tracking edge glow, coloured by `status`. Pure CSS driven by the single
+    delegated pointermove listener in usePointerGlow, so enabling it on every panel
+    costs one listener for the page rather than a WebGL context each.
+  */
+  glow?: boolean;
 }
 
 export function Panel({
@@ -23,18 +30,31 @@ export function Panel({
   status,
   actions,
   loading,
+  glow = true,
 }: PanelProps) {
+  const resolvedStatus = status ?? 'ok';
+
   const statusColor = {
     ok: 'border-green/40',
     warn: 'border-orange/60',
     error: 'border-red/60',
     info: 'border-blue-bright/40',
-  }[status || 'ok'];
+  }[resolvedStatus];
+
+  // Drives the .edge-glow gradient, so the glow matches the panel's state.
+  const glowColor = {
+    ok: 'rgba(0, 255, 136, 0.6)',
+    warn: 'rgba(255, 107, 53, 0.6)',
+    error: 'rgba(255, 51, 51, 0.7)',
+    info: 'rgba(59, 130, 246, 0.6)',
+  }[resolvedStatus];
 
   return (
     <div
+      style={glow ? ({ '--edge-glow-color': glowColor } as React.CSSProperties) : undefined}
       className={cn(
         'relative overflow-hidden rounded-lg border bg-bg-panel',
+        glow && 'edge-glow',
         statusColor,
         className,
       )}
@@ -84,7 +104,7 @@ export function Panel({
   );
 }
 
-// ── Stat ──────────────────────────────────────────────────────────────────
+// === Stat
 interface StatProps {
   label: string;
   value: string | ReactNode;
@@ -102,14 +122,14 @@ export function Stat({ label, value, dim, color = 'default' }: StatProps) {
   }[color];
 
   return (
-    <div className={cn('space-y-1', dim && 'opacity-60')}>
+    <div className={cn('flex flex-col gap-1', dim && 'opacity-60')}>
       <p className="font-mono text-xs uppercase tracking-wider text-text-muted">{label}</p>
       <p className={cn('font-mono text-sm font-bold', valueColor)}>{value}</p>
     </div>
   );
 }
 
-// ── Address ──────────────────────────────────────────────────────────────────
+// === Address
 interface AddressDisplayProps {
   address: string;
   label?: string;
@@ -123,30 +143,36 @@ export function AddressDisplay({
   etherscan = true,
   className,
 }: AddressDisplayProps) {
-  const [copied, setCopied] = useState(false);
-
-  const copy = async () => {
-    await navigator.clipboard.writeText(address);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+  const { copied, copy } = useCopyToClipboard();
 
   return (
     <div className={cn('group flex items-center gap-2', className)}>
       {label && <span className="font-mono text-xs text-text-muted">{label}:</span>}
       <span className="font-mono text-xs text-text-primary">{formatAddress(address)}</span>
-      <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-        <button onClick={copy} className="p-0.5 text-text-muted transition-colors hover:text-green">
-          {copied ? <Check size={11} /> : <Copy size={11} />}
+      {/*
+        Focus-within keeps the controls reachable by keyboard: group-hover alone leaves
+        them at opacity 0 while focused, which is a hidden focus target.
+      */}
+      <div className="flex items-center gap-1 opacity-0 transition-opacity focus-within:opacity-100 group-hover:opacity-100">
+        <button
+          type="button"
+          onClick={() => copy(address)}
+          aria-label={copied ? 'Address copied' : `Copy address ${address}`}
+          className="rounded p-0.5 text-text-muted transition-colors hover:text-green"
+        >
+          {copied ? <Check size={11} aria-hidden="true" /> : <Copy size={11} aria-hidden="true" />}
         </button>
         {etherscan && (
           <a
             href={getEtherscanLink(address, 'address')}
             target="_blank"
             rel="noopener noreferrer"
-            className="p-0.5 text-text-muted transition-colors hover:text-blue-bright"
+            className="rounded p-0.5 text-text-muted transition-colors hover:text-blue-bright"
           >
-            <ExternalLink size={11} />
+            <ExternalLink size={11} aria-hidden="true" />
+            <span className="sr-only">
+              View {formatAddress(address)} on the explorer (opens in a new tab)
+            </span>
           </a>
         )}
       </div>
@@ -154,7 +180,7 @@ export function AddressDisplay({
   );
 }
 
-// ── Badge ──────────────────────────────────────────────────────────────────
+// === Badge
 interface BadgeProps {
   children: ReactNode;
   variant?: 'green' | 'orange' | 'red' | 'blue' | 'gray';
@@ -191,7 +217,7 @@ export function Badge({ children, variant = 'green', pulse }: BadgeProps) {
   );
 }
 
-// ── ProgressBar ──────────────────────────────────────────────────────────────
+// === ProgressBar
 interface ProgressBarProps {
   value: number; // 0-100
   label?: string;
@@ -211,7 +237,7 @@ export function ProgressBar({
   const color = clamped >= danger ? '#ff3333' : clamped >= warn ? '#ff6b35' : '#00ff88';
 
   return (
-    <div className="space-y-1">
+    <div className="flex flex-col gap-1">
       {(label || showPercent) && (
         <div className="flex items-center justify-between">
           {label && <span className="font-mono text-xs text-text-muted">{label}</span>}
@@ -232,7 +258,7 @@ export function ProgressBar({
   );
 }
 
-// ── Button ──────────────────────────────────────────────────────────────────
+// === Button
 interface ButtonProps {
   children: ReactNode;
   onClick?: () => void;
@@ -256,7 +282,11 @@ export function Button({
 }: ButtonProps) {
   const base =
     'font-mono font-bold tracking-wider uppercase transition-all duration-150 rounded border disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2';
-  const sizes = { sm: 'px-3 py-1.5 text-xs', md: 'px-4 py-2 text-xs' };
+  // Size names, not breakpoints. `md` here is the default button scale.
+  const sizes: Record<NonNullable<ButtonProps['size']>, string> = {
+    sm: 'px-3 py-1.5 text-xs',
+    md: 'px-4 py-2 text-xs',
+  };
   const variants = {
     primary:
       'bg-green/10 border-green/50 text-green hover:bg-green/20 hover:border-green hover:shadow-green-sm',
@@ -284,7 +314,7 @@ export function Button({
   );
 }
 
-// ── Input ──────────────────────────────────────────────────────────────────
+// === Input
 interface InputProps {
   value: string;
   onChange: (v: string) => void;
@@ -303,7 +333,7 @@ export function Input({
   type = 'text',
 }: InputProps) {
   return (
-    <div className={cn('space-y-1', className)}>
+    <div className={cn('flex flex-col gap-1', className)}>
       {label && (
         <label className="font-mono text-xs uppercase tracking-wider text-text-muted">
           {label}
@@ -320,28 +350,23 @@ export function Input({
   );
 }
 
-// ── Countdown ──────────────────────────────────────────────────────────────
-import { useEffect, useState as useStateCountdown } from 'react';
-import { formatCountdown } from '@/lib/utils';
+// === Countdown
 
-export function Countdown({ unlockTimeMs }: { unlockTimeMs: number }) {
-  const [display, setDisplay] = useStateCountdown('--:--');
-  const [nowMs, setNowMs] = useStateCountdown(0);
+interface CountdownProps {
+  unlockTimeMs: number;
+  /* Supply the queue time to get a progress value alongside the label. */
+  startTimeMs?: number;
+}
 
-  useEffect(() => {
-    const update = () => {
-      setDisplay(formatCountdown(unlockTimeMs));
-      setNowMs(Date.now());
-    };
+export function Countdown({ unlockTimeMs, startTimeMs }: CountdownProps) {
+  const { display, ready } = useCountdown(unlockTimeMs, startTimeMs);
 
-    update();
-    const interval = setInterval(update, 1000);
-    return () => clearInterval(interval);
-  }, [unlockTimeMs]);
-
-  const isReady = nowMs >= unlockTimeMs;
   return (
-    <span className={cn('font-mono text-xs font-bold', isReady ? 'text-green' : 'text-orange')}>
+    <span
+      // Timelocks resolve without user action, so announce the change politely.
+      aria-live="polite"
+      className={cn('font-mono text-xs font-bold', ready ? 'text-green' : 'text-orange')}
+    >
       {display}
     </span>
   );

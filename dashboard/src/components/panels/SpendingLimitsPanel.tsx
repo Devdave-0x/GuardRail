@@ -1,6 +1,7 @@
 'use client';
 
 import { Panel, ProgressBar, Countdown, Badge } from '@/components/shared';
+import { AnimatedNumber } from '@/components/shared/AnimatedNumber';
 import { useContractState } from '@/hooks/useContractState';
 
 export function SpendingLimitsPanel() {
@@ -16,7 +17,7 @@ export function SpendingLimitsPanel() {
       status={loading ? 'ok' : panelStatus}
       loading={loading}
     >
-      <div className="space-y-5 p-4">
+      <div className="flex flex-col gap-5 p-4">
         {error && <div className="font-mono text-xs text-red">Error loading limits</div>}
 
         {/* Current limits */}
@@ -26,7 +27,7 @@ export function SpendingLimitsPanel() {
               Per-TX Limit
             </p>
             <p className="font-mono text-sm font-bold text-text-primary">
-              {data ? parseFloat(data.ethTxLimitFormatted).toFixed(6) : '—'}
+              <AnimatedNumber value={data ? parseFloat(data.ethTxLimitFormatted) : NaN} />
             </p>
             <p className="font-mono text-xs text-text-muted">BOT max/tx</p>
           </div>
@@ -35,14 +36,14 @@ export function SpendingLimitsPanel() {
               Daily Limit
             </p>
             <p className="font-mono text-sm font-bold text-text-primary">
-              {data ? parseFloat(data.ethDailyLimitFormatted).toFixed(6) : '—'}
+              <AnimatedNumber value={data ? parseFloat(data.ethDailyLimitFormatted) : NaN} />
             </p>
             <p className="font-mono text-xs text-text-muted">BOT/day</p>
           </div>
         </div>
 
         {/* Daily spend progress */}
-        <div className="space-y-3">
+        <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <p className="font-mono text-xs uppercase tracking-wider text-text-muted">
               Daily Spent
@@ -70,7 +71,7 @@ export function SpendingLimitsPanel() {
 
         {/* Pending limit change */}
         {data?.pendingLimitChange && (
-          <div className="space-y-2 rounded border border-orange/40 bg-orange/5 p-3">
+          <div className="flex flex-col gap-2 rounded border border-orange/40 bg-orange/5 p-3">
             <div className="flex items-center gap-2">
               <Badge variant="orange">⏳ Pending Limit Change</Badge>
             </div>

@@ -59,6 +59,8 @@ export interface ExecutedEvent {
   target: string;
   value: string;
   selector: string;
+  /* Human-readable label the events route derives from the event name and selector. */
+  action: string;
   logIndex: number;
 }
 
@@ -71,6 +73,59 @@ export interface ChatMessage {
   toolResult?: string;
   txHash?: string;
   timestamp: number;
+}
+
+// SEO types
+export interface SeoOptions {
+  /* Page title. The root layout's template appends the site name. */
+  title: string;
+  description?: string;
+  /* Appended to BASE_KEYWORDS, never replacing them. */
+  keywords?: string[];
+  /* Route path, used for the canonical URL and og:url. Leading slash. */
+  path?: string;
+  /* Absolute or root-relative OG image. Defaults to the generated /opengraph-image. */
+  image?: string;
+  imageAlt?: string;
+  type?: 'website' | 'article';
+  /* Set on anything behind a wallet connection. Dashboards should not be indexed. */
+  noIndex?: boolean;
+  /* ISO 8601. Only meaningful when type is 'article'. */
+  publishedTime?: string;
+}
+
+// Marketing types
+export interface MarketingStat {
+  id: string;
+  label: string;
+  value: number;
+  suffix: string;
+  /* Set when the figure is read live from /api/contract rather than derived. */
+  live?: boolean;
+}
+
+export interface GuardFeature {
+  id: string;
+  title: string;
+  description: string;
+  /* lucide-react icon name, resolved by the consuming component. */
+  icon: string;
+}
+
+export interface McpTool {
+  name: string;
+  description: string;
+}
+
+export interface NavItem {
+  label: string;
+  href: string;
+  external?: boolean;
+}
+
+export interface FooterSection {
+  title: string;
+  items: NavItem[];
 }
 
 // Guardian action types
