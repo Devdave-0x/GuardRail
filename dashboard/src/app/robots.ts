@@ -2,8 +2,8 @@ import type { MetadataRoute } from 'next';
 import { SITE } from '@/lib/seo';
 
 /*
-  Typed and generated rather than a static file, so the host follows NEXT_PUBLIC_SITE_URL
-  across preview and production instead of being hardcoded.
+  Typed and generated rather than a static file, so the host follows SITE.url across
+  preview and production instead of being duplicated as a literal here.
 */
 export default function robots(): MetadataRoute.Robots {
   return {

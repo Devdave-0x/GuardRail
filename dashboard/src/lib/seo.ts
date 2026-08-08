@@ -16,8 +16,20 @@ import type { SeoOptions } from '@/types';
 export const SITE = {
   name: 'GuardRail',
   /*
-    metadataBase resolves every relative OG and canonical URL to an absolute one.
-    Without it Next emits relative og:image URLs, which most crawlers silently drop.
+    The public origin, and the single place it is defined. metadataBase, every canonical,
+    the OG image base, robots.txt, and sitemap.xml all derive from this one value, so
+    changing the site's domain is a one-line edit here.
+
+    metadataBase resolves every relative OG and canonical URL to an absolute one. Without
+    it Next emits relative og:image URLs, which most crawlers silently drop.
+
+    The env override exists for the case where a crawler has to fetch the OG image from
+    the URL in the tag: testing social cards through a tunnel, or a preview deploy that
+    should reference itself. Ordinary local development does not need it, since nothing
+    dereferences a canonical while you browse.
+
+    The fallback is a placeholder until the site is deployed. It is not a secret, so it
+    stays in the source rather than becoming a required env var.
   */
   url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://guardrail.dev',
   description:

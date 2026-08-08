@@ -33,36 +33,42 @@ export const GUARDS: readonly GuardFeature[] = [
     title: 'Per-transaction limit',
     description: 'A hard ceiling on the value of any single transfer, enforced in the contract.',
     icon: 'gauge',
+    accent: 'orange',
   },
   {
     id: 'daily-limit',
     title: 'Daily limit',
     description: 'A rolling daily cap on native-token spend that resets on a fixed schedule.',
     icon: 'calendar-clock',
+    accent: 'yellow',
   },
   {
     id: 'whitelist',
     title: 'Target whitelist',
     description: 'The agent can only call addresses and function selectors you have approved.',
     icon: 'list-checks',
+    accent: 'pink',
   },
   {
     id: 'token-policy',
     title: 'Token policy',
     description: 'Per-ERC-20 daily limits, set and revoked independently of native-token rules.',
     icon: 'coins',
+    accent: 'cyan',
   },
   {
     id: 'guardian',
     title: 'Guardian kill switch',
     description: 'A separate guardian role can pause every agent action instantly.',
     icon: 'shield-alert',
+    accent: 'red',
   },
   {
     id: 'timelock',
     title: 'Timelock',
     description: 'Limit increases and new whitelist entries queue behind a delay you can cancel.',
     icon: 'timer',
+    accent: 'violet',
   },
 ];
 
@@ -70,15 +76,59 @@ export const GUARD_COUNT = GUARDS.length;
 
 // === MCP tools
 
+/*
+  Accents follow meaning, not order: reads are green, value-moving writes are blue and
+  cyan, lookups are violet and pink, and the guard-adjacent tools take orange and yellow.
+*/
 export const MCP_TOOLS: readonly McpTool[] = [
-  { name: 'get_wallet_state', description: 'Balance, limits, paused status, roles' },
-  { name: 'transfer_eth', description: 'Send native token to a whitelisted address' },
-  { name: 'transfer_token', description: 'Send ERC-20 within its token policy' },
-  { name: 'check_limits', description: 'Remaining daily native-token allowance' },
-  { name: 'get_tx_status', description: 'Look up a transaction by hash' },
-  { name: 'check_whitelist', description: 'Check if an address and action are allowed' },
-  { name: 'get_pending_actions', description: 'Queued calls with countdown timers' },
-  { name: 'get_transaction_history', description: 'Recent on-chain activity' },
+  {
+    name: 'get_wallet_state',
+    description: 'Balance, limits, paused status, roles',
+    icon: 'wallet',
+    accent: 'green',
+  },
+  {
+    name: 'transfer_eth',
+    description: 'Send native token to a whitelisted address',
+    icon: 'send',
+    accent: 'blue',
+  },
+  {
+    name: 'transfer_token',
+    description: 'Send ERC-20 within its token policy',
+    icon: 'coins',
+    accent: 'cyan',
+  },
+  {
+    name: 'check_limits',
+    description: 'Remaining daily native-token allowance',
+    icon: 'gauge',
+    accent: 'orange',
+  },
+  {
+    name: 'get_tx_status',
+    description: 'Look up a transaction by hash',
+    icon: 'search',
+    accent: 'violet',
+  },
+  {
+    name: 'check_whitelist',
+    description: 'Check if an address and action are allowed',
+    icon: 'list-checks',
+    accent: 'pink',
+  },
+  {
+    name: 'get_pending_actions',
+    description: 'Queued calls with countdown timers',
+    icon: 'timer',
+    accent: 'yellow',
+  },
+  {
+    name: 'get_transaction_history',
+    description: 'Recent on-chain activity',
+    icon: 'history',
+    accent: 'green',
+  },
 ];
 
 export const MCP_TOOL_COUNT = MCP_TOOLS.length;

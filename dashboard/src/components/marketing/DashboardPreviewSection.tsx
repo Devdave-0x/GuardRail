@@ -17,7 +17,7 @@ export function DashboardPreviewSection() {
   const containerRef = useSectionReveal();
 
   return (
-    <Section id="preview" background="bg-bg" innerClassName="flex flex-col gap-12">
+    <Section id="preview" background="bg-surface" innerClassName="flex flex-col gap-12">
       <div ref={containerRef} className="flex flex-col gap-12">
         <div data-reveal>
           <SectionHeading

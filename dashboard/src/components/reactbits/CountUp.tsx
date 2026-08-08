@@ -53,7 +53,15 @@ export const CountUp: React.FC<CountUpProps> = ({
   const stiffness = 100 * (1 / duration);
   const springValue = useSpring(motionValue, { damping, stiffness });
 
-  const isInView: boolean = useInView(ref, { once: true, margin: '0px' });
+  /*
+    The bottom margin must match useSectionReveal's `top 80%` ScrollTrigger start.
+
+    IntersectionObserver reports geometry, not opacity. With a 0px margin this fired the
+    moment one pixel was visible, so the count ran to completion while the section was
+    still at opacity 0 from the GSAP reveal, and the number simply faded in already
+    settled. Shrinking the root by 20% at the bottom lines both triggers up.
+  */
+  const isInView: boolean = useInView(ref, { once: true, margin: '0px 0px -20% 0px' });
 
   const maxDecimals = Math.max(getDecimalPlaces(from), getDecimalPlaces(to));
 

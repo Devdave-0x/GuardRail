@@ -33,15 +33,22 @@ export default function OpengraphImage() {
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        <div
-          style={{
-            width: 16,
-            height: 16,
-            borderRadius: 9999,
-            background: '#00ff88',
-            boxShadow: '0 0 24px #00ff88',
-          }}
-        />
+        {/* AppLogo mark, redrawn as raw SVG for Satori. Keep in sync with AppLogo.tsx. */}
+        <svg
+          width="48"
+          height="40"
+          viewBox="0 0 48 40"
+          fill="none"
+          stroke="#00ff88"
+          strokeWidth={3.5}
+          strokeLinecap="square"
+        >
+          <path d="M13 4 H5 V36 H13" />
+          <path d="M35 4 H43 V36 H35" />
+          <path d="M12 16 H36" />
+          <path d="M12 24 H36" />
+          <path d="M24 5 V35" strokeDasharray="4 4" strokeWidth={3} />
+        </svg>
         <div
           style={{
             fontSize: 28,
@@ -68,7 +75,7 @@ export default function OpengraphImage() {
         >
           Give your AI agent a wallet. Keep the keys to the brakes.
         </div>
-        <div style={{ fontSize: 28, color: '#888888', maxWidth: 900, lineHeight: 1.4 }}>
+        <div style={{ fontSize: 28, color: '#a1a1aa', maxWidth: 900, lineHeight: 1.4 }}>
           Spending limits, whitelists, and a guardian kill switch, enforced on-chain.
         </div>
       </div>

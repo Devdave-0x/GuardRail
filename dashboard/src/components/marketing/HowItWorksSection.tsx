@@ -1,12 +1,13 @@
 'use client';
 
+import type { FlowStep } from '@/types';
 import { Section } from '@/components/shared/Section';
 import { SectionHeading } from '@/components/shared/SectionHeading';
 import { useSectionReveal } from '@/hooks';
 
 // === Data
 
-const FLOW = [
+const FLOW: FlowStep[] = [
   {
     id: 'prompt',
     label: 'User prompt',
@@ -27,7 +28,7 @@ const FLOW = [
     label: 'Sepolia or BOT Chain',
     detail: 'Only calls that satisfied the policy reach the chain.',
   },
-] as const;
+];
 
 // === Component
 
@@ -35,7 +36,7 @@ export function HowItWorksSection() {
   const containerRef = useSectionReveal();
 
   return (
-    <Section id="how-it-works" background="bg-bg-panel" innerClassName="flex flex-col gap-12">
+    <Section id="how-it-works" background="bg-surface-panel" innerClassName="flex flex-col gap-12">
       <div ref={containerRef} className="flex flex-col gap-12">
         <div data-reveal>
           <SectionHeading
@@ -59,7 +60,7 @@ export function HowItWorksSection() {
               <h3 className="font-mono text-sm font-bold uppercase tracking-wider text-text-primary">
                 {step.label}
               </h3>
-              <p className="font-mono text-xs leading-relaxed text-text-secondary">{step.detail}</p>
+              <p className="font-mono text-caption text-text-secondary">{step.detail}</p>
               {index < FLOW.length - 1 && (
                 <span
                   aria-hidden="true"

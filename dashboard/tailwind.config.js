@@ -56,12 +56,63 @@ module.exports = {
           DEFAULT: '#ffd700',
           muted: '#ffd70030',
         },
+        /*
+          Extra accent hues so a set of sibling icons can each carry their own colour
+          instead of a uniform green. Chosen to stay legible on #0a0a0a alongside the
+          existing green, blue, orange, red, and yellow. See src/lib/accents.ts, which is
+          the only place these are mapped to meaning.
+        */
+        cyan: {
+          DEFAULT: '#22d3ee',
+        },
+        violet: {
+          DEFAULT: '#a78bfa',
+        },
+        pink: {
+          DEFAULT: '#f472b6',
+        },
         text: {
-          primary: '#e8e8e8',
-          secondary: '#888888',
-          muted: '#555555',
+          primary: '#f4f4f5',
+          secondary: '#a1a1aa',
+          muted: '#7d7d87',
           green: '#00ff88',
         },
+      },
+      /*
+        Fluid type scale. Each entry is [size, { lineHeight, letterSpacing }] and uses
+        clamp(), so `text-display` is already responsive and replaces ladders like
+        `text-3xl sm:text-5xl lg:text-6xl` at every call site.
+
+        These are canonical utilities, not arbitrary values. Changing a heading size
+        across the whole site is a one-line edit here. The clamp middle term is in vw so
+        it scales continuously rather than stepping at the two breakpoints.
+      */
+      fontSize: {
+        display: [
+          'clamp(2rem, 1.2rem + 4vw, 4rem)',
+          { lineHeight: '1.05', letterSpacing: '-0.02em' },
+        ],
+        h1: [
+          'clamp(1.75rem, 1.1rem + 3.2vw, 3rem)',
+          { lineHeight: '1.1', letterSpacing: '-0.02em' },
+        ],
+        h2: [
+          'clamp(1.375rem, 1rem + 1.9vw, 2.25rem)',
+          { lineHeight: '1.15', letterSpacing: '-0.01em' },
+        ],
+        h3: ['clamp(1.125rem, 0.95rem + 0.9vw, 1.5rem)', { lineHeight: '1.25' }],
+        lead: ['clamp(0.9375rem, 0.85rem + 0.5vw, 1.125rem)', { lineHeight: '1.6' }],
+        body: ['clamp(0.8125rem, 0.78rem + 0.2vw, 0.9375rem)', { lineHeight: '1.65' }],
+        caption: ['clamp(0.6875rem, 0.66rem + 0.15vw, 0.8125rem)', { lineHeight: '1.5' }],
+        micro: ['clamp(0.625rem, 0.61rem + 0.08vw, 0.6875rem)', { lineHeight: '1.4' }],
+      },
+      height: {
+        /* Fixed scroll height for the agent chat log. */
+        'chat-log': '26.25rem',
+      },
+      letterSpacing: {
+        /* The wordmark's wide spacing, matching the logo artwork. */
+        logo: '0.2em',
       },
       fontFamily: {
         mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace'],
@@ -75,6 +126,7 @@ module.exports = {
       },
       boxShadow: {
         green: '0 0 20px rgba(0, 255, 136, 0.15)',
+        cta: '0 0 0 1px rgba(0, 255, 136, 0.25), 0 6px 24px -4px rgba(0, 255, 136, 0.35)',
         'green-sm': '0 0 8px rgba(0, 255, 136, 0.2)',
         panel: '0 1px 0 #1e1e1e, 0 -1px 0 #1e1e1e',
       },

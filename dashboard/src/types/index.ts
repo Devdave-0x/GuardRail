@@ -1,3 +1,5 @@
+import type { LucideIcon } from 'lucide-react';
+
 // Contract state types
 export interface ContractState {
   address: string;
@@ -110,11 +112,67 @@ export interface GuardFeature {
   description: string;
   /* lucide-react icon name, resolved by the consuming component. */
   icon: string;
+  accent: Accent;
+}
+
+/*
+  Accent hues available to icons and cards. Mapped to Tailwind classes in
+  src/lib/accents.ts, which is the only place the class strings live.
+*/
+export type Accent = 'green' | 'blue' | 'cyan' | 'violet' | 'pink' | 'orange' | 'red' | 'yellow';
+
+export interface AccentClasses {
+  text: string;
+  border: string;
+  bg: string;
+  /* Raw rgba, not a class: feeds --edge-glow-color on the cursor-tracking border. */
+  glow: string;
+}
+
+/*
+  Marketing content shapes. Declared here and applied at the definition
+  (`const PROBLEMS: Problem[] = [...]`) rather than inferred with `as const`, so a missing
+  or misspelled field is an error where the data is written instead of where it is read.
+  That is also what removes the need for `as Accent` casts on every literal.
+*/
+export interface Problem {
+  id: string;
+  title: string;
+  body: string;
+  /* lucide-react icon component, imported by the section that renders it. */
+  icon: LucideIcon;
+  accent: Accent;
+}
+
+export interface FlowStep {
+  id: string;
+  label: string;
+  detail: string;
+}
+
+export interface Capability {
+  id: string;
+  title: string;
+  body: string;
+  icon: LucideIcon;
+  accent: Accent;
 }
 
 export interface McpTool {
   name: string;
   description: string;
+  /* lucide-react icon name, resolved by the consuming component. */
+  icon: string;
+  accent: Accent;
+}
+
+/*
+  One rendered row in a Terminal block. `prompt` is something the user types, `output` is
+  what the shell prints back, `comment` is annotation that is neither.
+*/
+export interface TerminalLine {
+  kind: 'prompt' | 'output' | 'comment';
+  text: string;
 }
 
 export interface NavItem {

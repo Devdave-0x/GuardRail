@@ -16,9 +16,9 @@
   --blue: #0070f3;
   --blue-bright: #3b82f6;
   --yellow: #ffd700;
-  --text-primary: #e8e8e8;
-  --text-secondary: #888888;
-  --text-muted: #555555;
+  --text-primary: #f4f4f5;
+  --text-secondary: #a1a1aa;
+  --text-muted: #7d7d87;
 }
 
 /*
@@ -37,6 +37,9 @@
     --section-py-loose: theme('spacing.20');
     --panel-gap: theme('spacing.4');
     --stack-gap: theme('spacing.3');
+
+    /* How opaque a section sits over the ambient background. See .bg-surface. */
+    --surface-alpha: 0.62;
   }
 
   @screen sm {
@@ -115,6 +118,68 @@ body::before {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
   opacity: 0.018;
   mix-blend-mode: overlay;
+}
+
+/*
+  Translucent section surfaces.
+
+  The ambient DotField is mounted once, fixed behind the whole marketing route, and
+  tracks the cursor globally. An opaque section background hides it, which is why the
+  effect used to be visible only behind the hero. These surfaces let it through for the
+  full page while keeping enough tint under body copy for contrast.
+
+  --surface-alpha is the single dial for how much shows through. Tune it here, not at
+  call sites. color-mix keeps --bg and --bg-panel the source of truth for the hue.
+*/
+@layer components {
+  .bg-surface {
+    background-color: color-mix(in srgb, var(--bg) calc(var(--surface-alpha) * 100%), transparent);
+  }
+
+  .bg-surface-panel {
+    background-color: color-mix(
+      in srgb,
+      var(--bg-panel) calc(var(--surface-alpha) * 100%),
+      transparent
+    );
+  }
+}
+
+/*
+  Gradient text. Used on a single phrase in the hero headline, not as a general style.
+
+  background-clip: text needs a transparent fill to show through, which means the glyphs
+  have no colour of their own. Forced-colors mode discards backgrounds, so the text would
+  disappear entirely without the fallback below.
+*/
+.text-gradient {
+  background-image: linear-gradient(100deg, #00ff88 0%, #22d3ee 45%, #a78bfa 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-pan 8s ease-in-out infinite alternate;
+}
+
+@keyframes gradient-pan {
+  to {
+    background-position: 100% center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text-gradient {
+    animation: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .text-gradient {
+    background-image: none;
+    color: CanvasText;
+    -webkit-text-fill-color: CanvasText;
+  }
 }
 
 /* Utility classes */
@@ -197,6 +262,155 @@ body::before {
 .edge-glow:hover::before,
 .edge-glow:focus-within::before {
   opacity: 1;
+}
+
+/*
+  Ambient background stack. Three fixed layers behind all content, painted in this order:
+
+    -30  .bg-mesh       drifting colour mesh, gives the page depth
+    -20  .bg-grid       faint engineering grid, parallaxes on scroll
+    -10  DotField       the cursor-reactive dot canvas (mounted in the layout)
+     -5  .bg-spotlight  large soft glow that follows the pointer
+
+  All three are CSS only, so the whole stack costs zero WebGL contexts and the budget in
+  docs/Context.md is unaffected. They read --pointer-x, --pointer-y, and --scroll-y, which
+  usePointerGlow and useScrollParallax write once per frame.
+*/
+.bg-mesh,
+.bg-grid,
+.bg-spotlight {
+  position: fixed;
+  pointer-events: none;
+  contain: strict;
+}
+
+.bg-mesh {
+  inset: -25%;
+  z-index: -30;
+  opacity: 0.5;
+  background:
+    radial-gradient(38rem circle at 18% 22%, rgba(0, 255, 136, 0.16), transparent 60%),
+    radial-gradient(34rem circle at 82% 18%, rgba(59, 130, 246, 0.16), transparent 60%),
+    radial-gradient(40rem circle at 68% 78%, rgba(167, 139, 250, 0.13), transparent 62%),
+    radial-gradient(30rem circle at 26% 82%, rgba(34, 211, 238, 0.12), transparent 60%);
+  /* translateZ promotes the layer so the drift never repaints page content. */
+  animation: mesh-drift 48s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes mesh-drift {
+  from {
+    transform: translate3d(-2%, -1%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(2%, 1.5%, 0) scale(1.08);
+  }
+}
+
+.bg-grid {
+  inset: 0;
+  z-index: -20;
+  opacity: 0.28;
+  background-image:
+    linear-gradient(to right, rgba(0, 255, 136, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 255, 136, 0.05) 1px, transparent 1px);
+  background-size: 64px 64px;
+  /* Parallax: the grid drifts at a fraction of scroll speed. */
+  transform: translate3d(0, calc(var(--scroll-y, 0) * -0.04px), 0);
+  mask-image: radial-gradient(ellipse 100% 60% at 50% 40%, #000 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 100% 60% at 50% 40%, #000 40%, transparent 100%);
+}
+
+.bg-spotlight {
+  inset: 0;
+  z-index: -5;
+  background: radial-gradient(
+    36rem circle at var(--pointer-x, 50%) var(--pointer-y, 30%),
+    rgba(0, 255, 136, 0.07),
+    rgba(59, 130, 246, 0.05) 35%,
+    transparent 65%
+  );
+  transition: opacity 0.4s ease;
+}
+
+/* Coarse pointers never hover, so the spotlight would sit frozen wherever it initialised. */
+@media (pointer: coarse) {
+  .bg-spotlight {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-mesh {
+    animation: none;
+  }
+  .bg-grid {
+    transform: none;
+  }
+}
+
+/*
+  Animated border glow: a conic gradient rotating around the element's edge.
+
+  Distinct from .edge-glow, which reacts to the cursor. This one runs on its own and is
+  for drawing the eye to a small number of high-intent surfaces (the install command, the
+  MCP config). Do not put it on more than a couple of elements per screen.
+
+  @property is what makes the angle animatable: a plain custom property is a string to
+  the interpolator and would jump from 0deg to 360deg with nothing in between.
+*/
+@property --border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.animated-border {
+  position: relative;
+  isolation: isolate;
+}
+
+.animated-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--border-angle),
+    transparent 0%,
+    var(--border-glow-from, #00ff88) 10%,
+    var(--border-glow-to, #3b82f6) 20%,
+    transparent 35%,
+    transparent 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: border-rotate 6s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes border-rotate {
+  to {
+    --border-angle: 360deg;
+  }
+}
+
+/*
+  Reduced motion stops the rotation. The global backstop below collapses the duration,
+  which would freeze the gradient mid-sweep on one bright edge, so hide it outright.
+*/
+@media (prefers-reduced-motion: reduce) {
+  .animated-border::before {
+    display: none;
+  }
 }
 
 /*

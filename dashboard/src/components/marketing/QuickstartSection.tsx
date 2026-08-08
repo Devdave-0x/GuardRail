@@ -1,61 +1,51 @@
 'use client';
 
-import { Check, Copy } from 'lucide-react';
 import { Section } from '@/components/shared/Section';
 import { SectionHeading } from '@/components/shared/SectionHeading';
-import { useCopyToClipboard, useSectionReveal } from '@/hooks';
+import { Terminal } from '@/components/shared/Terminal';
+import type { TerminalLine } from '@/types';
+import { useSectionReveal } from '@/hooks';
 
 // === Data
 
 const INSTALL_COMMAND = 'npx create-eth-agent@latest my-agent';
 
+const INSTALL_LINES: readonly TerminalLine[] = [
+  { kind: 'prompt', text: INSTALL_COMMAND },
+  { kind: 'output', text: '✔ Scaffolding agent in ./my-agent' },
+  { kind: 'output', text: '✔ Installing dependencies' },
+  { kind: 'output', text: '✔ Building runtime' },
+  { kind: 'comment', text: '# Done. Next: resolve the MCP server path.' },
+];
+
+/*
+  The args path in an MCP config must be absolute, and it is the single most common thing
+  people get wrong here. Rather than printing a placeholder they have to decode, this
+  block hands them a command whose output IS the value to paste.
+*/
+const PATH_COMMAND = 'echo "$(pwd)/runtime/dist/mcp-server.js"';
+
+const PATH_LINES: readonly TerminalLine[] = [
+  { kind: 'comment', text: '# From your project root:' },
+  { kind: 'prompt', text: 'cd my-agent' },
+  { kind: 'prompt', text: PATH_COMMAND },
+  { kind: 'output', text: '/Users/you/my-agent/runtime/dist/mcp-server.js' },
+  { kind: 'comment', text: '# Paste that line into "args" below.' },
+];
+
 const MCP_CONFIG = `{
   "mcpServers": {
     "eth-agent": {
       "command": "node",
-      "args": ["/full/path/to/runtime/dist/mcp-server.js"]
+      "args": ["<paste the path from step 2>"]
     }
   }
 }`;
 
-// === Copy block
-
-interface CopyBlockProps {
-  label: string;
-  value: string;
-  multiline?: boolean;
-}
-
-function CopyBlock({ label, value, multiline = false }: CopyBlockProps) {
-  const { copied, copy, error } = useCopyToClipboard();
-
-  return (
-    <div className="flex flex-col gap-2">
-      <p className="font-mono text-xs uppercase tracking-wider text-text-muted">{label}</p>
-      <div className="flex items-start gap-2 rounded-lg border border-border bg-bg-panel p-4">
-        <pre
-          className={`min-w-0 flex-1 overflow-x-auto font-mono text-xs text-text-primary ${multiline ? '' : 'whitespace-pre-wrap'}`}
-        >
-          <code>{value}</code>
-        </pre>
-        <button
-          type="button"
-          onClick={() => copy(value)}
-          aria-label={copied ? `${label} copied` : `Copy ${label}`}
-          className="shrink-0 rounded border border-border p-1.5 text-text-muted transition-colors hover:border-green/50 hover:text-green"
-        >
-          {copied ? <Check size={13} aria-hidden="true" /> : <Copy size={13} aria-hidden="true" />}
-        </button>
-      </div>
-      {/* Clipboard access is denied in insecure contexts, so surface the failure. */}
-      {error && (
-        <p role="alert" className="font-mono text-xs text-orange">
-          Could not copy. Select the text and copy manually.
-        </p>
-      )}
-    </div>
-  );
-}
+const MCP_LINES: readonly TerminalLine[] = [
+  { kind: 'comment', text: '# claude_desktop_config.json' },
+  { kind: 'output', text: MCP_CONFIG },
+];
 
 // === Component
 
@@ -63,25 +53,50 @@ export function QuickstartSection() {
   const containerRef = useSectionReveal();
 
   return (
-    <Section id="quickstart" background="bg-bg-panel" innerClassName="flex flex-col gap-12">
+    <Section id="quickstart" background="bg-surface-panel" innerClassName="flex flex-col gap-12">
       <div ref={containerRef} className="flex flex-col gap-12">
         <div data-reveal>
           <SectionHeading
             id="quickstart"
             eyebrow="Developers"
             title="Running in one command"
-            description="Scaffold an agent, point your IDE at the MCP server, and start issuing goals."
+            description="Scaffold an agent, resolve the server path, point your IDE at it, and start issuing goals."
           />
         </div>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <div data-reveal>
-            <CopyBlock label="Install" value={INSTALL_COMMAND} />
-          </div>
-          <div data-reveal>
-            <CopyBlock label="MCP config" value={MCP_CONFIG} multiline />
-          </div>
-        </div>
+        <ol className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <li data-reveal className="flex flex-col gap-3">
+            <StepLabel index={1} label="Scaffold" />
+            <Terminal
+              title="bash"
+              lines={INSTALL_LINES}
+              copyValue={INSTALL_COMMAND}
+              copyLabel="install command"
+              animatedBorder
+            />
+          </li>
+
+          <li data-reveal className="flex flex-col gap-3">
+            <StepLabel index={2} label="Resolve the path" />
+            <Terminal
+              title="bash"
+              lines={PATH_LINES}
+              copyValue={PATH_COMMAND}
+              copyLabel="path command"
+            />
+          </li>
+
+          <li data-reveal className="flex flex-col gap-3">
+            <StepLabel index={3} label="Configure MCP" />
+            <Terminal
+              title="claude_desktop_config.json"
+              lines={MCP_LINES}
+              copyValue={MCP_CONFIG}
+              copyLabel="MCP config"
+              animatedBorder
+            />
+          </li>
+        </ol>
 
         <p data-reveal className="font-mono text-xs text-text-muted">
           Add the config to Claude Desktop, Cursor, or Kiro, restart the IDE, and the eight tools
@@ -89,5 +104,23 @@ export function QuickstartSection() {
         </p>
       </div>
     </Section>
+  );
+}
+
+// === Step label
+
+function StepLabel({ index, label }: { index: number; label: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span
+        aria-hidden="true"
+        className="flex h-5 w-5 shrink-0 items-center justify-center rounded border border-green/40 bg-green/10 font-mono text-micro font-bold text-green"
+      >
+        {index}
+      </span>
+      <span className="font-mono text-xs uppercase tracking-wider text-text-secondary">
+        {label}
+      </span>
+    </div>
   );
 }

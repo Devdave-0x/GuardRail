@@ -3,7 +3,8 @@
 import { ReactNode } from 'react';
 import { Copy, Check, ExternalLink } from 'lucide-react';
 import { formatAddress, getEtherscanLink, cn } from '@/lib/utils';
-import { useCopyToClipboard, useCountdown } from '@/hooks';
+import { useCopyToClipboard } from '@/hooks/useCopyToClipboard';
+import { useCountdown } from '@/hooks/useCountdown';
 
 // === Panel
 export interface PanelProps {
@@ -280,16 +281,28 @@ export function Button({
   className,
   type = 'button',
 }: ButtonProps) {
+  /*
+    cursor-pointer is explicit because Tailwind's preflight sets `cursor: default` on
+    button, so a bare <button> does not get a hand cursor on its own.
+
+    transition-all rather than transition-colors: the primary variant animates its shadow
+    away on hover, and transition-colors would leave that change instant.
+  */
   const base =
-    'font-mono font-bold tracking-wider uppercase transition-all duration-150 rounded border disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2';
+    'flex items-center justify-center gap-2 rounded border font-mono font-bold uppercase tracking-wider transition-all duration-300 ease-in-out cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none';
   // Size names, not breakpoints. `md` here is the default button scale.
   const sizes: Record<NonNullable<ButtonProps['size']>, string> = {
-    sm: 'px-3 py-1.5 text-xs',
-    md: 'px-4 py-2 text-xs',
+    sm: 'px-3 py-1.5 text-micro',
+    md: 'px-4 py-2 text-caption',
   };
-  const variants = {
+  const variants: Record<NonNullable<ButtonProps['variant']>, string> = {
+    /*
+      The resting shadow is what makes the primary action findable at a glance. It clears
+      on hover so it does not sit under the cursor-tracking edge glow, which takes over as
+      the hover affordance.
+    */
     primary:
-      'bg-green/10 border-green/50 text-green hover:bg-green/20 hover:border-green hover:shadow-green-sm',
+      'bg-green/10 border-green/50 text-green shadow-cta hover:bg-green/20 hover:border-green hover:shadow-none',
     danger: 'bg-red/10 border-red/50 text-red hover:bg-red/20 hover:border-red',
     warn: 'bg-orange/10 border-orange/50 text-orange hover:bg-orange/20 hover:border-orange',
     ghost:

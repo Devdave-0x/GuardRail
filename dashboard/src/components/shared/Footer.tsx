@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { FooterSection } from '@/types';
 import { DEPLOYMENTS, GITHUB_URL, MARKETING_NAV } from '@/lib/marketing-stats';
+import { AppLogo } from '@/components/shared/AppLogo';
 import { cn } from '@/lib/utils';
 
 // === Types
@@ -80,17 +81,12 @@ export function Footer({ variant = 'marketing', className }: FooterProps) {
   }
 
   return (
-    <footer className={cn('relative h-full w-full border-t border-border bg-bg', className)}>
+    <footer className={cn('bg-surface relative h-full w-full border-t border-border', className)}>
       <div className="mx-auto w-full max-w-container px-section-px py-section-py-tight">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-1.5">
-              <span aria-hidden="true" className="h-2 w-2 animate-pulse rounded-full bg-green" />
-              <span className="font-mono text-xs font-bold uppercase tracking-widest text-green">
-                GuardRail
-              </span>
-            </div>
-            <p className="max-w-xs font-mono text-xs leading-relaxed text-text-secondary">
+            <AppLogo variant="full" size="md" />
+            <p className="max-w-xs font-mono text-caption text-text-secondary">
               On-chain policy enforcement for autonomous agents. Limits, whitelists, and a guardian
               kill switch, enforced by the contract.
             </p>
@@ -129,8 +125,14 @@ export function Footer({ variant = 'marketing', className }: FooterProps) {
           ))}
         </div>
 
-        <div className="flex flex-col gap-3 border-t border-border pt-6 font-mono text-xs text-text-muted sm:flex-row sm:items-center sm:justify-between">
-          <span>GuardRail. Autonomous agents, on a short leash.</span>
+        <div className="mt-10 flex flex-col gap-3 border-t border-border pt-6 font-mono text-xs text-text-muted sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
+            <span>&copy; {new Date().getFullYear()} GuardRail Team. All rights reserved.</span>
+            <span aria-hidden="true" className="hidden text-border-bright sm:inline">
+              |
+            </span>
+            <span>Autonomous agents, on a short leash.</span>
+          </div>
           <span className="flex items-center gap-2">
             <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-green" />
             All systems operational

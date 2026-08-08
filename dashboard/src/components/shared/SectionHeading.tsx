@@ -39,7 +39,7 @@ export function SectionHeading({
       )}
       <Heading
         id={`${id}-heading`}
-        className="text-balance text-2xl font-bold leading-tight tracking-tight text-text-primary sm:text-3xl lg:text-4xl"
+        className="text-balance text-3xl font-bold leading-tight tracking-tight text-text-primary sm:text-4xl lg:text-5xl"
       >
         {title}
       </Heading>

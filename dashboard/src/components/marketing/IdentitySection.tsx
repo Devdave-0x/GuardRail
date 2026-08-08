@@ -1,38 +1,43 @@
 'use client';
 
 import { Fingerprint, Lock, ScrollText, Share2 } from 'lucide-react';
+import type { Capability } from '@/types';
 import { Section } from '@/components/shared/Section';
 import { SectionHeading } from '@/components/shared/SectionHeading';
 import { useSectionReveal } from '@/hooks';
 
 // === Data
 
-const CAPABILITIES = [
+const CAPABILITIES: Capability[] = [
   {
     id: 'tee',
+    accent: 'violet',
     icon: Lock,
     title: 'Encrypted TEE session',
     body: 'Every agent session opens inside a Trusted Execution Environment through the T3N SDK.',
   },
   {
     id: 'did',
+    accent: 'cyan',
     icon: Fingerprint,
     title: 'did:t3n identifier',
     body: 'The agent receives a decentralized identifier cryptographically linked to its AgentWallet address.',
   },
   {
     id: 'audit',
+    accent: 'blue',
     icon: ScrollText,
     title: 'Immutable audit trail',
     body: 'Every action is logged to the T3N ledger, so the record cannot be edited after the fact.',
   },
   {
     id: 'protocols',
+    accent: 'green',
     icon: Share2,
     title: 'Protocol compatible',
     body: 'Works alongside A2A, ERC-8004, and MCP rather than replacing any of them.',
   },
-] as const;
+];
 
 // === Component
 
@@ -40,7 +45,7 @@ export function IdentitySection() {
   const containerRef = useSectionReveal();
 
   return (
-    <Section id="identity" background="bg-bg-panel" innerClassName="flex flex-col gap-12">
+    <Section id="identity" background="bg-surface-panel" innerClassName="flex flex-col gap-12">
       <div ref={containerRef} className="flex flex-col gap-12">
         <div data-reveal>
           <SectionHeading
@@ -64,9 +69,7 @@ export function IdentitySection() {
                 <h3 className="font-mono text-sm font-bold uppercase tracking-wider text-text-primary">
                   {capability.title}
                 </h3>
-                <p className="font-mono text-xs leading-relaxed text-text-secondary">
-                  {capability.body}
-                </p>
+                <p className="font-mono text-caption text-text-secondary">{capability.body}</p>
               </li>
             );
           })}

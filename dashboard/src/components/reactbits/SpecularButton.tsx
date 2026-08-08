@@ -367,7 +367,7 @@ export const SpecularButton: React.FC<SpecularButtonProps> = ({
       type={type}
       disabled={disabled}
       onClick={onClick}
-      className={`relative m-0 inline-flex cursor-pointer items-center justify-center border-none font-medium leading-none tracking-[0.01em] shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_8px_24px_rgba(0,0,0,0.25)] outline-none transition-transform duration-150 [backdrop-filter:blur(var(--sb-blur))] [background:color-mix(in_srgb,var(--sb-tint)_calc(var(--sb-tint-opacity)*100%),transparent)] [border-radius:var(--sb-radius)] [color:var(--sb-text-color)] focus-visible:outline-2 focus-visible:outline-offset-[3px] active:scale-[0.97] disabled:cursor-default disabled:opacity-55 disabled:active:scale-100 ${SIZES[size] || SIZES.md}${className ? ` ${className}` : ''}`}
+      className={`relative m-0 inline-flex w-full cursor-pointer items-center justify-center border-none font-medium leading-none tracking-[0.01em] shadow-cta outline-none transition-all duration-300 ease-in-out [backdrop-filter:blur(var(--sb-blur))] [background:color-mix(in_srgb,var(--sb-tint)_calc(var(--sb-tint-opacity)*100%),transparent)] [border-radius:var(--sb-radius)] [color:var(--sb-text-color)] hover:shadow-none focus-visible:outline-2 focus-visible:outline-offset-[3px] active:scale-[0.97] disabled:cursor-default disabled:opacity-55 disabled:active:scale-100 ${SIZES[size] || SIZES.md}${className ? ` ${className}` : ''}`}
       style={
         {
           '--sb-radius': `${radius}px`,

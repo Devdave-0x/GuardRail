@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { animate, useMotionValue } from 'motion/react';
-import { usePrefersReducedMotion } from '@/hooks';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { DURATION, EASE_OUT } from '@/lib/motion-presets';
 import { cn } from '@/lib/utils';
 
@@ -47,6 +47,15 @@ export function AnimatedNumber({
   useEffect(() => {
     if (!Number.isFinite(value)) return;
     setHasValue(true);
+
+    /*
+      The motion value seeds from `value`, which is NaN until the first poll resolves.
+      Animating out of NaN interpolates to NaN on every frame, so the figure showed
+      "NaN" and then snapped instead of counting. Reset to a real number first.
+    */
+    if (!Number.isFinite(motionValue.get())) {
+      motionValue.set(0);
+    }
 
     if (prefersReduced) {
       motionValue.set(value);

@@ -3,7 +3,7 @@ import '@rainbow-me/rainbowkit/styles.css';
 import { Providers } from '@/components/shared/Providers';
 import { Navbar } from '@/components/shared/Navbar';
 import { Footer } from '@/components/shared/Footer';
-import { PointerGlow } from '@/components/shared/PointerGlow';
+import { AmbientBackground } from '@/components/shared/AmbientBackground';
 import { createMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = createMetadata({
@@ -22,8 +22,11 @@ export const metadata: Metadata = createMetadata({
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <Providers>
-      {/* Feeds the cursor-tracking glow on every Panel. One listener for the route. */}
-      <PointerGlow />
+      {/*
+        Same ambient stack as the marketing route at lower intensity, so the dashboard
+        reads as the same product. Also feeds the cursor glow on every Panel.
+      */}
+      <AmbientBackground variant="subtle" />
       <Navbar />
       <main id="main" className="min-h-screen">
         {children}

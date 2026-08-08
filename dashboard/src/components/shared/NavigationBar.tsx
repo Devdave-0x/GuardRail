@@ -4,8 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
+import { AppLogo } from '@/components/shared/AppLogo';
 import { MARKETING_NAV } from '@/lib/marketing-stats';
-import { usePrefersReducedMotion } from '@/hooks';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { DURATION, EASE_OUT } from '@/lib/motion-presets';
 import { cn } from '@/lib/utils';
 
@@ -66,10 +67,7 @@ export function NavigationBar() {
     >
       <div className="mx-auto flex h-14 w-full max-w-container items-center justify-between px-section-px lg:h-16">
         <Link href="/" className="flex items-center gap-1.5 rounded" aria-label="GuardRail home">
-          <span aria-hidden="true" className="h-2 w-2 animate-pulse rounded-full bg-green" />
-          <span className="font-mono text-xs font-bold uppercase tracking-widest text-green">
-            GuardRail
-          </span>
+          <AppLogo variant="full" size="md" />
         </Link>
 
         <nav aria-label="Main" className="hidden lg:block">

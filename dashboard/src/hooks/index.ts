@@ -14,3 +14,4 @@ export type { UseCountdownResult } from './useCountdown';
 export type { UseInViewportOptions } from './useInViewport';
 export type { RafCallback, UseRafLoopOptions } from './useRafLoop';
 export type { UseSectionRevealOptions } from './useSectionReveal';
+export { useScrollParallax } from './useScrollParallax';

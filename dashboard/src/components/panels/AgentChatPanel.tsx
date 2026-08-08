@@ -365,7 +365,7 @@ export function AgentChatPanel() {
       }
       status={streaming ? 'info' : 'ok'}
     >
-      <div className="flex h-[420px] flex-col">
+      <div className="flex h-chat-log flex-col">
         {/* Message log */}
         <div
           ref={messageLogRef}
@@ -397,7 +397,8 @@ export function AgentChatPanel() {
                           rel="noopener noreferrer"
                           className="ml-2 inline-flex items-center gap-1 text-blue-bright hover:underline"
                         >
-                          View on Etherscan <ExternalLink size={10} />
+                          View on Etherscan <ExternalLink size={10} aria-hidden="true" />
+                          <span className="sr-only"> (opens in a new tab)</span>
                         </a>
                       )}
                     </div>
