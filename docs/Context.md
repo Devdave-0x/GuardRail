@@ -250,8 +250,10 @@ canvas read as a page-wide background.
 `--surface-alpha` in `globals.css` is the single dial for how much shows through. Tune it
 there. Never hardcode `bg-bg/60` at a call site.
 
-The hero is the deliberate exception and stays opaque. It has its own LaserFlow canvas and
-gradient stack, and layering the dot field under that reads as noise.
+The hero was previously the deliberate exception and stayed opaque, because it owned a
+LaserFlow canvas and a gradient stack that the dot field read as noise underneath. That
+canvas is gone, so the hero is now on `bg-surface` like every other section and there is no
+exception left to remember.
 
 Two consequences to respect:
 
@@ -468,13 +470,15 @@ Contexts are a countable budget. Spend them deliberately.
 | `SpecularButton`                                | 1 per instance  | ogl        |
 | `Prism`, `LightRays`, `Aurora`, `GradientWaves` | 1               | ogl        |
 | `LaserFlow`                                     | 1, large bundle | three      |
+| Hero render (`next/image`)                      | 0               | still PNG  |
 | `ElectricBorder`                                | 0               | SVG filter |
 
 Allocation:
 
-- **Marketing route: 3 contexts.** `DotField` background (0), one hero effect (1), two
-  `SpecularButton` CTAs (2). Additional WebGL section backgrounds must lazy-mount on
-  scroll into view and unmount on exit so they borrow a slot rather than adding one.
+- **Marketing route: 2 contexts.** `DotField` background (0), the hero render (0, it is a
+  still image), two `SpecularButton` CTAs (2). Additional WebGL section backgrounds must
+  lazy-mount on scroll into view and unmount on exit so they borrow a slot rather than
+  adding one.
 - **App route: 1 context maximum.** `DotField` (0), edge glow on all panels (0), and
   optionally `Connect Wallet` as the single `SpecularButton` (1).
 - **Never more than 2 WebGL surfaces animating in the viewport at once.**
@@ -618,9 +622,12 @@ This is not theoretical. The marketing route's First Load JS was **456 kB** with
 imports and **303 kB** after switching six imports to deep paths, with `three` dropping out
 of the initial payload entirely.
 
-Anything three-based is additionally loaded through `next/dynamic` with `ssr: false` so it
-stays out of First Load even where it is used. `LaserFlow` in `HeroSection` is the
-reference example.
+Anything three-based must additionally be loaded through `next/dynamic` with `ssr: false`
+so it stays out of First Load even where it is used.
+
+Nothing currently imports it. `three` is not in any client chunk on either route, and the
+build is checked with `grep -rl WebGLRenderer .next/static/chunks/`, which must return
+nothing. Keep it that way.
 
 ---
 
@@ -734,12 +741,30 @@ for demo iteration. The marketing figure quotes the Sepolia value.
 
 Two things share the hero and should not be confused.
 
-`LaserFlow` is the abstract centrepiece. It reads as a beam of light through a guard rail,
-which is on-metaphor, and it substitutes for the rendered 3D asset the reference videos
-use and we do not have. It imports `three`, materially larger than the rest of the vendored
-set, so it is dynamically imported and mounts only when in view and motion is allowed.
-`Prism` and `LightRays` are `ogl`-based alternatives at a fraction of the weight if the
-bundle cost ever proves unacceptable.
+The **hero render** is the centrepiece: a still 3D plate at
+`dashboard/public/hero/ai-gateway.png`, served through `next/image` with `priority` because
+it is the LCP element. It is capped by the `max-w-hero-art` token (550px) and centred with
+`mx-auto` when the layout stacks below `lg`.
+
+It replaced `LaserFlow`, a three-based WebGL beam that was the largest entry in the
+marketing bundle. The still carries the whole product narrative in one frame, agent to
+intent to policy gate to settled transaction, which the beam never did, and it costs zero
+WebGL contexts. `three` left the bundle entirely with it.
+
+Two consequences:
+
+- `HeroSection` has no `'use client'`. Nothing in it is stateful, so it renders on the
+  server and the LCP image is in the initial HTML. `ShinyText` and `SpecularButton` draw
+  their own client boundaries and take only serialisable props. Do not add state here
+  without weighing that.
+- The source art is `docs/Screens/AI_Gateway_.png` and the served copy is
+  `dashboard/public/hero/ai-gateway.png`. They are two files, so replacing one and not the
+  other silently leaves the site on the old art. `docs/Screens/` was gitignored until the
+  hero needed it; if that line in `.gitignore` is ever restored, the source stops being
+  tracked while the served copy keeps working, which is a trap worth knowing about.
+
+`animate-art-float` gives the plate a slow 9s drift. A still that never moves beside an
+animated ambient background reads as a failed asset load.
 
 `LiveProductHero` is the stronger idea and is implemented in
 `src/components/marketing/LiveProductHero.tsx`. It is the product itself, running: a

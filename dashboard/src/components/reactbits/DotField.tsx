@@ -147,11 +147,16 @@ export const DotField = memo<DotFieldProps>(
         canvas.style.height = `${h}px`;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
+        /*
+          Viewport coords, not page coords. The container is position: fixed, so folding
+          scrollX/scrollY in here froze the offset at whatever the scroll was when this
+          last ran and the pointer drifted off the cursor by exactly the distance scrolled.
+        */
         sizeRef.current = {
           w,
           h,
-          offsetX: rect.left + window.scrollX,
-          offsetY: rect.top + window.scrollY,
+          offsetX: rect.left,
+          offsetY: rect.top,
         };
         buildDots(w, h);
         if (reduced) draw();
@@ -164,8 +169,8 @@ export const DotField = memo<DotFieldProps>(
 
       const onMouseMove = (event: MouseEvent): void => {
         const s = sizeRef.current;
-        mouseRef.current.x = event.pageX - s.offsetX;
-        mouseRef.current.y = event.pageY - s.offsetY;
+        mouseRef.current.x = event.clientX - s.offsetX;
+        mouseRef.current.y = event.clientY - s.offsetY;
       };
 
       const updateMouseSpeed = (): void => {

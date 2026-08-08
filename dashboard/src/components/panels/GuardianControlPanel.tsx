@@ -16,6 +16,7 @@ import { Panel, Badge, Button, Input } from '@/components/shared';
 import { useContractState } from '@/hooks/useContractState';
 import { useAccount, useWriteContract } from 'wagmi';
 import { CONTRACT_ADDRESS, AGENT_WALLET_ABI } from '@/lib/contract';
+import { cn } from '@/lib/utils';
 import { parseEther } from 'viem';
 
 type ActiveSection = 'none' | 'withdraw' | 'agent' | 'guardian' | 'limits';
@@ -141,7 +142,7 @@ export function GuardianControlPanel() {
       >
         <div className="p-6 text-center">
           <ShieldAlert size={32} className="mx-auto mb-3 text-text-muted" />
-          <p className="font-mono text-xs text-text-muted">
+          <p className="font-mono text-caption text-text-muted">
             Connect guardian wallet to access controls
           </p>
         </div>
@@ -159,7 +160,7 @@ export function GuardianControlPanel() {
       >
         <div className="p-6 text-center">
           <ShieldAlert size={32} className="mx-auto mb-3 text-text-muted" />
-          <p className="font-mono text-xs text-text-muted">
+          <p className="font-mono text-caption text-text-muted">
             Connect guardian wallet to access controls
           </p>
         </div>
@@ -177,10 +178,10 @@ export function GuardianControlPanel() {
       >
         <div className="p-6 text-center">
           <ShieldAlert size={32} className="mx-auto mb-3 text-orange" />
-          <p className="font-mono text-xs text-text-muted">
+          <p className="font-mono text-caption text-text-muted">
             Connected: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
           </p>
-          <p className="mt-1 font-mono text-xs text-orange">Not the guardian address</p>
+          <p className="mt-1 font-mono text-caption text-orange">Not the guardian address</p>
         </div>
       </Panel>
     );
@@ -200,9 +201,26 @@ export function GuardianControlPanel() {
           <Badge variant="green">Guardian Connected</Badge>
         </div>
 
-        {/* Pause / Unpause */}
-        <div className="flex flex-col gap-2 rounded border border-border p-3">
-          <p className="font-mono text-xs uppercase tracking-wider text-text-muted">
+        {/*
+          One of the two surfaces allowed `.animated-border` per docs/Context.md, and only
+          while paused. A rotating border on an idle kill switch is decoration; on a paused
+          contract it is the one control the guardian is here to find.
+        */}
+        <div
+          style={
+            data?.paused
+              ? ({
+                  '--border-glow-from': '#ff3333',
+                  '--border-glow-to': '#ff6b35',
+                } as React.CSSProperties)
+              : undefined
+          }
+          className={cn(
+            'flex flex-col gap-2 rounded border p-3',
+            data?.paused ? 'animated-border border-red/40' : 'border-border',
+          )}
+        >
+          <p className="font-mono text-micro uppercase tracking-wider text-text-muted">
             Emergency Controls
           </p>
           <div className="flex gap-2">
@@ -221,7 +239,7 @@ export function GuardianControlPanel() {
             )}
           </div>
           {data?.paused && (
-            <div className="flex items-center gap-2 font-mono text-xs text-red">
+            <div className="flex items-center gap-2 font-mono text-caption text-red">
               <AlertTriangle size={12} className="animate-blink" /> CONTRACT IS PAUSED: agent cannot
               execute
             </div>
@@ -295,7 +313,7 @@ export function GuardianControlPanel() {
               onChange={setNewAgent}
               placeholder="0x..."
             />
-            <p className="font-mono text-xs text-text-muted">
+            <p className="font-mono text-caption text-text-muted">
               New agent must call acceptAgent() to complete transfer
             </p>
             <Button
@@ -313,7 +331,7 @@ export function GuardianControlPanel() {
         {/* Transfer guardian form */}
         {section === 'guardian' && (
           <div className="flex animate-slide-in flex-col gap-3 rounded border border-red/30 bg-red/5 p-3">
-            <p className="inline-flex items-center gap-1 font-mono text-xs text-red">
+            <p className="inline-flex items-center gap-1 font-mono text-caption text-red">
               <AlertTriangle size={12} /> CAUTION: New guardian must accept before this takes effect
             </p>
             <Input
@@ -337,7 +355,7 @@ export function GuardianControlPanel() {
         {/* Limits form */}
         {section === 'limits' && (
           <div className="flex animate-slide-in flex-col gap-3 rounded border border-border p-3">
-            <p className="font-mono text-xs text-text-muted">
+            <p className="font-mono text-caption text-text-muted">
               To increase limits, a 10-minute timelock applies
             </p>
             <Input
@@ -391,7 +409,7 @@ export function GuardianControlPanel() {
         {/* Status */}
         {txStatus && (
           <div
-            className={`rounded border px-3 py-2 font-mono text-xs ${
+            className={`rounded border px-3 py-2 font-mono text-caption ${
               txStatus.ok && txStatus.msg.startsWith('✓')
                 ? 'border-green/30 bg-green/5 text-green'
                 : txStatus.ok

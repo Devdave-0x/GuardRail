@@ -50,19 +50,39 @@ export function Panel({
     info: 'rgba(59, 130, 246, 0.6)',
   }[resolvedStatus];
 
+  /*
+    Only a panel in trouble breathes. A dashboard where every surface pulses carries no
+    information, so `ok` and `info` stay still and the animation itself becomes the signal.
+  */
+  const alerting = resolvedStatus === 'warn' || resolvedStatus === 'error';
+  const statusGlowColor = {
+    warn: 'rgba(255, 107, 53, 0.55)',
+    error: 'rgba(255, 51, 51, 0.65)',
+  }[resolvedStatus as 'warn' | 'error'];
+
   return (
     <div
-      style={glow ? ({ '--edge-glow-color': glowColor } as React.CSSProperties) : undefined}
+      style={
+        {
+          ...(glow ? { '--edge-glow-color': glowColor } : {}),
+          ...(alerting ? { '--status-glow-color': statusGlowColor } : {}),
+        } as React.CSSProperties
+      }
       className={cn(
-        'relative overflow-hidden rounded-lg border bg-bg-panel',
+        'relative flex flex-col overflow-hidden rounded-lg border bg-bg-panel',
         glow && 'edge-glow',
+        alerting && 'status-pulse',
         statusColor,
         className,
       )}
     >
-      {/* Scanline effect */}
+      {/*
+        Scanline. Previously 0.015, which is below the threshold where an LCD renders any
+        difference at all: it cost a composited layer and showed nothing.
+      */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.015]"
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 opacity-[0.04]"
         style={{
           backgroundImage:
             'repeating-linear-gradient(0deg, transparent, transparent 2px, #00ff88 2px, #00ff88 3px)',
@@ -70,30 +90,35 @@ export function Panel({
       />
 
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-border px-4 py-3">
-        <div>
+      <div className="flex items-start justify-between gap-3 border-b border-border px-4 py-3">
+        <div className="flex flex-col gap-0.5">
           <div className="flex items-center gap-2">
-            <span className="font-mono text-xs font-bold uppercase tracking-wider text-green">
+            <h2 className="font-mono text-caption font-bold uppercase tracking-wider text-green">
               {title}
-            </span>
+            </h2>
             {status === 'error' && (
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red" />
+              <span aria-hidden="true" className="h-1.5 w-1.5 animate-pulse rounded-full bg-red" />
             )}
             {status === 'warn' && (
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-orange" />
+              <span
+                aria-hidden="true"
+                className="h-1.5 w-1.5 animate-pulse rounded-full bg-orange"
+              />
             )}
           </div>
-          {subtitle && <p className="mt-0.5 font-mono text-xs text-text-muted">{subtitle}</p>}
+          {subtitle && <p className="font-mono text-micro text-text-muted">{subtitle}</p>}
         </div>
-        {actions && <div className="flex items-center gap-2">{actions}</div>}
+        {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
       </div>
 
       {/* Body */}
-      <div className="relative">
+      <div className="relative flex-1">
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="flex items-center gap-2 font-mono text-xs text-text-secondary">
-              <span className="animate-blink text-green">█</span>
+            <div className="flex items-center gap-2 font-mono text-caption text-text-secondary">
+              <span aria-hidden="true" className="animate-blink text-green">
+                █
+              </span>
               <span>LOADING...</span>
             </div>
           </div>
@@ -111,9 +136,23 @@ interface StatProps {
   value: string | ReactNode;
   dim?: boolean;
   color?: 'green' | 'orange' | 'red' | 'blue' | 'default';
+  /*
+    `lead` is the one figure a panel exists to report. At most one per panel: promoting
+    every stat returns the panel to a single flat size, which is the problem this solves.
+  */
+  emphasis?: 'lead' | 'default';
+  /* Sub-label under the value, typically a unit. */
+  hint?: string;
 }
 
-export function Stat({ label, value, dim, color = 'default' }: StatProps) {
+export function Stat({
+  label,
+  value,
+  dim,
+  color = 'default',
+  emphasis = 'default',
+  hint,
+}: StatProps) {
   const valueColor = {
     green: 'text-green',
     orange: 'text-orange',
@@ -124,8 +163,17 @@ export function Stat({ label, value, dim, color = 'default' }: StatProps) {
 
   return (
     <div className={cn('flex flex-col gap-1', dim && 'opacity-60')}>
-      <p className="font-mono text-xs uppercase tracking-wider text-text-muted">{label}</p>
-      <p className={cn('font-mono text-sm font-bold', valueColor)}>{value}</p>
+      <p className="font-mono text-micro uppercase tracking-wider text-text-muted">{label}</p>
+      <p
+        className={cn(
+          'font-mono-numbers font-mono font-bold',
+          emphasis === 'lead' ? 'text-h3' : 'text-body',
+          valueColor,
+        )}
+      >
+        {value}
+      </p>
+      {hint && <p className="font-mono text-micro text-text-muted">{hint}</p>}
     </div>
   );
 }
@@ -148,8 +196,10 @@ export function AddressDisplay({
 
   return (
     <div className={cn('group flex items-center gap-2', className)}>
-      {label && <span className="font-mono text-xs text-text-muted">{label}:</span>}
-      <span className="font-mono text-xs text-text-primary">{formatAddress(address)}</span>
+      {label && <span className="font-mono text-caption text-text-muted">{label}:</span>}
+      <span className="font-mono-numbers font-mono text-caption text-text-primary">
+        {formatAddress(address)}
+      </span>
       {/*
         Focus-within keeps the controls reachable by keyboard: group-hover alone leaves
         them at opacity 0 while focused, which is a hidden focus target.
@@ -208,7 +258,7 @@ export function Badge({ children, variant = 'green', pulse }: BadgeProps) {
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded border px-2 py-0.5 font-mono text-xs font-bold uppercase tracking-wider',
+        'inline-flex items-center gap-1.5 rounded border px-2 py-0.5 font-mono text-caption font-bold uppercase tracking-wider',
         styles,
       )}
     >
@@ -235,15 +285,24 @@ export function ProgressBar({
   danger = 90,
 }: ProgressBarProps) {
   const clamped = Math.min(100, Math.max(0, value));
-  const color = clamped >= danger ? '#ff3333' : clamped >= warn ? '#ff6b35' : '#00ff88';
+  const atDanger = clamped >= danger;
+  const color = atDanger ? '#ff3333' : clamped >= warn ? '#ff6b35' : '#00ff88';
 
   return (
     <div className="flex flex-col gap-1">
       {(label || showPercent) && (
         <div className="flex items-center justify-between">
-          {label && <span className="font-mono text-xs text-text-muted">{label}</span>}
+          {label && (
+            <span className="font-mono text-micro uppercase tracking-wider text-text-muted">
+              {label}
+            </span>
+          )}
           {showPercent && (
-            <span className="font-mono text-xs font-bold" style={{ color }}>
+            <span
+              aria-live="polite"
+              className="font-mono-numbers font-mono text-caption font-bold"
+              style={{ color }}
+            >
               {clamped.toFixed(1)}%
             </span>
           )}
@@ -251,7 +310,12 @@ export function ProgressBar({
       )}
       <div className="h-1.5 overflow-hidden rounded-full border border-border bg-bg-elevated">
         <div
-          className="h-full rounded-full transition-all duration-500"
+          /* Past the danger threshold the fill breathes, so a maxed-out limit is visible
+             from across the room rather than only on inspection. */
+          className={cn(
+            'h-full rounded-full transition-all duration-500',
+            atDanger && 'animate-pulse',
+          )}
           style={{ width: `${clamped}%`, backgroundColor: color, boxShadow: `0 0 6px ${color}60` }}
         />
       </div>
@@ -348,7 +412,7 @@ export function Input({
   return (
     <div className={cn('flex flex-col gap-1', className)}>
       {label && (
-        <label className="font-mono text-xs uppercase tracking-wider text-text-muted">
+        <label className="font-mono text-micro uppercase tracking-wider text-text-muted">
           {label}
         </label>
       )}
@@ -357,7 +421,7 @@ export function Input({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded border border-border bg-bg-elevated px-3 py-2 font-mono text-xs text-text-primary placeholder-text-muted transition-colors focus:border-green/50 focus:bg-bg-hover focus:outline-none"
+        className="w-full rounded border border-border bg-bg-elevated px-3 py-2 font-mono text-caption text-text-primary placeholder-text-muted transition-colors focus:border-green/50 focus:bg-bg-hover focus:outline-none"
       />
     </div>
   );
@@ -378,7 +442,7 @@ export function Countdown({ unlockTimeMs, startTimeMs }: CountdownProps) {
     <span
       // Timelocks resolve without user action, so announce the change politely.
       aria-live="polite"
-      className={cn('font-mono text-xs font-bold', ready ? 'text-green' : 'text-orange')}
+      className={cn('font-mono text-caption font-bold', ready ? 'text-green' : 'text-orange')}
     >
       {display}
     </span>

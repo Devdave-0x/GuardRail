@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { animate, useMotionValue } from 'motion/react';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { useValueFlash } from '@/hooks/useValueFlash';
 import { DURATION, EASE_OUT } from '@/lib/motion-presets';
 import { cn } from '@/lib/utils';
 
@@ -17,6 +18,11 @@ export interface AnimatedNumberProps {
   placeholder?: string;
   /* Values that change without user action should announce politely. */
   live?: boolean;
+  /*
+    Colour of the brief flash when the value moves. Defaults to the green in globals.css.
+    Set it to match the readout's own colour where that is not green.
+  */
+  flashColor?: string;
 }
 
 // === Component
@@ -38,11 +44,17 @@ export function AnimatedNumber({
   className,
   placeholder = '—',
   live = true,
+  flashColor,
 }: AnimatedNumberProps) {
   const motionValue = useMotionValue<number>(value);
   const [display, setDisplay] = useState<string>(value.toFixed(decimals));
   const [hasValue, setHasValue] = useState<boolean>(Number.isFinite(value));
   const prefersReduced = usePrefersReducedMotion();
+  /*
+    Counting shows the transition, but only to someone already looking at this figure.
+    The flash is what tells a reader scanning elsewhere that this panel just moved.
+  */
+  const flashing = useValueFlash(value);
 
   useEffect(() => {
     if (!Number.isFinite(value)) return;
@@ -73,7 +85,11 @@ export function AnimatedNumber({
   }, [value, decimals, motionValue, prefersReduced]);
 
   return (
-    <span aria-live={live ? 'polite' : undefined} className={cn('font-mono-numbers', className)}>
+    <span
+      aria-live={live ? 'polite' : undefined}
+      style={flashColor ? ({ '--flash-color': flashColor } as React.CSSProperties) : undefined}
+      className={cn('font-mono-numbers', flashing && 'value-flash', className)}
+    >
       {hasValue ? display : placeholder}
       {hasValue && suffix ? ` ${suffix}` : ''}
     </span>

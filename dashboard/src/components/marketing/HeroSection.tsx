@@ -1,101 +1,52 @@
-'use client';
-
 import Link from 'next/link';
-import { useRef } from 'react';
-import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import { Section } from '@/components/shared/Section';
 import { ShinyText } from '@/components/reactbits/ShinyText';
 import { SpecularButton } from '@/components/reactbits/SpecularButton';
-import { useInViewport } from '@/hooks/useInViewport';
-import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-import { GITHUB_URL } from '@/lib/marketing-stats';
-
-/*
-  LaserFlow imports three, which is by far the largest dependency in the marketing
-  bundle. Loading it statically put it in the initial payload even though the component
-  only ever renders once the hero is in view and motion is allowed. Importing it lazily
-  keeps three out of First Load JS entirely.
-
-  ssr: false because it is a WebGL canvas with nothing meaningful to render on the server.
-*/
-const LaserFlow = dynamic(
-  () => import('@/components/reactbits/LaserFlow').then((mod) => mod.LaserFlow),
-  { ssr: false },
-);
 
 // === Component
 
 /*
-  The one WebGL hero on the site. LaserFlow is three-based and is the single largest
-  entry in the marketing bundle, so it mounts only while in view and never under
-  reduced motion. See the WebGL budget in docs/Context.md.
+  Hero. Two columns from lg: copy left, the render right.
 
-  Layout is a single centred column on mobile and two columns from sm, with the copy on
-  the left and the beam occupying the right. The beam is decoration rather than a grid
-  child so it can bleed past the column edge.
+  This used to mount LaserFlow, a three-based WebGL beam that was the single largest entry
+  in the marketing bundle. The still render carries far more meaning for a fraction of the
+  weight, so three is gone from the route entirely.
+
+  No `use client`. Nothing here is stateful, so the hero renders on the server and the LCP
+  image is in the initial HTML. SpecularButton and ShinyText draw their own client
+  boundaries and take only serialisable props.
 */
 export function HeroSection() {
-  const decorationRef = useRef<HTMLDivElement | null>(null);
-  const inViewport = useInViewport(decorationRef, { rootMargin: '200px' });
-  const prefersReduced = usePrefersReducedMotion();
-  const showBeam = inViewport && !prefersReduced;
-
   return (
     <Section
       id="hero"
       spacing="loose"
       fullHeight
-      background="bg-bg"
+      background="bg-surface"
       innerClassName="flex items-center"
-      decoration={
-        <div
-          ref={decorationRef}
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 overflow-hidden"
-        >
-          {/*
-            Full bleed on mobile, where the copy is centred over it. From sm the beam is
-            confined to the right half so it sits beside the headline instead of under it.
-          */}
-          <div className="absolute inset-y-0 right-0 w-full sm:w-3/5 lg:w-1/2">
-            {showBeam && (
-              <LaserFlow
-                color="#00ff88"
-                className="h-full w-full opacity-70"
-                verticalBeamOffset={0.1}
-                horizontalBeamOffset={0.0}
-                flowSpeed={0.4}
-              />
-            )}
-          </div>
-
-          {/* Keeps the headline legible over the beam at every viewport size. */}
-          <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/70 to-transparent" />
-          <div className="absolute inset-0 hidden bg-gradient-to-r from-bg via-bg/80 to-transparent sm:block" />
-        </div>
-      }
     >
-      <div className="flex w-full flex-col items-center gap-6 text-center sm:max-w-2xl sm:items-start sm:text-left lg:max-w-3xl">
-        <p className="font-mono text-caption uppercase tracking-widest text-green">
-          <ShinyText text="On-chain agent policy" speed={4} />
-        </p>
+      <div className="grid w-full grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-12">
+        <div className="flex w-full flex-col items-center gap-6 text-center lg:items-start lg:text-left">
+          <p className="font-mono text-caption uppercase tracking-widest text-green">
+            <ShinyText text="On-chain agent policy" speed={4} />
+          </p>
 
-        <h1
-          id="hero-heading"
-          className="text-balance text-display font-extrabold text-text-primary"
-        >
-          Give your <span className="text-gradient">AI agent</span> a wallet. Keep the keys to{' '}
-          <span className="text-green">the brakes</span>.
-        </h1>
+          <h1
+            id="hero-heading"
+            className="text-balance text-display font-extrabold text-text-primary"
+          >
+            Give your <span className="text-gradient">AI agent</span> a wallet. Keep the keys to{' '}
+            <span className="text-green">the brakes</span>.
+          </h1>
 
-        <p className="max-w-xl text-pretty font-mono text-lead text-text-secondary">
-          GuardRail puts spending limits, whitelists, token policies, and a guardian kill switch
-          inside the contract. The agent cannot argue its way past any of them.
-        </p>
+          <p className="max-w-xl text-pretty font-mono text-lead text-text-secondary">
+            GuardRail puts spending limits, whitelists, token policies, and a guardian kill switch
+            inside the contract. The agent cannot argue its way past any of them.
+          </p>
 
-        <div className="flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center">
           {/* Full width and centred on mobile, natural width from sm. */}
-          <div className="mx-auto w-full max-w-sm sm:mx-0 sm:w-auto">
+          <div className="mx-auto w-full max-w-sm sm:mx-0 sm:w-auto lg:mr-auto">
             <Link href="/app" className="inline-flex w-full">
               <SpecularButton
                 lineColor="#00ff88"
@@ -107,18 +58,36 @@ export function HeroSection() {
               </SpecularButton>
             </Link>
           </div>
+        </div>
 
-          <div className="mx-auto w-full max-w-sm sm:mx-0 sm:w-auto">
-            <a
-              href={GITHUB_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="edge-glow inline-flex w-full cursor-pointer items-center justify-center rounded border border-border px-5 py-3 font-mono text-caption font-bold uppercase tracking-wider text-text-secondary transition-all duration-300 ease-in-out hover:border-border-bright hover:text-text-primary"
-            >
-              Read the contract
-              <span className="sr-only"> (opens in a new tab)</span>
-            </a>
-          </div>
+        {/*
+          The art is a grid child rather than Section decoration. The beam it replaced was
+          decoration so it could bleed past the column edge; this is a composed plate that
+          has to stay whole, and cropping it would cut the agent off one end and the settled
+          transaction off the other.
+
+          mx-auto centres it in the stacked layout below lg, where it sits under the copy.
+
+          `isolate` contains the -z-10 glow. Without a stacking context here it escapes this
+          subtree and lands behind the page, under the ambient DotField.
+        */}
+        <div className="relative isolate mx-auto w-full max-w-hero-art">
+          {/* Grounds the plate in the page palette. The render sits on pure black and the
+              page is #0a0a0a, so without this the square edge is faintly visible. */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 -z-10 bg-green/10 blur-3xl"
+          />
+          <Image
+            src="/hero/ai-gateway.png"
+            alt="An AI agent sends a transfer intent into a policy gate. The gate checks target, action, limit, guardian, and timelock, then the transaction is signed and confirmed on-chain. The gate stands on a ring labelled limits, whitelist, guardian, daily limit, timelock, and audit trail."
+            width={1254}
+            height={1254}
+            /* LCP element, so it must not be lazy loaded. */
+            priority
+            sizes="(min-width: 1024px) 550px, 100vw"
+            className="h-auto w-full animate-art-float"
+          />
         </div>
       </div>
     </Section>

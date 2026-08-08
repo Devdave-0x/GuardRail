@@ -6,7 +6,9 @@ export { useInViewport } from './useInViewport';
 export { usePointerGlow } from './usePointerGlow';
 export { usePrefersReducedMotion } from './usePrefersReducedMotion';
 export { useRafLoop } from './useRafLoop';
+export { useScrollProgress } from './useScrollProgress';
 export { useSectionReveal } from './useSectionReveal';
+export { useValueFlash } from './useValueFlash';
 
 export type { ContractStateData } from './useContractState';
 export type { UseCopyToClipboardResult } from './useCopyToClipboard';

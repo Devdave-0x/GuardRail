@@ -265,6 +265,72 @@ body::before {
 }
 
 /*
+  Scroll progress rail. Sits on the header's bottom edge and replaces its border, so the
+  header gains a readout without gaining a row.
+
+  scaleX on a pre-painted bar, not an animated width: width is a layout property and would
+  reflow the header on every frame. useScrollProgress writes --scroll-progress once per
+  frame from the same coalesced-listener pattern as usePointerGlow.
+*/
+.scroll-progress {
+  position: absolute;
+  inset-inline: 0;
+  bottom: -1px;
+  height: 2px;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.scroll-progress::after {
+  content: '';
+  display: block;
+  height: 100%;
+  transform: scaleX(var(--scroll-progress, 0));
+  transform-origin: left center;
+  background: linear-gradient(90deg, var(--green) 0%, #22d3ee 55%, var(--blue-bright) 100%);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.45);
+}
+
+/*
+  Value-change flash. A readout that updates under the user with no visual event is a
+  change they will miss; this is the only cue that a poll actually moved a number.
+
+  Ends at the base state with no fill mode, so the element carries no leftover style once
+  the flash finishes and the class can simply be removed.
+*/
+@keyframes value-flash {
+  from {
+    color: var(--flash-color, var(--green));
+    text-shadow: 0 0 12px var(--flash-color, var(--green));
+  }
+}
+
+.value-flash {
+  animation: value-flash 0.9s ease-out;
+}
+
+/*
+  Status glow for a panel in trouble. Deliberately not applied at rest: a dashboard where
+  every panel breathes tells you nothing, so only `warn` and `error` animate and the eye
+  is pulled to the one panel that has something to say.
+
+  Distinct from .edge-glow, which is the cursor affordance and stays on every panel.
+*/
+@keyframes status-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+  50% {
+    box-shadow: 0 0 20px -3px var(--status-glow-color, transparent);
+  }
+}
+
+.status-pulse {
+  animation: status-pulse 2.6s ease-in-out infinite;
+}
+
+/*
   Ambient background stack. Three fixed layers behind all content, painted in this order:
 
     -30  .bg-mesh       drifting colour mesh, gives the page depth
@@ -317,8 +383,27 @@ body::before {
   background-size: 64px 64px;
   /* Parallax: the grid drifts at a fraction of scroll speed. */
   transform: translate3d(0, calc(var(--scroll-y, 0) * -0.04px), 0);
+  /*
+    Ambient drift, on background-position rather than transform because transform is
+    already carrying the scroll parallax above and a keyframe there would clobber it.
+    One full 64px tile per cycle, so the loop point is invisible.
+  */
+  animation: grid-drift 24s linear infinite;
   mask-image: radial-gradient(ellipse 100% 60% at 50% 40%, #000 40%, transparent 100%);
   -webkit-mask-image: radial-gradient(ellipse 100% 60% at 50% 40%, #000 40%, transparent 100%);
+}
+
+@keyframes grid-drift {
+  from {
+    background-position:
+      0 0,
+      0 0;
+  }
+  to {
+    background-position:
+      64px 64px,
+      64px 64px;
+  }
 }
 
 .bg-spotlight {
@@ -346,6 +431,7 @@ body::before {
   }
   .bg-grid {
     transform: none;
+    animation: none;
   }
 }
 

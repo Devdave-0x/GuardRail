@@ -12,6 +12,12 @@ module.exports = {
       maxWidth: {
         // Single shared page width for both route groups. Never write max-w-[1600px].
         container: '1600px',
+        /*
+          Ceiling for the hero render. The plate is a 1254px square, and past this it
+          overpowers the headline beside it and pushes the CTA below the fold on short
+          laptop viewports.
+        */
+        'hero-art': '550px',
       },
       /*
         Spacing tokens back onto CSS variables defined in globals.css, which shift at the
@@ -136,11 +142,38 @@ module.exports = {
         blink: 'blink 1.2s step-end infinite',
         'slide-in': 'slide-in 0.3s ease-out',
         'fade-in': 'fade-in 0.4s ease-out',
+        /*
+          Dashboard panel mount reveal.
+
+          CSS rather than Motion, which section 5 would otherwise assign this. Motion
+          leaves a `transform` on the element after the animation settles, and any
+          transformed ancestor re-bases the `background-attachment: fixed` inside
+          `.edge-glow`, so every panel's cursor glow would drift out of alignment with
+          the pointer. A keyframe that ends at `transform: none` leaves no such trace.
+
+          `backwards` holds the from-state through the stagger delay. Without it a panel
+          renders at full opacity, then blinks out when its delay elapses.
+        */
+        'panel-in': 'panel-in 0.42s cubic-bezier(0.16, 1, 0.3, 1) backwards',
+        /*
+          Slow drift for the hero art. The render is a still, and a plate that never moves
+          next to an animated ambient background reads as a failed asset load. This is the
+          smallest amount of life that fixes that without becoming a gimmick.
+        */
+        'art-float': 'art-float 9s ease-in-out infinite alternate',
       },
       keyframes: {
         'pulse-green': {
           '0%, 100%': { boxShadow: '0 0 0px rgba(0,255,136,0)' },
           '50%': { boxShadow: '0 0 12px rgba(0,255,136,0.4)' },
+        },
+        'panel-in': {
+          from: { opacity: '0', transform: 'translate3d(0, 10px, 0)' },
+          to: { opacity: '1', transform: 'none' },
+        },
+        'art-float': {
+          from: { transform: 'translate3d(0, -0.5%, 0)' },
+          to: { transform: 'translate3d(0, 1.5%, 0)' },
         },
         scan: {
           '0%': { backgroundPosition: '0 -100%' },

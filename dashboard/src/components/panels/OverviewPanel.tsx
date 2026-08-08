@@ -1,7 +1,7 @@
 'use client';
 
 import { RefreshCw } from 'lucide-react';
-import { Panel, Badge, AddressDisplay } from '@/components/shared';
+import { Panel, Badge, AddressDisplay, Stat } from '@/components/shared';
 import { AnimatedNumber } from '@/components/shared/AnimatedNumber';
 import { useContractState } from '@/hooks/useContractState';
 import { CONTRACT_ADDRESS } from '@/lib/contract';
@@ -17,16 +17,21 @@ export function OverviewPanel() {
       loading={loading}
       actions={
         <button
+          type="button"
           onClick={refetch}
-          className="p-1 text-text-muted transition-colors hover:text-green"
+          aria-label="Refresh contract state"
+          className="rounded p-1 text-text-muted transition-colors hover:text-green"
         >
-          <RefreshCw size={12} />
+          <RefreshCw size={12} aria-hidden="true" />
         </button>
       }
     >
       <div className="flex flex-col gap-5 p-4">
         {error && (
-          <div className="rounded border border-red/30 bg-red/10 px-3 py-2 font-mono text-xs text-red">
+          <div
+            role="alert"
+            className="rounded border border-red/30 bg-red/10 px-3 py-2 font-mono text-caption text-red"
+          >
             RPC ERROR: {error}
           </div>
         )}
@@ -44,7 +49,7 @@ export function OverviewPanel() {
           )}
           <Badge variant="blue">BOT Chain</Badge>
           {lastUpdated && (
-            <span className="font-mono text-xs text-text-muted">
+            <span className="font-mono-numbers font-mono text-micro text-text-muted">
               Updated {lastUpdated.toLocaleTimeString()}
             </span>
           )}
@@ -52,52 +57,53 @@ export function OverviewPanel() {
 
         {/* Grid of stats */}
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <p className="mb-1 font-mono text-xs uppercase tracking-wider text-text-muted">
-              BOT Balance
-            </p>
-            <p className="font-mono text-lg font-bold text-green">
-              <AnimatedNumber value={data ? parseFloat(data.balanceFormatted) : NaN} />
-            </p>
-            <p className="font-mono text-xs text-text-muted">BOT</p>
-          </div>
-          <div>
-            <p className="mb-1 font-mono text-xs uppercase tracking-wider text-text-muted">
-              Network
-            </p>
-            <p className="font-mono text-sm font-bold text-text-primary">BOT Chain</p>
-            <p className="font-mono text-xs text-text-muted">BOT Chain Testnet</p>
-          </div>
+          {/* The vault balance is what this panel exists to report, so it alone gets `lead`. */}
+          <Stat
+            label="BOT Balance"
+            color="green"
+            emphasis="lead"
+            hint="BOT"
+            value={<AnimatedNumber value={data ? parseFloat(data.balanceFormatted) : NaN} />}
+          />
+          <Stat label="Network" value="BOT Chain" hint="BOT Chain Testnet" />
         </div>
 
         {/* Addresses */}
-        <div className="flex flex-col gap-2 border-t border-border pt-2">
-          <p className="mb-2 font-mono text-xs uppercase tracking-wider text-text-muted">Roles</p>
+        <div className="flex flex-col gap-2 border-t border-border pt-3">
+          <p className="font-mono text-micro uppercase tracking-wider text-text-muted">Roles</p>
           <div className="grid grid-cols-1 gap-2">
             <div className="flex items-center justify-between rounded bg-bg-elevated px-3 py-2">
-              <span className="font-mono text-xs text-text-muted">CONTRACT</span>
+              <span className="font-mono text-micro uppercase tracking-wider text-text-muted">
+                CONTRACT
+              </span>
               <AddressDisplay address={CONTRACT_ADDRESS} />
             </div>
             <div className="flex items-center justify-between rounded bg-bg-elevated px-3 py-2">
-              <span className="font-mono text-xs text-text-muted">AGENT</span>
+              <span className="font-mono text-micro uppercase tracking-wider text-text-muted">
+                AGENT
+              </span>
               {data ? (
                 <AddressDisplay address={data.agent} />
               ) : (
-                <span className="font-mono text-xs text-text-muted">—</span>
+                <span className="font-mono text-caption text-text-muted">—</span>
               )}
             </div>
             <div className="flex items-center justify-between rounded bg-bg-elevated px-3 py-2">
-              <span className="font-mono text-xs text-text-muted">GUARDIAN</span>
+              <span className="font-mono text-micro uppercase tracking-wider text-text-muted">
+                GUARDIAN
+              </span>
               {data ? (
                 <AddressDisplay address={data.guardian} />
               ) : (
-                <span className="font-mono text-xs text-text-muted">—</span>
+                <span className="font-mono text-caption text-text-muted">—</span>
               )}
             </div>
             {data?.pendingAgent &&
               data.pendingAgent !== '0x0000000000000000000000000000000000000000' && (
                 <div className="flex items-center justify-between rounded border border-orange/20 bg-orange/5 px-3 py-2">
-                  <span className="font-mono text-xs text-orange">PENDING AGENT</span>
+                  <span className="font-mono text-micro uppercase tracking-wider text-orange">
+                    PENDING AGENT
+                  </span>
                   <AddressDisplay address={data.pendingAgent} />
                 </div>
               )}
@@ -105,9 +111,9 @@ export function OverviewPanel() {
         </div>
 
         {/* Chain ID */}
-        <div className="flex items-center justify-between border-t border-border pt-1 font-mono text-xs text-text-muted">
+        <div className="flex items-center justify-between border-t border-border pt-3 font-mono text-micro uppercase tracking-wider text-text-muted">
           <span>CHAIN ID</span>
-          <span className="text-text-secondary">968</span>
+          <span className="font-mono-numbers text-text-secondary">968</span>
         </div>
       </div>
     </Panel>

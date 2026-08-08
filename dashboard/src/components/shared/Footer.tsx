@@ -48,11 +48,14 @@ export function Footer({ variant = 'marketing', className }: FooterProps) {
     return (
       <footer
         className={cn(
-          'mx-auto flex w-full max-w-container flex-col gap-stack-gap px-section-px pb-8 pt-4 font-mono text-xs text-text-muted sm:flex-row sm:items-center sm:justify-between',
+          'mx-auto mt-4 flex w-full max-w-container flex-col gap-stack-gap border-t border-border px-section-px pb-8 pt-6 font-mono text-caption text-text-muted sm:flex-row sm:items-center sm:justify-between',
           className,
         )}
       >
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+          <Link href="/" className="flex items-center rounded" aria-label="GuardRail home">
+            <AppLogo variant="mark" size="sm" className="text-text-muted" />
+          </Link>
           <span>GuardRail Dashboard</span>
           <span aria-hidden="true" className="text-border-bright">
             |
@@ -65,7 +68,7 @@ export function Footer({ variant = 'marketing', className }: FooterProps) {
             href={PRIMARY_DEPLOYMENT.explorer}
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded transition-colors hover:text-blue-bright"
+            className="font-mono-numbers rounded transition-colors hover:text-blue-bright"
           >
             {PRIMARY_DEPLOYMENT.address.slice(0, 6)}...{PRIMARY_DEPLOYMENT.address.slice(-4)}
             <span className="sr-only"> (opens in a new tab)</span>

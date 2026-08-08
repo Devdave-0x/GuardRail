@@ -101,7 +101,7 @@ export function WhitelistManagerPanel() {
               <Badge variant="orange">⏳ Queued Call</Badge>
               <Countdown unlockTimeMs={data.pendingCall.unlockTimeMs} />
             </div>
-            <div className="grid grid-cols-2 gap-2 font-mono text-xs">
+            <div className="grid grid-cols-2 gap-2 font-mono text-caption">
               <div>
                 <p className="text-text-muted">Target</p>
                 <p className="text-text-primary">{formatAddress(data.pendingCall.target)}</p>
@@ -147,7 +147,7 @@ export function WhitelistManagerPanel() {
             )}
           </div>
         ) : (
-          <div className="flex items-center gap-2 font-mono text-xs text-text-muted">
+          <div className="flex items-center gap-2 font-mono text-caption text-text-muted">
             <span className="text-green">✓</span> No pending call in queue
           </div>
         )}
@@ -155,7 +155,7 @@ export function WhitelistManagerPanel() {
         {/* Guardian: Queue new call form */}
         {isGuardian && !data?.pendingCall && (
           <div className="flex flex-col gap-3 rounded border border-border p-3">
-            <p className="font-mono text-xs uppercase tracking-wider text-text-secondary">
+            <p className="font-mono text-micro uppercase tracking-wider text-text-secondary">
               Queue New Call
             </p>
             <Input
@@ -171,7 +171,7 @@ export function WhitelistManagerPanel() {
               placeholder="0x00000000"
             />
             <div className="grid grid-cols-2 gap-3">
-              <label className="flex cursor-pointer items-center gap-2 font-mono text-xs text-text-secondary">
+              <label className="flex cursor-pointer items-center gap-2 font-mono text-caption text-text-secondary">
                 <input
                   type="checkbox"
                   checked={queueCheckRecipient}
@@ -180,7 +180,7 @@ export function WhitelistManagerPanel() {
                 />
                 Check Recipient
               </label>
-              <label className="flex cursor-pointer items-center gap-2 font-mono text-xs text-text-secondary">
+              <label className="flex cursor-pointer items-center gap-2 font-mono text-caption text-text-secondary">
                 <input
                   type="checkbox"
                   checked={queueCheckAmount}
@@ -212,20 +212,20 @@ export function WhitelistManagerPanel() {
         )}
 
         {!isGuardian && walletAddress && (
-          <div className="font-mono text-xs text-text-muted">
+          <div className="font-mono text-caption text-text-muted">
             Connect guardian wallet to manage whitelist
           </div>
         )}
 
         {!walletAddress && (
-          <div className="font-mono text-xs text-text-muted">
+          <div className="font-mono text-caption text-text-muted">
             Connect wallet to manage whitelist
           </div>
         )}
 
         {txStatus && (
           <div
-            className={`rounded border px-3 py-2 font-mono text-xs ${
+            className={`rounded border px-3 py-2 font-mono text-caption ${
               txStatus.startsWith('✓')
                 ? 'border-green/30 bg-green/5 text-green'
                 : 'border-orange/30 bg-orange/5 text-orange'

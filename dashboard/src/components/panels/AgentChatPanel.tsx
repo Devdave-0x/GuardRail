@@ -369,7 +369,7 @@ export function AgentChatPanel() {
         {/* Message log */}
         <div
           ref={messageLogRef}
-          className="flex flex-1 flex-col gap-2 overflow-y-auto px-4 py-3 font-mono text-xs"
+          className="flex flex-1 flex-col gap-2 overflow-y-auto px-4 py-3 font-mono text-caption"
         >
           {messages.map((msg) => (
             <div key={msg.id} className="animate-slide-in">
@@ -385,7 +385,7 @@ export function AgentChatPanel() {
                     )}
                     <div className="min-w-0">
                       {msg.toolName && (
-                        <span className="mr-2 text-xs text-yellow">[{msg.toolName}]</span>
+                        <span className="mr-2 text-micro text-yellow">[{msg.toolName}]</span>
                       )}
                       <span className={`${msgColor[msg.role]} whitespace-pre-wrap break-words`}>
                         {msg.content}
@@ -431,7 +431,7 @@ export function AgentChatPanel() {
             </span>
           </Button>
           {mode === 'direct' && !isConnected && (
-            <span className="font-mono text-xs text-orange">
+            <span className="font-mono text-caption text-orange">
               Connect wallet to enable direct sends
             </span>
           )}
@@ -439,7 +439,7 @@ export function AgentChatPanel() {
 
         {/* Input */}
         <div className="flex items-center gap-3 border-t border-border px-4 py-3">
-          <span className="shrink-0 font-mono text-xs text-green">
+          <span className="shrink-0 font-mono text-caption text-green">
             {streaming ? <span className="animate-blink">●</span> : '▶'}
           </span>
           <input
@@ -455,7 +455,7 @@ export function AgentChatPanel() {
                   : 'Direct mode: "send 0.001 BOT to 0x..."'
             }
             disabled={streaming}
-            className="flex-1 border-none bg-transparent font-mono text-xs text-text-primary placeholder-text-muted outline-none disabled:opacity-50"
+            className="flex-1 border-none bg-transparent font-mono text-caption text-text-primary placeholder-text-muted outline-none disabled:opacity-50"
           />
           <button
             onClick={sendGoal}

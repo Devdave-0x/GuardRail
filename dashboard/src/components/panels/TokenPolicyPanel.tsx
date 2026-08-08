@@ -142,7 +142,7 @@ export function TokenPolicyPanel() {
       <div className="flex flex-col gap-4 p-4">
         {/* Lookup section */}
         <div className="flex flex-col gap-2">
-          <p className="font-mono text-xs uppercase tracking-wider text-text-muted">
+          <p className="font-mono text-micro uppercase tracking-wider text-text-muted">
             Lookup Token Policy
           </p>
           <div className="flex gap-2">
@@ -150,7 +150,7 @@ export function TokenPolicyPanel() {
               value={lookupToken}
               onChange={(e) => setLookupToken(e.target.value)}
               placeholder="Token contract address (0x...)"
-              className="flex-1 rounded border border-border bg-bg-elevated px-3 py-1.5 font-mono text-xs text-text-primary placeholder-text-muted focus:border-green/50 focus:outline-none"
+              className="flex-1 rounded border border-border bg-bg-elevated px-3 py-1.5 font-mono text-caption text-text-primary placeholder-text-muted focus:border-green/50 focus:outline-none"
             />
             <Button variant="ghost" size="sm" onClick={handleLookup} loading={lookupLoading}>
               Lookup
@@ -164,7 +164,7 @@ export function TokenPolicyPanel() {
             className={`flex flex-col gap-2 rounded border p-3 ${lookupResult.enabled ? 'border-green/30 bg-green/5' : 'border-border bg-bg-elevated'}`}
           >
             <div className="flex items-center justify-between">
-              <p className="font-mono text-xs text-text-muted">
+              <p className="font-mono text-caption text-text-muted">
                 {formatAddress(lookupResult.token)}
               </p>
               <Badge variant={lookupResult.enabled ? 'green' : 'gray'}>
@@ -184,7 +184,7 @@ export function TokenPolicyPanel() {
                   }
                   label="Daily spend"
                 />
-                <div className="font-mono text-xs text-text-muted">
+                <div className="font-mono text-caption text-text-muted">
                   {lookupResult.dailySpent} / {lookupResult.dailyLimit} wei
                 </div>
               </>
@@ -204,18 +204,20 @@ export function TokenPolicyPanel() {
 
         {/* Tracked policies */}
         {policiesLoading && policies.length === 0 && (
-          <div className="font-mono text-xs text-text-muted">Scanning for token policies...</div>
+          <div className="font-mono text-caption text-text-muted">
+            Scanning for token policies...
+          </div>
         )}
 
         {!policiesLoading && policies.filter((p) => p.enabled).length === 0 && (
-          <div className="flex items-center gap-2 font-mono text-xs text-text-muted">
+          <div className="flex items-center gap-2 font-mono text-caption text-text-muted">
             <span className="text-green">✓</span> No active token policies
           </div>
         )}
 
         {policies.length > 0 && (
           <div className="flex flex-col gap-2">
-            <p className="font-mono text-xs uppercase tracking-wider text-text-muted">
+            <p className="font-mono text-micro uppercase tracking-wider text-text-muted">
               Active Policies
             </p>
             {policies
@@ -226,7 +228,7 @@ export function TokenPolicyPanel() {
                   className="flex flex-col gap-2 rounded border border-green/20 bg-green/5 p-3"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs text-text-primary">
+                    <span className="font-mono text-caption text-text-primary">
                       {formatAddress(policy.token)}
                     </span>
                     <Badge variant="green">Active</Badge>
@@ -259,7 +261,7 @@ export function TokenPolicyPanel() {
         {/* Guardian: set new policy */}
         {isGuardian && (
           <div className="flex flex-col gap-3 rounded border border-border p-3">
-            <p className="font-mono text-xs uppercase tracking-wider text-text-secondary">
+            <p className="font-mono text-micro uppercase tracking-wider text-text-secondary">
               Set Token Policy
             </p>
             <Input
@@ -289,7 +291,7 @@ export function TokenPolicyPanel() {
 
         {txStatus && (
           <div
-            className={`rounded border px-3 py-2 font-mono text-xs ${
+            className={`rounded border px-3 py-2 font-mono text-caption ${
               txStatus.startsWith('✓')
                 ? 'border-green/30 bg-green/5 text-green'
                 : 'border-orange/30 bg-orange/5 text-orange'

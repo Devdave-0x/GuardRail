@@ -52,12 +52,12 @@ export function TransactionHistoryPanel() {
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             placeholder="Filter by target, action, selector, or tx hash..."
-            className="w-full rounded border border-border bg-bg-elevated px-3 py-1.5 font-mono text-xs text-text-primary placeholder-text-muted transition-colors focus:border-green/50 focus:outline-none"
+            className="w-full rounded border border-border bg-bg-elevated px-3 py-1.5 font-mono text-caption text-text-primary placeholder-text-muted transition-colors focus:border-green/50 focus:outline-none"
           />
         </div>
 
         {error && (
-          <div className="border-b border-border px-4 py-2 font-mono text-xs text-red">
+          <div className="border-b border-border px-4 py-2 font-mono text-caption text-red">
             Error: {error}
           </div>
         )}
@@ -65,11 +65,11 @@ export function TransactionHistoryPanel() {
         {/* Table */}
         <div className="overflow-x-auto">
           {filtered.length === 0 ? (
-            <div className="px-4 py-8 text-center font-mono text-xs text-text-muted">
+            <div className="px-4 py-8 text-center font-mono text-caption text-text-muted">
               {loading ? 'Loading...' : 'No transactions found'}
             </div>
           ) : (
-            <table className="w-full font-mono text-xs">
+            <table className="w-full font-mono text-caption">
               <thead>
                 <tr className="border-b border-border">
                   <th className="px-4 py-2 text-left font-normal uppercase tracking-wider text-text-muted">
@@ -188,7 +188,7 @@ export function TransactionHistoryPanel() {
           )}
         </div>
 
-        <div className="flex justify-between border-t border-border px-4 py-2 font-mono text-xs text-text-muted">
+        <div className="flex justify-between border-t border-border px-4 py-2 font-mono text-caption text-text-muted">
           <span>{filtered.length} events</span>
           <span>Auto-refresh: 60s</span>
         </div>
