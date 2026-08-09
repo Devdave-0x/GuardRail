@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createPublicClient, http, parseAbiItem } from 'viem';
-import { CONTRACT_ADDRESS, RPC_URLS, AGENT_WALLET_ABI, botChainTestnet } from '@/lib/contract';
+import { CONTRACT_ADDRESS, RPC_URLS, AGENT_WALLET_ABI, activeChain } from '@/lib/contract';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -25,7 +25,7 @@ export async function GET() {
   try {
     const clients = RPC_URLS.map((url) =>
       createPublicClient({
-        chain: botChainTestnet,
+        chain: activeChain,
         transport: http(url, { timeout: 12_000, retryCount: 1 }),
       }),
     );

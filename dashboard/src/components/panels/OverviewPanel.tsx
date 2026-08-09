@@ -4,7 +4,7 @@ import { MdOutlineRefresh } from 'react-icons/md';
 import { Panel, Badge, AddressDisplay, Stat } from '@/components/shared';
 import { AnimatedNumber } from '@/components/shared/AnimatedNumber';
 import { useContractState } from '@/hooks/useContractState';
-import { CONTRACT_ADDRESS } from '@/lib/contract';
+import { CONTRACT_ADDRESS, activeChain } from '@/lib/contract';
 
 export function OverviewPanel() {
   const { data, loading, error, refetch, lastUpdated } = useContractState();
@@ -65,7 +65,7 @@ export function OverviewPanel() {
             hint="BOT"
             value={<AnimatedNumber value={data ? parseFloat(data.balanceFormatted) : NaN} />}
           />
-          <Stat label="Network" value="BOT Chain" hint="BOT Chain Testnet" />
+          <Stat label="Network" value="BOT Chain" hint={activeChain.name} />
         </div>
 
         {/* Addresses */}

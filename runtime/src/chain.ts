@@ -15,9 +15,24 @@ export const botChainTestnet: Chain = {
   testnet: true,
 };
 
+// Chain ID, RPC, and explorer confirmed against BOT Chain's own dev docs
+// (dev-docs.botchain.ai/docs/Developers/quick-guide), not guessed.
+export const botChainMainnet: Chain = {
+  id: 677,
+  name: 'BOT Chain',
+  nativeCurrency: { name: 'BOT', symbol: 'BOT', decimals: 18 },
+  rpcUrls: {
+    default: { http: ['https://rpc.botchain.ai'] },
+  },
+  blockExplorers: {
+    default: { name: 'BOTScan', url: 'https://scan.botchain.ai' },
+  },
+};
+
 const SUPPORTED_CHAINS: Record<number, Chain> = {
   [sepolia.id]: sepolia,
   [botChainTestnet.id]: botChainTestnet,
+  [botChainMainnet.id]: botChainMainnet,
 };
 
 const FALLBACK_RPCS: Record<number, string[]> = {
