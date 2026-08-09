@@ -1,0 +1,5 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "builds": [{ "src": "dashboard/package.json", "use": "@vercel/next" }],
+  "routes": [{ "handle": "filesystem" }, { "src": "/(.*)", "dest": "/dashboard/$1" }]
+}

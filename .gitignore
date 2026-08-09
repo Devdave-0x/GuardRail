@@ -33,3 +33,4 @@ test-project/
 
 # Ignored Files
 # docs/Screens/
+.vercel

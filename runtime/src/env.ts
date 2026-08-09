@@ -1,8 +1,22 @@
 import path from 'node:path';
 import dotenv from 'dotenv';
 
-const envPath = path.resolve(import.meta.dirname, '../.env');
-dotenv.config({ path: envPath, override: false });
+/*
+  import.meta.dirname is undefined when this compiled module runs inside a bundler's
+  dynamic-import execution context (e.g. Next.js's webpack runtime, as opposed to plain
+  `node dist/....js`) rather than true native ESM, and path.resolve(undefined, ...)
+  throws immediately. Callers that embed this module (dashboard's /api/agent route) rely
+  on the platform's own environment variables anyway, so a missing dirname just means
+  there's no local .env file to find — not a hard failure.
+*/
+const envPath =
+  typeof import.meta.dirname === 'string'
+    ? path.resolve(import.meta.dirname, '../.env')
+    : undefined;
+
+if (envPath) {
+  dotenv.config({ path: envPath, override: false });
+}
 
 export const DEFAULT_CHAIN_ID = 11155111;
 
@@ -24,7 +38,8 @@ export function optionalEnv(name: string): string | undefined {
 export function requireEnv(name: string): string {
   const value = optionalEnv(name);
   if (!value) {
-    throw new Error(`${name} is missing. Expected it in ${envPath}`);
+    const where = envPath ?? 'the environment (no local .env file resolvable in this context)';
+    throw new Error(`${name} is missing. Expected it in ${where}`);
   }
   return value;
 }
@@ -60,11 +75,12 @@ export function getRpcUrl(): string {
   // Backward compatibility for old runtime envs
   const rpc = optionalEnv('RPC_URL') ?? optionalEnv('ALCHEMY_RPC_URL');
   if (!rpc) {
-    throw new Error(`RPC_URL is missing. Expected it in ${envPath}`);
+    const where = envPath ?? 'the environment (no local .env file resolvable in this context)';
+    throw new Error(`RPC_URL is missing. Expected it in ${where}`);
   }
   return rpc;
 }
 
-export function getRuntimeEnvPath(): string {
+export function getRuntimeEnvPath(): string | undefined {
   return envPath;
 }

@@ -1,10 +1,39 @@
 import { NextRequest } from 'next/server';
-import path from 'path';
-import fs from 'fs';
-import { spawn } from 'child_process';
+import { runAgent } from '../../../../.agent-runtime/bridge.js';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+
+/*
+  Calls the agent's tool-calling loop in-process instead of spawning
+  `runtime/dist/dashboard-agent.js` as a child process. The subprocess approach worked
+  locally because the compiled sibling package sat right there on disk, but it can't
+  survive a serverless deploy:
+
+  1. Vercel's build only bundles files a route imports. A `spawn()` call with a path
+     built at runtime (`path.join(runtimePath, 'dist', ...)`) is invisible to that
+     analysis, so the target file never shipped with the function.
+  2. Launching a second full Node process inside an already-sandboxed serverless function
+     is fragile even when the file is present.
+
+  The import above must be static, not `await import(...)`, and it has to be the compiled
+  dist (via dashboard/.agent-runtime, a gitignored copy `prebuild` produces from
+  ../runtime/dist — see package.json), not the TS source. Both facts matter for the same
+  reason: Next's file-tracer only shallowly includes a *dynamically* imported external
+  file itself, not that file's own further imports — bridge.js's `openai` dependency
+  (three hops down, via agent.js) silently went missing from the deployed function even
+  though bridge.js itself was present. A static import lets webpack bundle the whole
+  transitive graph normally, the same way it does for every other import in this app, so
+  openai/zod/dotenv end up compiled directly into the output instead of needing runtime
+  node_modules resolution at all. The TS source doesn't work as the static-import target
+  because its nodenext-style `.js`-suffixed imports (pointing at .ts files) don't resolve
+  through Next's webpack config; the compiled dist's imports are real .js files.
+
+  One tradeoff: agent.ts/account.ts read required env vars as top-level consts, so a
+  missing one now throws at module load (function cold start) rather than being caught
+  per-request inside the try/catch below. That's an acceptable trade for a working
+  deploy — the required vars are set as Vercel project env vars, not optional.
+*/
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,11 +41,6 @@ export async function POST(req: NextRequest) {
     if (!goal || typeof goal !== 'string') {
       return new Response(JSON.stringify({ error: 'Missing goal' }), { status: 400 });
     }
-
-    // The runtime path from env, defaults to sibling directory
-    const runtimePath = process.env.RUNTIME_PATH
-      ? path.resolve(process.env.RUNTIME_PATH)
-      : path.resolve(process.cwd(), '..', 'runtime');
 
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
@@ -37,92 +61,10 @@ export async function POST(req: NextRequest) {
         };
 
         try {
-          const runtimeEntry = path.join(runtimePath, 'dist', 'dashboard-agent.js');
-
-          if (!fs.existsSync(runtimeEntry)) {
-            sendChunk({
-              type: 'text',
-              content: `Agent runtime dashboard bridge not found at ${runtimeEntry}. Run: cd ${runtimePath} && npm run build`,
-            });
-            closeStream();
-            return;
-          }
-
-          const runtimeEnvPath = path.join(runtimePath, '.env');
-          const runtimeEnvExamplePath = path.join(runtimePath, '.env.example');
-          const requiredRuntimeEnv = ['RPC_URL', 'AGENT_CONTRACT_ADDRESS', 'AGENT_PRIVATE_KEY'];
-          const missingRuntimeEnv = requiredRuntimeEnv.filter((key) => !process.env[key]?.trim());
-
-          if (missingRuntimeEnv.length > 0 && !fs.existsSync(runtimeEnvPath)) {
-            sendChunk({
-              type: 'error',
-              content: `Runtime config missing: ${runtimeEnvPath}. Create it from ${runtimeEnvExamplePath} and set ${missingRuntimeEnv.join(', ')}.`,
-            });
-            closeStream();
-            return;
-          }
-
-          await new Promise<void>((resolve) => {
-            const child = spawn(process.execPath, [runtimeEntry, goal], {
-              cwd: runtimePath,
-              env: process.env,
-              stdio: ['ignore', 'pipe', 'pipe'],
-            });
-
-            let stdoutBuffer = '';
-            let stderrBuffer = '';
-
-            child.stdout.on('data', (data) => {
-              stdoutBuffer += data.toString();
-              const lines = stdoutBuffer.split('\n');
-              stdoutBuffer = lines.pop() || '';
-
-              for (const line of lines) {
-                const trimmed = line.trim();
-                if (!trimmed) continue;
-                try {
-                  sendChunk(JSON.parse(trimmed));
-                } catch {
-                  sendChunk({ type: 'text', content: trimmed });
-                }
-              }
-            });
-
-            child.stderr.on('data', (data) => {
-              stderrBuffer += data.toString();
-            });
-
-            child.on('error', (error) => {
-              sendChunk({
-                type: 'error',
-                content: `Failed to start runtime process: ${error.message}`,
-              });
-              resolve();
-            });
-
-            child.on('close', (code) => {
-              const trailing = stdoutBuffer.trim();
-              if (trailing) {
-                try {
-                  sendChunk(JSON.parse(trailing));
-                } catch {
-                  sendChunk({ type: 'text', content: trailing });
-                }
-              }
-
-              if (code && code !== 0) {
-                const stderr = stderrBuffer.trim();
-                sendChunk({
-                  type: 'error',
-                  content: stderr || `Runtime process exited with code ${code}`,
-                });
-              }
-
-              resolve();
-            });
-          });
+          await runAgent(goal, (chunk: object) => sendChunk(chunk));
         } catch (error) {
-          sendChunk({ type: 'error', content: String(error) });
+          const content = error instanceof Error ? error.message : String(error);
+          sendChunk({ type: 'error', content });
         } finally {
           closeStream();
         }

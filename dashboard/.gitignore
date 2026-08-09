@@ -7,6 +7,8 @@ node_modules/
 .next/
 out/
 dist/
+# Copy of ../runtime/dist, produced by the prebuild script — see api/agent/route.ts
+.agent-runtime/
 
 # Environment
 .env.local
@@ -30,3 +32,4 @@ yarn-error.log*
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+.vercel
