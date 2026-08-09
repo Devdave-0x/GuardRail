@@ -1,7 +1,6 @@
 # GuardRail
 
-> Autonomous Ethereum AI agent framework for EVM chains.
-> Like Starknet Agent Kit, but for Ethereum.
+> Autonomous AI agent wallet framework for EVM chains, live on BOT Chain Mainnet.
 > Connect your AI assistant to an on-chain wallet with
 > enforced spending limits, whitelisting, and guardian controls.
 
@@ -37,8 +36,8 @@ npm run setup
 ### Option B: Clone the full repo
 
 ```bash
-git clone https://github.com/Chibey-max/Ethereum-Agentic.git
-cd Ethereum-Agentic/runtime
+git clone https://github.com/Devdave-0x/GuardRail.git
+cd GuardRail/runtime
 cp .env.example .env
 npm install
 npm run build
