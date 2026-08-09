@@ -12,7 +12,9 @@ import { fallback, http } from 'viem';
 import { RPC_URLS, botChainTestnet } from './contract';
 
 const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID?.trim();
-const hasWalletConnectProjectId = Boolean(walletConnectProjectId && !/^0+$/.test(walletConnectProjectId));
+const hasWalletConnectProjectId = Boolean(
+  walletConnectProjectId && !/^0+$/.test(walletConnectProjectId),
+);
 
 const popularWallets = [
   metaMaskWallet,

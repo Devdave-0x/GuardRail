@@ -1,66 +1,115 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useAccount, useBalance } from 'wagmi';
-import { ShieldCheck, Timer } from 'lucide-react';
+import { MdOutlineSecurityUpdateGood, MdOutlineTimer } from 'react-icons/md';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { CONTRACT_ADDRESS } from '@/lib/contract';
 import { formatEther } from 'viem';
+import { AppLogo } from '@/components/shared/AppLogo';
+import { ScrollProgress } from '@/components/shared/ScrollProgress';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import { CONTRACT_ADDRESS } from '@/lib/contract';
+import { cn } from '@/lib/utils';
 
+// === Component
+
+/*
+  App-route header. Mirrors NavigationBar's scroll behaviour and lockup so the two route
+  groups read as one product, but stays on wagmi and RainbowKit, which NavigationBar may
+  never import.
+
+  Two rows: identity and wallet on top, chain telemetry below. The rail on the bottom edge
+  is the scroll readout, which is why this header sets no border-b of its own.
+*/
 export function Navbar() {
   const { address } = useAccount();
   const { data: balance } = useBalance({ address });
   const { data: contractBalance } = useBalance({ address: CONTRACT_ADDRESS });
+  const [scrolled, setScrolled] = useState<boolean>(false);
+
+  useEffect(() => {
+    const onScroll = (): void => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-50 bg-bg/95 backdrop-blur border-b border-border">
-      <div className="max-w-[1600px] mx-auto px-4 h-12 flex items-center justify-between">
-        {/* Logo */}
+    <header
+      className={cn(
+        'sticky top-0 z-50 w-full transition-colors duration-300',
+        // bg-surface at rest lets the ambient layer through; solid once content scrolls under.
+        scrolled ? 'bg-bg/70 backdrop-blur-xl backdrop-saturate-150' : 'bg-surface',
+      )}
+    >
+      <div className="mx-auto flex h-14 w-full max-w-container items-center justify-between gap-4 px-section-px lg:h-16">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full bg-green animate-pulse" />
-            <span className="font-mono text-xs font-bold text-green tracking-widest uppercase">GuardRail</span>
-          </div>
-          <span className="text-border-bright text-xs">|</span>
-          <span className="font-mono text-xs text-text-muted">BOT Chain Testnet</span>
+          <Link href="/" className="flex items-center rounded" aria-label="GuardRail home">
+            <AppLogo variant="full" size="md" />
+          </Link>
+          <span aria-hidden="true" className="hidden text-border-bright sm:inline">
+            |
+          </span>
+          <span className="hidden font-mono text-micro uppercase tracking-wider text-text-muted sm:inline">
+            BOT Chain Testnet
+          </span>
         </div>
 
-        {/* Center: contract balance */}
         {contractBalance && (
-          <div className="hidden md:flex items-center gap-2 font-mono text-xs">
-            <span className="text-text-muted">Vault Balance:</span>
-            <span className="text-green font-bold">
+          <div className="hidden items-center gap-2 font-mono lg:flex">
+            <span className="text-micro uppercase tracking-wider text-text-muted">
+              Vault Balance
+            </span>
+            {/* Updates on a poll with no user action, so announce it politely. */}
+            <span aria-live="polite" className="font-mono-numbers text-body font-bold text-green">
               {parseFloat(formatEther(contractBalance.value)).toFixed(6)} BOT
             </span>
           </div>
         )}
 
-        {/* Wallet */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {balance && (
-            <span className="font-mono text-xs text-text-muted hidden sm:block">
+            <span className="font-mono-numbers hidden font-mono text-caption text-text-secondary sm:block">
               {parseFloat(formatEther(balance.value)).toFixed(4)} BOT
             </span>
           )}
-          <ConnectButton chainStatus="icon" showBalance={false} accountStatus={{ smallScreen: 'avatar', largeScreen: 'full' }} />
+          <ThemeToggle />
+          <ConnectButton
+            chainStatus="icon"
+            showBalance={false}
+            accountStatus={{ smallScreen: 'avatar', largeScreen: 'full' }}
+          />
         </div>
       </div>
 
-      {/* Network status bar */}
-      <div className="border-t border-border/50 bg-bg px-4 py-1.5 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2 shrink-0">
-          <span className="w-1.5 h-1.5 rounded-full bg-green" />
-          <span className="font-mono text-xs text-text-muted">
-            {CONTRACT_ADDRESS.slice(0, 6)}...{CONTRACT_ADDRESS.slice(-4)}
-          </span>
+      <div className="relative border-t border-border/50">
+        <div className="mx-auto flex w-full max-w-container items-center justify-between gap-4 px-section-px py-2">
+          <div className="flex shrink-0 items-center gap-2">
+            <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-green" />
+            <span className="font-mono-numbers font-mono text-micro text-text-muted">
+              {CONTRACT_ADDRESS.slice(0, 6)}...{CONTRACT_ADDRESS.slice(-4)}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3 font-mono text-micro uppercase tracking-wider text-text-muted">
+            <span className="font-mono-numbers">CHAIN:968</span>
+            <span aria-hidden="true" className="text-border-bright">
+              |
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <MdOutlineTimer size={11} aria-hidden="true" /> TIMELOCK:10MIN
+            </span>
+            <span aria-hidden="true" className="hidden text-border-bright sm:inline">
+              |
+            </span>
+            <span className="hidden items-center gap-1 sm:inline-flex">
+              <MdOutlineSecurityUpdateGood size={11} aria-hidden="true" /> REENTRANCY:GUARDED
+            </span>
+          </div>
         </div>
 
-        <div className="flex items-center gap-4 text-text-muted text-xs font-mono">
-          <span>CHAIN:968</span>
-          <span className="text-border-bright">|</span>
-          <span className="inline-flex items-center gap-1"><Timer size={12} /> TIMELOCK:10MIN</span>
-          <span className="text-border-bright">|</span>
-          <span className="inline-flex items-center gap-1"><ShieldCheck size={12} /> REENTRANCY:GUARDED</span>
-        </div>
+        <ScrollProgress />
       </div>
     </header>
   );

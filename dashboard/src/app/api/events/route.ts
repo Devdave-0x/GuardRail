@@ -5,17 +5,15 @@ import { CONTRACT_ADDRESS, RPC_URLS, botChainTestnet } from '@/lib/contract';
 export const dynamic = 'force-dynamic';
 
 const EXECUTED_EVENT = parseAbiItem(
-  'event Executed(address indexed target, uint256 value, bytes4 selector)'
+  'event Executed(address indexed target, uint256 value, bytes4 selector)',
 );
 const CALL_QUEUED_EVENT = parseAbiItem(
-  'event CallQueued(address indexed target, bytes4 selector, uint256 unlockTime)'
+  'event CallQueued(address indexed target, bytes4 selector, uint256 unlockTime)',
 );
 const CALL_APPLIED_EVENT = parseAbiItem(
-  'event CallApplied(address indexed target, bytes4 selector)'
+  'event CallApplied(address indexed target, bytes4 selector)',
 );
-const WITHDRAWN_EVENT = parseAbiItem(
-  'event Withdrawn(address indexed to, uint256 amount)'
-);
+const WITHDRAWN_EVENT = parseAbiItem('event Withdrawn(address indexed to, uint256 amount)');
 const PAUSED_EVENT = parseAbiItem('event Paused(address indexed by)');
 const UNPAUSED_EVENT = parseAbiItem('event Unpaused(address indexed by)');
 
@@ -73,6 +71,19 @@ function isTimeoutError(error: unknown): boolean {
   return msg.includes('timed out') || msg.includes('timeout');
 }
 
+// Provider URLs embed API keys, so only the host is ever logged.
+function providerHost(url: string): string {
+  try {
+    return new URL(url).host;
+  } catch {
+    return 'unknown-host';
+  }
+}
+
+function errorReason(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -89,7 +100,9 @@ export async function GET(req: NextRequest) {
       url,
     }));
 
-    const withFallback = async <T,>(fn: (client: (typeof providerStates)[number]['client']) => Promise<T>): Promise<T> => {
+    const withFallback = async <T>(
+      fn: (client: (typeof providerStates)[number]['client']) => Promise<T>,
+    ): Promise<T> => {
       let lastError: unknown;
       for (const provider of providerStates) {
         try {
@@ -108,11 +121,14 @@ export async function GET(req: NextRequest) {
         ? latestBlock - LOOKBACK_BLOCKS
         : BIGINT_ZERO;
 
-    // Load-balanced RPC gateways (e.g. BOT Chain's public endpoint) can report a
-    // latestBlock lower than a previous request if it lands on a different backend
-    // node. Treat that as "start fresh" rather than letting stale cache state make
-    // scanStartBlock > scanCursor, which would silently skip the scan loop entirely.
-    const previousHead = cacheHeadBlock !== null && latestBlock < cacheHeadBlock ? null : cacheHeadBlock;
+    /*
+     * Load-balanced RPC gateways (e.g. BOT Chain's public endpoint) can report a
+     * latestBlock lower than a previous request if it lands on a different backend
+     * node. Treat that as "start fresh" rather than letting stale cache state make
+     * scanStartBlock > scanCursor, which would silently skip the scan loop entirely.
+     */
+    const previousHead =
+      cacheHeadBlock !== null && latestBlock < cacheHeadBlock ? null : cacheHeadBlock;
 
     // Initialize scan state once, then only extend it as new blocks arrive.
     if (previousHead === null) {
@@ -139,12 +155,12 @@ export async function GET(req: NextRequest) {
     while (scanCursor >= scanStartBlock && chunksScanned < MAX_CHUNKS_PER_REQUEST) {
       const cursor: bigint = scanCursor;
       let chunkLogs: CachedLog[] | null = null;
-      let lastError: unknown;
       let usedChunkFrom: bigint | null = null;
 
       for (const provider of providerStates) {
         const span = provider.maxLogRange > BIGINT_ZERO ? provider.maxLogRange : BIGINT_ONE;
-        const from: bigint = cursor >= span - BIGINT_ONE ? cursor - (span - BIGINT_ONE) : BIGINT_ZERO;
+        const from: bigint =
+          cursor >= span - BIGINT_ONE ? cursor - (span - BIGINT_ONE) : BIGINT_ZERO;
         const fromBlockChunk: bigint = from > scanStartBlock ? from : scanStartBlock;
 
         try {
@@ -157,22 +173,23 @@ export async function GET(req: NextRequest) {
                   fromBlock: fromBlockChunk,
                   toBlock: cursor,
                 })
-                .then((logs) => ({ name, logs }))
-            )
+                .then((logs) => ({ name, logs })),
+            ),
           );
 
-          chunkLogs = logsByEvent
-            .flatMap(({ name, logs }) =>
-              logs
-                .filter((log) => log.transactionHash && log.blockNumber !== null && log.logIndex !== null)
-                .map((log) => ({
-                  transactionHash: log.transactionHash as `0x${string}`,
-                  blockNumber: log.blockNumber ?? undefined,
-                  logIndex: log.logIndex as number,
-                  eventName: name,
-                  args: (log.args ?? {}) as Record<string, unknown>,
-                }))
-            );
+          chunkLogs = logsByEvent.flatMap(({ name, logs }) =>
+            logs
+              .filter(
+                (log) => log.transactionHash && log.blockNumber !== null && log.logIndex !== null,
+              )
+              .map((log) => ({
+                transactionHash: log.transactionHash as `0x${string}`,
+                blockNumber: log.blockNumber ?? undefined,
+                logIndex: log.logIndex as number,
+                eventName: name,
+                args: (log.args ?? {}) as Record<string, unknown>,
+              })),
+          );
           usedChunkFrom = fromBlockChunk;
           break;
         } catch (error) {
@@ -182,16 +199,30 @@ export async function GET(req: NextRequest) {
           }
 
           // On repeated provider limits/timeouts, skip this provider for future chunks.
-          if (limitedRange === QUICKNODE_MIN_RANGE || isTimeoutError(error)) {
+          const disabled = limitedRange === QUICKNODE_MIN_RANGE || isTimeoutError(error);
+          if (disabled) {
             provider.maxLogRange = BIGINT_ZERO;
           }
 
-          lastError = error;
+          console.warn(
+            `[/api/events] getLogs failed on ${providerHost(provider.url)} for blocks ${fromBlockChunk}-${cursor}` +
+              (limitedRange ? `, range capped to ${limitedRange}` : '') +
+              (disabled ? ', provider disabled for this request' : '') +
+              `: ${errorReason(error)}`,
+          );
         }
       }
 
       if (!chunkLogs || usedChunkFrom === null) {
-        // Don't fail the whole request: return cached/partial data instead.
+        /*
+         * Every provider failed for this chunk. Don't fail the whole request:
+         * return cached/partial data instead. The response carries partial: true,
+         * so this warning is the only place the reason is recorded.
+         */
+        console.warn(
+          `[/api/events] all ${providerStates.length} RPC providers failed at block ${cursor}; ` +
+            `returning partial data after ${chunksScanned} chunk(s)`,
+        );
         break;
       }
 
@@ -227,10 +258,14 @@ export async function GET(req: NextRequest) {
     }
 
     const recentLogs = cachedEvents.slice(0, limit);
-    const blockNumbers = [...new Set(recentLogs.map((l) => l.blockNumber).filter((bn): bn is bigint => typeof bn === 'bigint'))];
+    const blockNumbers = [
+      ...new Set(
+        recentLogs.map((l) => l.blockNumber).filter((bn): bn is bigint => typeof bn === 'bigint'),
+      ),
+    ];
 
     const blocks = await Promise.all(
-      blockNumbers.map((bn) => withFallback((client) => client.getBlock({ blockNumber: bn })))
+      blockNumbers.map((bn) => withFallback((client) => client.getBlock({ blockNumber: bn }))),
     );
     const blockTimestamps = new Map(blocks.map((b) => [b.number.toString(), Number(b.timestamp)]));
 
@@ -279,7 +314,7 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error("[/api/events]", message);
+    console.error('[/api/events]', message);
     return NextResponse.json({
       events: [],
       latestBlock: cacheHeadBlock?.toString() ?? null,

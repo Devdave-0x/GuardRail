@@ -1,5 +1,6 @@
 {
   "name": "eth-agent",
+  "version": "0.0.0",
   "private": true,
   "workspaces": [
     "runtime",
@@ -8,14 +9,38 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build -w runtime",
+    "build": "npm run build -w eth-agent-kit && npm run build -w runtime",
+    "type-check": "npm run type-check -w runtime && npm run type-check -w dashboard",
     "setup": "npm run setup -w runtime",
     "mcp": "npm --prefix runtime run -s mcp",
     "dev": "npm run dev -w dashboard",
     "publish:kit": "npm run publish -w packages/eth-agent-kit",
-    "publish:cli": "npm run publish -w packages/create-eth-agent"
+    "publish:cli": "npm run publish -w packages/create-eth-agent",
+    "lint": "eslint . && npm run lint -w dashboard",
+    "lint:fix": "eslint . --fix && npm run lint -w dashboard -- --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint-staged": "lint-staged",
+    "validate-branch-name": "validate-branch-name",
+    "prepare": "husky"
+  },
+  "validate-branch-name": {
+    "pattern": "^(main|develop)$|^(feat|feature|fix|chore|docs|refactor|perf|style|test|hotfix)/.+$",
+    "errorMsg": "Branch name must be main, develop, or <type>/<topic> where type is one of: feat, feature, fix, chore, docs, refactor, perf, style, test, hotfix."
   },
   "devDependencies": {
-    "concurrently": "^8.0.0"
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "concurrently": "^8.0.0",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^14.2.35",
+    "eslint-config-prettier": "^9.1.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.2",
+    "prettier": "^3.9.6",
+    "prettier-plugin-tailwindcss": "^0.6.14",
+    "validate-branch-name": "^1.3.2"
   }
 }

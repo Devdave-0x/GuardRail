@@ -84,9 +84,7 @@ export function WhitelistManagerPanel() {
     return () => clearInterval(interval);
   }, []);
 
-  const isUnlocked = data?.pendingCall
-    ? nowMs >= data.pendingCall.unlockTimeMs
-    : false;
+  const isUnlocked = data?.pendingCall ? nowMs >= data.pendingCall.unlockTimeMs : false;
 
   return (
     <Panel
@@ -95,15 +93,15 @@ export function WhitelistManagerPanel() {
       status={data?.pendingCall ? 'warn' : 'ok'}
       loading={loading}
     >
-      <div className="p-4 space-y-4">
+      <div className="flex flex-col gap-4 p-4">
         {/* Pending queued call */}
         {data?.pendingCall ? (
-          <div className="border border-orange/40 bg-orange/5 rounded p-3 space-y-3">
+          <div className="flex flex-col gap-3 rounded border border-orange/40 bg-orange/5 p-3">
             <div className="flex items-center justify-between">
               <Badge variant="orange">⏳ Queued Call</Badge>
               <Countdown unlockTimeMs={data.pendingCall.unlockTimeMs} />
             </div>
-            <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+            <div className="grid grid-cols-2 gap-2 font-mono text-caption">
               <div>
                 <p className="text-text-muted">Target</p>
                 <p className="text-text-primary">{formatAddress(data.pendingCall.target)}</p>
@@ -126,7 +124,7 @@ export function WhitelistManagerPanel() {
               </div>
             </div>
             {isGuardian && (
-              <div className="flex gap-2 pt-2 border-t border-orange/20">
+              <div className="flex gap-2 border-t border-orange/20 pt-2">
                 <Button
                   variant="primary"
                   size="sm"
@@ -149,15 +147,17 @@ export function WhitelistManagerPanel() {
             )}
           </div>
         ) : (
-          <div className="text-text-muted text-xs font-mono flex items-center gap-2">
+          <div className="flex items-center gap-2 font-mono text-caption text-text-muted">
             <span className="text-green">✓</span> No pending call in queue
           </div>
         )}
 
         {/* Guardian: Queue new call form */}
         {isGuardian && !data?.pendingCall && (
-          <div className="border border-border rounded p-3 space-y-3">
-            <p className="text-text-secondary text-xs font-mono uppercase tracking-wider">Queue New Call</p>
+          <div className="flex flex-col gap-3 rounded border border-border p-3">
+            <p className="font-mono text-micro uppercase tracking-wider text-text-secondary">
+              Queue New Call
+            </p>
             <Input
               label="Target Address"
               value={queueTarget}
@@ -171,7 +171,7 @@ export function WhitelistManagerPanel() {
               placeholder="0x00000000"
             />
             <div className="grid grid-cols-2 gap-3">
-              <label className="flex items-center gap-2 text-xs font-mono text-text-secondary cursor-pointer">
+              <label className="flex cursor-pointer items-center gap-2 font-mono text-caption text-text-secondary">
                 <input
                   type="checkbox"
                   checked={queueCheckRecipient}
@@ -180,7 +180,7 @@ export function WhitelistManagerPanel() {
                 />
                 Check Recipient
               </label>
-              <label className="flex items-center gap-2 text-xs font-mono text-text-secondary cursor-pointer">
+              <label className="flex cursor-pointer items-center gap-2 font-mono text-caption text-text-secondary">
                 <input
                   type="checkbox"
                   checked={queueCheckAmount}
@@ -212,21 +212,25 @@ export function WhitelistManagerPanel() {
         )}
 
         {!isGuardian && walletAddress && (
-          <div className="text-text-muted text-xs font-mono">
+          <div className="font-mono text-caption text-text-muted">
             Connect guardian wallet to manage whitelist
           </div>
         )}
 
         {!walletAddress && (
-          <div className="text-text-muted text-xs font-mono">
+          <div className="font-mono text-caption text-text-muted">
             Connect wallet to manage whitelist
           </div>
         )}
 
         {txStatus && (
-          <div className={`text-xs font-mono rounded px-3 py-2 border ${
-            txStatus.startsWith('✓') ? 'text-green border-green/30 bg-green/5' : 'text-orange border-orange/30 bg-orange/5'
-          }`}>
+          <div
+            className={`rounded border px-3 py-2 font-mono text-caption ${
+              txStatus.startsWith('✓')
+                ? 'border-green/30 bg-green/5 text-green'
+                : 'border-orange/30 bg-orange/5 text-orange'
+            }`}
+          >
             {txStatus}
           </div>
         )}

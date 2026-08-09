@@ -2,24 +2,131 @@
 @tailwind components;
 @tailwind utilities;
 
-
-:root {
+/*
+  Every color a Tailwind utility can carry an opacity modifier on (`bg-green/10`,
+  `border-red/40`, `bg-bg/90`, ...) needs an `-rgb` triplet alongside its hex value.
+  Tailwind can only apply `/NN` to a color function it can inject an alpha channel into
+  (`rgba(var(--x-rgb), NN)`); it silently drops the modifier — no CSS rule at all — for a
+  color that's just `var(--x)`. tailwind.config.js's `withOpacity()` reads these.
+*/
+:root,
+.dark {
   --bg: #0a0a0a;
+  --bg-rgb: 10 10 10;
   --bg-panel: #0f0f0f;
+  --bg-panel-rgb: 15 15 15;
   --bg-elevated: #141414;
   --bg-hover: #1a1a1a;
   --border: #1e1e1e;
+  --border-rgb: 30 30 30;
   --border-bright: #2a2a2a;
   --green: #00ff88;
+  --green-rgb: 0 255 136;
   --green-dim: #00cc6a;
   --orange: #ff6b35;
+  --orange-rgb: 255 107 53;
   --red: #ff3333;
+  --red-rgb: 255 51 51;
   --blue: #0070f3;
+  --blue-rgb: 0 112 243;
   --blue-bright: #3b82f6;
+  --blue-bright-rgb: 59 130 246;
   --yellow: #ffd700;
-  --text-primary: #e8e8e8;
-  --text-secondary: #888888;
-  --text-muted: #555555;
+  --yellow-rgb: 255 215 0;
+  --text-primary: #f4f4f5;
+  --text-secondary: #a1a1aa;
+  --text-muted: #7d7d87;
+  /*
+    The floating nav's shadow, not a static value — the same shadow reads as correct depth
+    in dark mode and as a muddy grey smear in light mode (or the reverse at a lighter
+    weight), so it's tuned per theme rather than shared.
+  */
+  --shadow-nav: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 255, 136, 0.08);
+
+  /*
+    Fixed, not flipping. Declared once here and never redeclared in `.light` below, so
+    the value stays constant regardless of theme — unlike --text-primary etc., which
+    `.light` does override.
+
+    This is for the one place text sits directly on the hero video rather than on the
+    page's own (theme-flipping) background: the video is always dark, full stop, it
+    doesn't participate in the light/dark toggle. Text over it needs to always be light
+    for the same reason a flipping token would be wrong there — if the headline used
+    --text-primary, it would correctly go near-black in light mode and then be nearly
+    invisible against the still-dark video behind it. See HeroCopy.tsx.
+  */
+  --fixed-light: #fafaf9;
+  --fixed-light-rgb: 250 250 249;
+}
+
+/* Light theme. Neutral scale flips; accents keep their dark-mode hue, just mapped 1:1. */
+.light {
+  --bg: #fafaf9;
+  --bg-rgb: 250 250 249;
+  --bg-panel: #ffffff;
+  --bg-panel-rgb: 255 255 255;
+  --bg-elevated: #f4f4f5;
+  --bg-hover: #ececee;
+  --border: #e4e4e7;
+  --border-rgb: 228 228 231;
+  --border-bright: #d4d4d8;
+  --green: #00b368;
+  --green-rgb: 0 179 104;
+  --green-dim: #00a05c;
+  --orange: #d94f1c;
+  --orange-rgb: 217 79 28;
+  --red: #d92626;
+  --red-rgb: 217 38 38;
+  --blue: #0058c4;
+  --blue-rgb: 0 88 196;
+  --blue-bright: #2563eb;
+  --blue-bright-rgb: 37 99 235;
+  --yellow: #a87900;
+  --yellow-rgb: 168 121 0;
+  --text-primary: #18181b;
+  --text-secondary: #52525b;
+  --text-muted: #71717a;
+  --shadow-nav: 0 4px 20px rgba(24, 24, 27, 0.1), 0 0 0 1px rgba(24, 24, 27, 0.04);
+}
+
+/*
+  Spacing tokens, responsive at the token level rather than at the call site. A section
+  writes `px-section-px py-section-py` once instead of repeating a px-4 sm:px-6 lg:px-8
+  ladder everywhere, and changing the page gutter is a one-line edit here.
+
+  Values come from theme() and breakpoints from @screen, so tailwind.config.js stays the
+  single source of truth. No pixel or rem literal is duplicated into this file.
+*/
+@layer base {
+  :root {
+    --section-px: theme('spacing.4');
+    --section-py-tight: theme('spacing.10');
+    --section-py: theme('spacing.16');
+    --section-py-loose: theme('spacing.20');
+    --panel-gap: theme('spacing.4');
+    --stack-gap: theme('spacing.3');
+
+    /* How opaque a section sits over the ambient background. See .bg-surface. */
+    --surface-alpha: 0.62;
+  }
+
+  @screen sm {
+    :root {
+      --section-px: theme('spacing.6');
+      --section-py-tight: theme('spacing.14');
+      --section-py: theme('spacing.20');
+      --section-py-loose: theme('spacing.28');
+    }
+  }
+
+  @screen lg {
+    :root {
+      --section-px: theme('spacing.8');
+      --section-py-tight: theme('spacing.16');
+      --section-py: theme('spacing.28');
+      --section-py-loose: theme('spacing.36');
+    }
+  }
 }
 
 * {
@@ -33,7 +140,12 @@ html {
 body {
   background-color: var(--bg);
   color: var(--text-primary);
-  font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  font-family:
+    var(--font-hanken-grotesk),
+    'Hanken Grotesk',
+    system-ui,
+    -apple-system,
+    sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -77,10 +189,403 @@ body::before {
   mix-blend-mode: overlay;
 }
 
+/*
+  Translucent section surfaces.
+
+  The ambient DotField is mounted once, fixed behind the whole marketing route, and
+  tracks the cursor globally. An opaque section background hides it, which is why the
+  effect used to be visible only behind the hero. These surfaces let it through for the
+  full page while keeping enough tint under body copy for contrast.
+
+  --surface-alpha is the single dial for how much shows through. Tune it here, not at
+  call sites. color-mix keeps --bg and --bg-panel the source of truth for the hue.
+*/
+@layer components {
+  .bg-surface {
+    background-color: color-mix(in srgb, var(--bg) calc(var(--surface-alpha) * 100%), transparent);
+  }
+
+  .bg-surface-panel {
+    background-color: color-mix(
+      in srgb,
+      var(--bg-panel) calc(var(--surface-alpha) * 100%),
+      transparent
+    );
+  }
+}
+
+/*
+  Gradient text. Used on a single phrase in the hero headline, not as a general style.
+
+  background-clip: text needs a transparent fill to show through, which means the glyphs
+  have no colour of their own. Forced-colors mode discards backgrounds, so the text would
+  disappear entirely without the fallback below.
+*/
+.text-gradient {
+  background-image: linear-gradient(100deg, #00ff88 0%, #22d3ee 45%, #a78bfa 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-pan 8s ease-in-out infinite alternate;
+}
+
+@keyframes gradient-pan {
+  to {
+    background-position: 100% center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text-gradient {
+    animation: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .text-gradient {
+    background-image: none;
+    color: CanvasText;
+    -webkit-text-fill-color: CanvasText;
+  }
+}
+
 /* Utility classes */
 .font-mono-numbers {
   font-variant-numeric: tabular-nums;
   font-feature-settings: 'tnum';
+}
+
+/*
+  Visually hidden but announced by screen readers. Required by every animated-text
+  component: the animated spans are aria-hidden and the plain string sits in one of these.
+*/
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Skip link: hidden until focused, then pinned to the top left. */
+.skip-link:focus-visible {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 10000;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-panel);
+  border: 1px solid var(--green);
+  color: var(--green);
+  font-family: var(--font-jetbrains-mono), 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+}
+
+/*
+  Cursor-tracking edge glow. usePointerGlow writes --pointer-x / --pointer-y once per
+  frame from a single delegated listener, so any number of these cost one listener total
+  rather than a WebGL context each. See the WebGL budget in docs/Context.md.
+*/
+.edge-glow {
+  position: relative;
+  isolation: isolate;
+}
+
+.edge-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(
+    18rem circle at var(--pointer-x, -100%) var(--pointer-y, -100%),
+    var(--edge-glow-color, rgba(0, 255, 136, 0.6)),
+    transparent 40%
+  );
+  background-attachment: fixed;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.edge-glow:hover::before,
+.edge-glow:focus-within::before {
+  opacity: 1;
+}
+
+/*
+  Scroll progress rail. Sits on the header's bottom edge and replaces its border, so the
+  header gains a readout without gaining a row.
+
+  scaleX on a pre-painted bar, not an animated width: width is a layout property and would
+  reflow the header on every frame. useScrollProgress writes --scroll-progress once per
+  frame from the same coalesced-listener pattern as usePointerGlow.
+*/
+.scroll-progress {
+  position: absolute;
+  inset-inline: 0;
+  bottom: -1px;
+  height: 2px;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.scroll-progress::after {
+  content: '';
+  display: block;
+  height: 100%;
+  transform: scaleX(var(--scroll-progress, 0));
+  transform-origin: left center;
+  background: linear-gradient(90deg, var(--green) 0%, #22d3ee 55%, var(--blue-bright) 100%);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.45);
+}
+
+/*
+  Value-change flash. A readout that updates under the user with no visual event is a
+  change they will miss; this is the only cue that a poll actually moved a number.
+
+  Ends at the base state with no fill mode, so the element carries no leftover style once
+  the flash finishes and the class can simply be removed.
+*/
+@keyframes value-flash {
+  from {
+    color: var(--flash-color, var(--green));
+    text-shadow: 0 0 12px var(--flash-color, var(--green));
+  }
+}
+
+.value-flash {
+  animation: value-flash 0.9s ease-out;
+}
+
+/*
+  Status glow for a panel in trouble. Deliberately not applied at rest: a dashboard where
+  every panel breathes tells you nothing, so only `warn` and `error` animate and the eye
+  is pulled to the one panel that has something to say.
+
+  Distinct from .edge-glow, which is the cursor affordance and stays on every panel.
+*/
+@keyframes status-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+  50% {
+    box-shadow: 0 0 20px -3px var(--status-glow-color, transparent);
+  }
+}
+
+.status-pulse {
+  animation: status-pulse 2.6s ease-in-out infinite;
+}
+
+/*
+  Ambient background stack. Three fixed layers behind all content, painted in this order:
+
+    -30  .bg-mesh       drifting colour mesh, gives the page depth
+    -20  .bg-grid       faint engineering grid, parallaxes on scroll
+    -10  DotField       the cursor-reactive dot canvas (mounted in the layout)
+     -5  .bg-spotlight  large soft glow that follows the pointer
+
+  All three are CSS only, so the whole stack costs zero WebGL contexts and the budget in
+  docs/Context.md is unaffected. They read --pointer-x, --pointer-y, and --scroll-y, which
+  usePointerGlow and useScrollParallax write once per frame.
+*/
+.bg-mesh,
+.bg-grid,
+.bg-spotlight {
+  position: fixed;
+  pointer-events: none;
+  contain: strict;
+}
+
+.bg-mesh {
+  inset: -25%;
+  z-index: -30;
+  opacity: 0.5;
+  background:
+    radial-gradient(38rem circle at 18% 22%, rgba(0, 255, 136, 0.16), transparent 60%),
+    radial-gradient(34rem circle at 82% 18%, rgba(59, 130, 246, 0.16), transparent 60%),
+    radial-gradient(40rem circle at 68% 78%, rgba(167, 139, 250, 0.13), transparent 62%),
+    radial-gradient(30rem circle at 26% 82%, rgba(34, 211, 238, 0.12), transparent 60%);
+  /* translateZ promotes the layer so the drift never repaints page content. */
+  animation: mesh-drift 48s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes mesh-drift {
+  from {
+    transform: translate3d(-2%, -1%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(2%, 1.5%, 0) scale(1.08);
+  }
+}
+
+.bg-grid {
+  inset: 0;
+  z-index: -20;
+  opacity: 0.28;
+  background-image:
+    linear-gradient(to right, rgba(0, 255, 136, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 255, 136, 0.05) 1px, transparent 1px);
+  background-size: 64px 64px;
+  /* Parallax: the grid drifts at a fraction of scroll speed. */
+  transform: translate3d(0, calc(var(--scroll-y, 0) * -0.04px), 0);
+  /*
+    Ambient drift, on background-position rather than transform because transform is
+    already carrying the scroll parallax above and a keyframe there would clobber it.
+    One full 64px tile per cycle, so the loop point is invisible.
+  */
+  animation: grid-drift 24s linear infinite;
+  mask-image: radial-gradient(ellipse 100% 60% at 50% 40%, #000 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 100% 60% at 50% 40%, #000 40%, transparent 100%);
+}
+
+@keyframes grid-drift {
+  from {
+    background-position:
+      0 0,
+      0 0;
+  }
+  to {
+    background-position:
+      64px 64px,
+      64px 64px;
+  }
+}
+
+.bg-spotlight {
+  inset: 0;
+  z-index: -5;
+  background: radial-gradient(
+    36rem circle at var(--pointer-x, 50%) var(--pointer-y, 30%),
+    rgba(0, 255, 136, 0.07),
+    rgba(59, 130, 246, 0.05) 35%,
+    transparent 65%
+  );
+  transition: opacity 0.4s ease;
+}
+
+/* Coarse pointers never hover, so the spotlight would sit frozen wherever it initialised. */
+@media (pointer: coarse) {
+  .bg-spotlight {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-mesh {
+    animation: none;
+  }
+  .bg-grid {
+    transform: none;
+    animation: none;
+  }
+}
+
+/*
+  Animated border glow: a conic gradient rotating around the element's edge.
+
+  Distinct from .edge-glow, which reacts to the cursor. This one runs on its own and is
+  for drawing the eye to a small number of high-intent surfaces (the install command, the
+  MCP config). Do not put it on more than a couple of elements per screen.
+
+  @property is what makes the angle animatable: a plain custom property is a string to
+  the interpolator and would jump from 0deg to 360deg with nothing in between.
+*/
+@property --border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.animated-border {
+  position: relative;
+  isolation: isolate;
+}
+
+.animated-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--border-angle),
+    transparent 0%,
+    var(--border-glow-from, #00ff88) 10%,
+    var(--border-glow-to, #3b82f6) 20%,
+    transparent 35%,
+    transparent 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: border-rotate 6s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes border-rotate {
+  to {
+    --border-angle: 360deg;
+  }
+}
+
+/*
+  Reduced motion stops the rotation. The global backstop below collapses the duration,
+  which would freeze the gradient mid-sweep on one bright edge, so hide it outright.
+*/
+@media (prefers-reduced-motion: reduce) {
+  .animated-border::before {
+    display: none;
+  }
+}
+
+/*
+  Global reduced-motion backstop. Components also branch in JS via
+  usePrefersReducedMotion, which is what actually prevents rAF loops from starting.
+  This catches CSS transitions and keyframes that no component owns.
+*/
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 /* Table reset */
@@ -98,21 +603,93 @@ button {
   cursor: pointer;
 }
 
-input, textarea {
-  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+input,
+textarea {
+  font-family: var(--font-jetbrains-mono), 'JetBrains Mono', 'Fira Code', Consolas, monospace;
 }
 
 .font-mono {
-  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  font-family: var(--font-jetbrains-mono), 'JetBrains Mono', 'Fira Code', Consolas, monospace;
 }
 
 /* CRT flicker - very subtle */
 @keyframes crt-flicker {
-  0%, 100% { opacity: 1; }
-  98% { opacity: 1; }
-  99% { opacity: 0.97; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  98% {
+    opacity: 1;
+  }
+  99% {
+    opacity: 0.97;
+  }
 }
 
 .crt {
   animation: crt-flicker 8s infinite;
+}
+
+/*
+  Theme toggle ripple. ThemeToggle stores the button's centre in --theme-toggle-x/y on
+  :root before flipping the class, then wraps that flip in document.startViewTransition().
+  The browser snapshots old/new states either side of the flip; we override the default
+  cross-fade so the new theme instead wipes outward from the button as a circle.
+
+  Named ::view-transition-new(root) rather than the bare pseudo so this never fights a
+  future named transition elsewhere on the page.
+*/
+@keyframes sun-reveal {
+  from {
+    clip-path: circle(0% at var(--theme-toggle-x, 50%) var(--theme-toggle-y, 50%));
+  }
+  to {
+    clip-path: circle(140% at var(--theme-toggle-x, 50%) var(--theme-toggle-y, 50%));
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root) {
+    animation: none;
+  }
+
+  ::view-transition-new(root) {
+    animation: sun-reveal 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    animation-fill-mode: both;
+  }
+}
+
+/*
+  Animated underline for nav-style links. `transform: scaleX` rather than animating
+  `width`, so this is a compositor-only transition and never triggers layout on hover.
+  transform-origin flips per direction so the line draws in on enter and draws out
+  toward the same edge the cursor left from, rather than just collapsing in place.
+*/
+.link-underline {
+  position: relative;
+}
+
+.link-underline::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: -2px;
+  left: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.link-underline:hover::after,
+.link-underline:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .link-underline::after {
+    transition: none;
+  }
 }

@@ -1,11 +1,22 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AlertTriangle, Bot, Pause, Play, Shield, ShieldAlert, ShieldCheck, Send, Zap } from 'lucide-react';
+import {
+  MdOutlineWarning,
+  MdOutlineMemory,
+  MdOutlinePause,
+  MdOutlinePlayArrow,
+  MdOutlineShield,
+  MdOutlineSecurityUpdateWarning,
+  MdOutlineSecurityUpdateGood,
+  MdOutlineSend,
+  MdOutlineBolt,
+} from 'react-icons/md';
 import { Panel, Badge, Button, Input } from '@/components/shared';
 import { useContractState } from '@/hooks/useContractState';
 import { useAccount, useWriteContract } from 'wagmi';
 import { CONTRACT_ADDRESS, AGENT_WALLET_ABI } from '@/lib/contract';
+import { cn } from '@/lib/utils';
 import { parseEther } from 'viem';
 
 type ActiveSection = 'none' | 'withdraw' | 'agent' | 'guardian' | 'limits';
@@ -45,48 +56,95 @@ export function GuardianControlPanel() {
     }
   };
 
-  const handlePause = () => exec('Pausing', () => writeContractAsync({
-    address: CONTRACT_ADDRESS, abi: AGENT_WALLET_ABI, functionName: 'pause',
-  }));
+  const handlePause = () =>
+    exec('Pausing', () =>
+      writeContractAsync({
+        address: CONTRACT_ADDRESS,
+        abi: AGENT_WALLET_ABI,
+        functionName: 'pause',
+      }),
+    );
 
-  const handleUnpause = () => exec('Unpausing', () => writeContractAsync({
-    address: CONTRACT_ADDRESS, abi: AGENT_WALLET_ABI, functionName: 'unpause',
-  }));
+  const handleUnpause = () =>
+    exec('Unpausing', () =>
+      writeContractAsync({
+        address: CONTRACT_ADDRESS,
+        abi: AGENT_WALLET_ABI,
+        functionName: 'unpause',
+      }),
+    );
 
-  const handleWithdraw = () => exec('Withdrawing', () => writeContractAsync({
-    address: CONTRACT_ADDRESS, abi: AGENT_WALLET_ABI, functionName: 'withdraw',
-    args: [withdrawTo as `0x${string}`, parseEther(withdrawAmount)],
-  }));
+  const handleWithdraw = () =>
+    exec('Withdrawing', () =>
+      writeContractAsync({
+        address: CONTRACT_ADDRESS,
+        abi: AGENT_WALLET_ABI,
+        functionName: 'withdraw',
+        args: [withdrawTo as `0x${string}`, parseEther(withdrawAmount)],
+      }),
+    );
 
-  const handleTransferAgent = () => exec('Transfer agent', () => writeContractAsync({
-    address: CONTRACT_ADDRESS, abi: AGENT_WALLET_ABI, functionName: 'transferAgent',
-    args: [newAgent as `0x${string}`],
-  }));
+  const handleTransferAgent = () =>
+    exec('Transfer agent', () =>
+      writeContractAsync({
+        address: CONTRACT_ADDRESS,
+        abi: AGENT_WALLET_ABI,
+        functionName: 'transferAgent',
+        args: [newAgent as `0x${string}`],
+      }),
+    );
 
-  const handleTransferGuardian = () => exec('Transfer guardian', () => writeContractAsync({
-    address: CONTRACT_ADDRESS, abi: AGENT_WALLET_ABI, functionName: 'transferGuardian',
-    args: [newGuardian as `0x${string}`],
-  }));
+  const handleTransferGuardian = () =>
+    exec('Transfer guardian', () =>
+      writeContractAsync({
+        address: CONTRACT_ADDRESS,
+        abi: AGENT_WALLET_ABI,
+        functionName: 'transferGuardian',
+        args: [newGuardian as `0x${string}`],
+      }),
+    );
 
-  const handleQueueLimitChange = () => exec('Queuing limit change', () => writeContractAsync({
-    address: CONTRACT_ADDRESS, abi: AGENT_WALLET_ABI, functionName: 'queueLimitChange',
-    args: [parseEther(newTxLimit), parseEther(newDailyLimit)],
-  }));
+  const handleQueueLimitChange = () =>
+    exec('Queuing limit change', () =>
+      writeContractAsync({
+        address: CONTRACT_ADDRESS,
+        abi: AGENT_WALLET_ABI,
+        functionName: 'queueLimitChange',
+        args: [parseEther(newTxLimit), parseEther(newDailyLimit)],
+      }),
+    );
 
-  const handleApplyLimitChange = () => exec('Applying limit change', () => writeContractAsync({
-    address: CONTRACT_ADDRESS, abi: AGENT_WALLET_ABI, functionName: 'applyLimitChange',
-  }));
+  const handleApplyLimitChange = () =>
+    exec('Applying limit change', () =>
+      writeContractAsync({
+        address: CONTRACT_ADDRESS,
+        abi: AGENT_WALLET_ABI,
+        functionName: 'applyLimitChange',
+      }),
+    );
 
-  const handleCancelLimitChange = () => exec('Cancelling limit change', () => writeContractAsync({
-    address: CONTRACT_ADDRESS, abi: AGENT_WALLET_ABI, functionName: 'cancelLimitChange',
-  }));
+  const handleCancelLimitChange = () =>
+    exec('Cancelling limit change', () =>
+      writeContractAsync({
+        address: CONTRACT_ADDRESS,
+        abi: AGENT_WALLET_ABI,
+        functionName: 'cancelLimitChange',
+      }),
+    );
 
   if (!mounted) {
     return (
-      <Panel title="Guardian Control" subtitle="Connect wallet to access" status="warn" loading={loading}>
+      <Panel
+        title="Guardian Control"
+        subtitle="Connect wallet to access"
+        status="warn"
+        loading={loading}
+      >
         <div className="p-6 text-center">
-          <ShieldAlert size={32} className="text-text-muted mx-auto mb-3" />
-          <p className="text-text-muted text-xs font-mono">Connect guardian wallet to access controls</p>
+          <MdOutlineSecurityUpdateWarning size={32} className="mx-auto mb-3 text-text-muted" />
+          <p className="font-mono text-caption text-text-muted">
+            Connect guardian wallet to access controls
+          </p>
         </div>
       </Panel>
     );
@@ -94,10 +152,17 @@ export function GuardianControlPanel() {
 
   if (!walletAddress) {
     return (
-      <Panel title="Guardian Control" subtitle="Connect wallet to access" status="warn" loading={loading}>
+      <Panel
+        title="Guardian Control"
+        subtitle="Connect wallet to access"
+        status="warn"
+        loading={loading}
+      >
         <div className="p-6 text-center">
-          <ShieldAlert size={32} className="text-text-muted mx-auto mb-3" />
-          <p className="text-text-muted text-xs font-mono">Connect guardian wallet to access controls</p>
+          <MdOutlineSecurityUpdateWarning size={32} className="mx-auto mb-3 text-text-muted" />
+          <p className="font-mono text-caption text-text-muted">
+            Connect guardian wallet to access controls
+          </p>
         </div>
       </Panel>
     );
@@ -105,13 +170,18 @@ export function GuardianControlPanel() {
 
   if (!isGuardian) {
     return (
-      <Panel title="Guardian Control" subtitle="Guardian access required" status="warn" loading={loading}>
+      <Panel
+        title="Guardian Control"
+        subtitle="Guardian access required"
+        status="warn"
+        loading={loading}
+      >
         <div className="p-6 text-center">
-          <ShieldAlert size={32} className="text-orange mx-auto mb-3" />
-          <p className="text-text-muted text-xs font-mono">
+          <MdOutlineSecurityUpdateWarning size={32} className="mx-auto mb-3 text-orange" />
+          <p className="font-mono text-caption text-text-muted">
             Connected: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
           </p>
-          <p className="text-orange text-xs font-mono mt-1">Not the guardian address</p>
+          <p className="mt-1 font-mono text-caption text-orange">Not the guardian address</p>
         </div>
       </Panel>
     );
@@ -124,30 +194,54 @@ export function GuardianControlPanel() {
       status={data?.paused ? 'error' : 'ok'}
       loading={loading}
     >
-      <div className="p-4 space-y-4">
+      <div className="flex flex-col gap-4 p-4">
         {/* Guardian badge */}
         <div className="flex items-center gap-2">
-          <ShieldCheck size={14} className="text-green" />
+          <MdOutlineSecurityUpdateGood size={14} className="text-green" />
           <Badge variant="green">Guardian Connected</Badge>
         </div>
 
-        {/* Pause / Unpause */}
-        <div className="border border-border rounded p-3 space-y-2">
-          <p className="text-text-muted text-xs font-mono uppercase tracking-wider">Emergency Controls</p>
+        {/*
+          One of the two surfaces allowed `.animated-border` per docs/Context.md, and only
+          while paused. A rotating border on an idle kill switch is decoration; on a paused
+          contract it is the one control the guardian is here to find.
+        */}
+        <div
+          style={
+            data?.paused
+              ? ({
+                  '--border-glow-from': '#ff3333',
+                  '--border-glow-to': '#ff6b35',
+                } as React.CSSProperties)
+              : undefined
+          }
+          className={cn(
+            'flex flex-col gap-2 rounded border p-3',
+            data?.paused ? 'animated-border border-red/40' : 'border-border',
+          )}
+        >
+          <p className="font-mono text-micro uppercase tracking-wider text-text-muted">
+            Emergency Controls
+          </p>
           <div className="flex gap-2">
             {data?.paused ? (
               <Button variant="primary" onClick={handleUnpause} loading={isPending} size="sm">
-                <span className="inline-flex items-center gap-1"><Play size={12} /> Unpause Contract</span>
+                <span className="inline-flex items-center gap-1">
+                  <MdOutlinePlayArrow size={12} /> Unpause Contract
+                </span>
               </Button>
             ) : (
               <Button variant="danger" onClick={handlePause} loading={isPending} size="sm">
-                <span className="inline-flex items-center gap-1"><Pause size={12} /> Pause Contract</span>
+                <span className="inline-flex items-center gap-1">
+                  <MdOutlinePause size={12} /> Pause Contract
+                </span>
               </Button>
             )}
           </div>
           {data?.paused && (
-            <div className="flex items-center gap-2 text-red text-xs font-mono">
-              <AlertTriangle size={12} className="animate-blink" /> CONTRACT IS PAUSED — agent cannot execute
+            <div className="flex items-center gap-2 font-mono text-caption text-red">
+              <MdOutlineWarning size={12} className="animate-blink" /> CONTRACT IS PAUSED: agent
+              cannot execute
             </div>
           )}
         </div>
@@ -161,19 +255,43 @@ export function GuardianControlPanel() {
               size="sm"
               onClick={() => setSection(section === s ? 'none' : s)}
             >
-              {s === 'withdraw' ? <span className="inline-flex items-center gap-1"><Send size={12} /> Withdraw</span> :
-               s === 'agent' ? <span className="inline-flex items-center gap-1"><Bot size={12} /> Transfer Agent</span> :
-               s === 'guardian' ? <span className="inline-flex items-center gap-1"><Shield size={12} /> Transfer Guardian</span> :
-               <span className="inline-flex items-center gap-1"><Zap size={12} /> Limits</span>}
+              {s === 'withdraw' ? (
+                <span className="inline-flex items-center gap-1">
+                  <MdOutlineSend size={12} /> Withdraw
+                </span>
+              ) : s === 'agent' ? (
+                <span className="inline-flex items-center gap-1">
+                  <MdOutlineMemory size={12} /> Transfer Agent
+                </span>
+              ) : s === 'guardian' ? (
+                <span className="inline-flex items-center gap-1">
+                  <MdOutlineShield size={12} /> Transfer Guardian
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1">
+                  <MdOutlineBolt size={12} /> Limits
+                </span>
+              )}
             </Button>
           ))}
         </div>
 
         {/* Withdraw form */}
         {section === 'withdraw' && (
-          <div className="border border-orange/30 bg-orange/5 rounded p-3 space-y-3 animate-slide-in">
-            <Input label="Recipient Address" value={withdrawTo} onChange={setWithdrawTo} placeholder="0x..." />
-            <Input label="Amount (BOT)" value={withdrawAmount} onChange={setWithdrawAmount} placeholder="0.01" type="number" />
+          <div className="flex animate-slide-in flex-col gap-3 rounded border border-orange/30 bg-orange/5 p-3">
+            <Input
+              label="Recipient Address"
+              value={withdrawTo}
+              onChange={setWithdrawTo}
+              placeholder="0x..."
+            />
+            <Input
+              label="Amount (BOT)"
+              value={withdrawAmount}
+              onChange={setWithdrawAmount}
+              placeholder="0.01"
+              type="number"
+            />
             <Button
               variant="warn"
               size="sm"
@@ -188,9 +306,16 @@ export function GuardianControlPanel() {
 
         {/* Transfer agent form */}
         {section === 'agent' && (
-          <div className="border border-border rounded p-3 space-y-3 animate-slide-in">
-            <Input label="New Agent Address" value={newAgent} onChange={setNewAgent} placeholder="0x..." />
-            <p className="text-text-muted text-xs font-mono">New agent must call acceptAgent() to complete transfer</p>
+          <div className="flex animate-slide-in flex-col gap-3 rounded border border-border p-3">
+            <Input
+              label="New Agent Address"
+              value={newAgent}
+              onChange={setNewAgent}
+              placeholder="0x..."
+            />
+            <p className="font-mono text-caption text-text-muted">
+              New agent must call acceptAgent() to complete transfer
+            </p>
             <Button
               variant="warn"
               size="sm"
@@ -205,9 +330,17 @@ export function GuardianControlPanel() {
 
         {/* Transfer guardian form */}
         {section === 'guardian' && (
-          <div className="border border-red/30 bg-red/5 rounded p-3 space-y-3 animate-slide-in">
-            <p className="text-red text-xs font-mono inline-flex items-center gap-1"><AlertTriangle size={12} /> CAUTION: New guardian must accept before this takes effect</p>
-            <Input label="New Guardian Address" value={newGuardian} onChange={setNewGuardian} placeholder="0x..." />
+          <div className="flex animate-slide-in flex-col gap-3 rounded border border-red/30 bg-red/5 p-3">
+            <p className="inline-flex items-center gap-1 font-mono text-caption text-red">
+              <MdOutlineWarning size={12} /> CAUTION: New guardian must accept before this takes
+              effect
+            </p>
+            <Input
+              label="New Guardian Address"
+              value={newGuardian}
+              onChange={setNewGuardian}
+              placeholder="0x..."
+            />
             <Button
               variant="danger"
               size="sm"
@@ -222,11 +355,25 @@ export function GuardianControlPanel() {
 
         {/* Limits form */}
         {section === 'limits' && (
-          <div className="border border-border rounded p-3 space-y-3 animate-slide-in">
-            <p className="text-text-muted text-xs font-mono">To increase limits, a 10-minute timelock applies</p>
-            <Input label="New Per-TX Limit (BOT)" value={newTxLimit} onChange={setNewTxLimit} placeholder="0.01" type="number" />
-            <Input label="New Daily Limit (BOT)" value={newDailyLimit} onChange={setNewDailyLimit} placeholder="0.1" type="number" />
-            <div className="flex gap-2 flex-wrap">
+          <div className="flex animate-slide-in flex-col gap-3 rounded border border-border p-3">
+            <p className="font-mono text-caption text-text-muted">
+              To increase limits, a 10-minute timelock applies
+            </p>
+            <Input
+              label="New Per-TX Limit (BOT)"
+              value={newTxLimit}
+              onChange={setNewTxLimit}
+              placeholder="0.01"
+              type="number"
+            />
+            <Input
+              label="New Daily Limit (BOT)"
+              value={newDailyLimit}
+              onChange={setNewDailyLimit}
+              placeholder="0.1"
+              type="number"
+            />
+            <div className="flex flex-wrap gap-2">
               <Button
                 variant="warn"
                 size="sm"
@@ -238,10 +385,20 @@ export function GuardianControlPanel() {
               </Button>
               {data?.pendingLimitChange && (
                 <>
-                  <Button variant="primary" size="sm" onClick={handleApplyLimitChange} loading={isPending}>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={handleApplyLimitChange}
+                    loading={isPending}
+                  >
                     Apply
                   </Button>
-                  <Button variant="danger" size="sm" onClick={handleCancelLimitChange} loading={isPending}>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={handleCancelLimitChange}
+                    loading={isPending}
+                  >
                     Cancel
                   </Button>
                 </>
@@ -252,13 +409,15 @@ export function GuardianControlPanel() {
 
         {/* Status */}
         {txStatus && (
-          <div className={`text-xs font-mono rounded px-3 py-2 border ${
-            txStatus.ok && txStatus.msg.startsWith('✓')
-              ? 'text-green border-green/30 bg-green/5'
-              : txStatus.ok
-              ? 'text-text-secondary border-border'
-              : 'text-red border-red/30 bg-red/5'
-          }`}>
+          <div
+            className={`rounded border px-3 py-2 font-mono text-caption ${
+              txStatus.ok && txStatus.msg.startsWith('✓')
+                ? 'border-green/30 bg-green/5 text-green'
+                : txStatus.ok
+                  ? 'border-border text-text-secondary'
+                  : 'border-red/30 bg-red/5 text-red'
+            }`}
+          >
             {txStatus.msg}
           </div>
         )}

@@ -39,7 +39,6 @@
     "eth-agent-kit": "latest",
     "express": "^4.18.0",
     "openai": "^4.104.0",
-    "permissionless": "^0.1.49",
     "uuid": "^9.0.0",
     "viem": "2.17.11",
     "zod": "^3.22.0"

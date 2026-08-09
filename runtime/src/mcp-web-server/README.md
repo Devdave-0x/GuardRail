@@ -37,10 +37,10 @@ Server listens on `MCP_WEB_PORT` (example `3001`).
 
 ## Endpoints
 
-- `GET /sse` — opens SSE stream and returns `session.created` event (JSON-RPC message payload)
-- `POST /message` — send JSON-RPC-like MCP messages (`tools/list`, `tools/call`)
-- `GET /health` — status, connected clients, contract/network
-- `GET /tools` — discover tool definitions
+- `GET /sse`: opens SSE stream and returns `session.created` event (JSON-RPC message payload)
+- `POST /message`: send JSON-RPC-like MCP messages (`tools/list`, `tools/call`)
+- `GET /health`: status, connected clients, contract/network
+- `GET /tools`: discover tool definitions
 
 ### curl examples
 

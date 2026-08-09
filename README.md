@@ -5,7 +5,7 @@
 > Connect your AI assistant to an on-chain wallet with
 > enforced spending limits, whitelisting, and guardian controls.
 
-**Supports Ethereum Sepolia and BOT Chain testnet** — same audited `AgentWallet` contract, the runtime targets whichever chain you configure.
+**Supports Ethereum Sepolia and BOT Chain testnet**: same audited `AgentWallet` contract, the runtime targets whichever chain you configure.
 
 ## How it works
 
@@ -18,11 +18,12 @@ User prompt → MCP Server → AgentWallet.sol → [Sepolia | BOT Chain testnet]
                               daily limits
 ```
 
-Chain is selected at runtime via `CHAIN_ID` — no code changes needed to switch networks.
+Chain is selected at runtime via `CHAIN_ID`, so no code changes are needed to switch networks.
 
 ## Quickstart
 
-### Option A — npx (fastest)
+### Option A: npx (fastest)
+
 ```bash
 npx create-eth-agent@latest my-agent
 cd my-agent
@@ -33,7 +34,8 @@ npm run setup
 # restart your IDE
 ```
 
-### Option B — Clone the full repo
+### Option B: Clone the full repo
+
 ```bash
 git clone https://github.com/Chibey-max/Ethereum-Agentic.git
 cd Ethereum-Agentic/runtime
@@ -43,7 +45,8 @@ npm run build
 npm run setup
 ```
 
-### Option C — npm install (build on top)
+### Option C: npm install (build on top)
+
 ```ts
 npm install eth-agent-kit
 
@@ -57,8 +60,8 @@ await agent.run('Send 0.01 ETH to 0x...')
 Add to your IDE config:
 
 Claude Desktop: ~/.config/claude/claude_desktop_config.json
-Cursor:         ~/.cursor/mcp.json
-Kiro:           ~/.kiro/settings/mcp.json
+Cursor: ~/.cursor/mcp.json
+Kiro: ~/.kiro/settings/mcp.json
 
 ```json
 {
@@ -73,38 +76,39 @@ Kiro:           ~/.kiro/settings/mcp.json
 
 ## Available Tools
 
-| Tool | Description |
-|------|-------------|
-| get_wallet_state | Balance, limits, paused status, roles |
-| transfer_eth | Send native token (ETH on Sepolia, BOT on BOT Chain) to whitelisted address |
-| transfer_token | Send ERC-20 within token policy |
-| check_limits | Remaining daily native-token allowance |
-| get_tx_status | Look up transaction by hash |
-| check_whitelist | Check if address+action is allowed |
-| get_pending_actions | Queued calls with countdown timers |
-| get_transaction_history | Recent on-chain activity |
+| Tool                    | Description                                                                 |
+| ----------------------- | --------------------------------------------------------------------------- |
+| get_wallet_state        | Balance, limits, paused status, roles                                       |
+| transfer_eth            | Send native token (ETH on Sepolia, BOT on BOT Chain) to whitelisted address |
+| transfer_token          | Send ERC-20 within token policy                                             |
+| check_limits            | Remaining daily native-token allowance                                      |
+| get_tx_status           | Look up transaction by hash                                                 |
+| check_whitelist         | Check if address+action is allowed                                          |
+| get_pending_actions     | Queued calls with countdown timers                                          |
+| get_transaction_history | Recent on-chain activity                                                    |
 
 ## Smart Contract
 
 AgentWallet enforces all agent actions on-chain:
+
 - Per-transaction native-token spending limit
 - Daily native-token spending limit
 - Whitelisted target addresses and function selectors
 - Token-specific daily limits
 - Guardian pause/unpause kill switch
-- Timelock on limit increases and new whitelist entries (10 minutes on Sepolia; 1 minute on the BOT Chain testnet deployment, shortened for faster demo iteration — `TIMELOCK` is a compile-time constant, baked in per deployment)
+- Timelock on limit increases and new whitelist entries (10 minutes on Sepolia; 1 minute on the BOT Chain testnet deployment, shortened for faster demo iteration, since `TIMELOCK` is a compile-time constant, baked in per deployment)
 - 2-step role transfers
 
-The runtime automatically targets the configured chain via `CHAIN_ID` — Sepolia and BOT Chain testnet are supported today (`runtime/src/chain.ts`), and more EVM chains can be added there without touching the contract or agent logic.
+The runtime automatically targets the configured chain via `CHAIN_ID`. Sepolia and BOT Chain testnet are supported today (`runtime/src/chain.ts`), and more EVM chains can be added there without touching the contract or agent logic.
 
 ## Deployments
 
 The same audited `AgentWallet` contract is live on two networks:
 
-| Network | Chain ID | Contract Address | Explorer |
-|---|---|---|---|
-| Ethereum Sepolia | 11155111 | `0x4fbE2CeFEC5ef766634C83CFAd0338fEfBB65b35` | [Etherscan](https://sepolia.etherscan.io/address/0x4fbE2CeFEC5ef766634C83CFAd0338fEfBB65b35) |
-| BOT Chain testnet | 968 | `0x2e86509caAdFbEbbe223E51ee7d70Fcb7ba60B01` | [scan.bohr.life](https://scan.bohr.life/address/0x2e86509caAdFbEbbe223E51ee7d70Fcb7ba60B01) |
+| Network           | Chain ID | Contract Address                             | Explorer                                                                                     |
+| ----------------- | -------- | -------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Ethereum Sepolia  | 11155111 | `0x4fbE2CeFEC5ef766634C83CFAd0338fEfBB65b35` | [Etherscan](https://sepolia.etherscan.io/address/0x4fbE2CeFEC5ef766634C83CFAd0338fEfBB65b35) |
+| BOT Chain testnet | 968      | `0x2e86509caAdFbEbbe223E51ee7d70Fcb7ba60B01` | [scan.bohr.life](https://scan.bohr.life/address/0x2e86509caAdFbEbbe223E51ee7d70Fcb7ba60B01)  |
 
 Deploy your own: see contracts/README.md
 
@@ -114,6 +118,7 @@ GuardRail integrates with Terminal 3 Network for
 cryptographically verifiable agent identity.
 
 Every agent session:
+
 - Opens an encrypted TEE (Trusted Execution Environment)
   session via T3N SDK
 - Receives a `did:t3n` decentralized identifier linked to
@@ -126,11 +131,13 @@ Every agent session:
 Get your free API key at https://terminal3.io/claim-page
 
 Add to your `.env`:
+
 ```
 T3N_API_KEY=your_key_here
 ```
 
 On agent startup you will see:
+
 ```
 ✅ T3N Identity active
    Address : 0x...
@@ -142,24 +149,29 @@ without the identity layer.
 
 ## Platform Integrations
 
-- **MCP** — Cursor, VS Code, Kiro, Claude Desktop, Zed
-- **Anna Platform** — Executa plugin via `anna-executa/`
-- **Terminal 3 Network** — TEE-backed verifiable identity
+- **MCP**: Cursor, VS Code, Kiro, Claude Desktop, Zed
+- **Anna Platform**: Executa plugin via `anna-executa/`
+- **Terminal 3 Network**: TEE-backed verifiable identity
 
 ### Anna Executa Plugin
+
 Run GuardRail as an Anna platform plugin:
+
 ```bash
 node anna-executa/index.js
 ```
+
 Test:
+
 ```bash
 echo '{"jsonrpc":"2.0","method":"describe","id":1}' | node anna-executa/index.js
 ```
 
 ## Roadmap
-- [x] Multi-chain support — Sepolia + BOT Chain testnet live; Base, Arbitrum, Optimism next
+
+- [x] Multi-chain support: Sepolia + BOT Chain testnet live; Base, Arbitrum, Optimism next
 - [ ] Role-based agent teams (treasury, HR, ops)
-- [ ] Visual policy builder — no-code limit configuration
+- [ ] Visual policy builder: no-code limit configuration
 - [ ] Telegram/Slack bot interface
 - [ ] Audit trail export for compliance
 - [ ] Anna App Store listing
@@ -180,8 +192,8 @@ eth-agent/
 
 This repository is an npm workspace monorepo with publishable packages:
 
-- `eth-agent-kit` — SDK for building Ethereum AI agents programmatically
-- `create-eth-agent` — scaffolding CLI used by `npx create-eth-agent`
+- `eth-agent-kit`: SDK for building Ethereum AI agents programmatically
+- `create-eth-agent`: scaffolding CLI used by `npx create-eth-agent`
 
 Published packages:
 

@@ -5,7 +5,7 @@ Ethereum AI agent framework. Connect an AI assistant to an
 
 > This SDK currently supports Sepolia only. The main `runtime/` in
 > [Ethereum-Agentic](https://github.com/Chibey-max/Ethereum-Agentic) also
-> supports BOT Chain testnet via `CHAIN_ID` — that multi-chain support
+> supports BOT Chain testnet via `CHAIN_ID`. That multi-chain support
 > hasn't been ported to this package yet.
 
 ## Install
@@ -24,32 +24,32 @@ npm install eth-agent-kit
 ## Usage
 
 ```ts
-import { ETHAgent } from 'eth-agent-kit'
+import { ETHAgent } from 'eth-agent-kit';
 
 const agent = new ETHAgent({
   contractAddress: '0x...',
   privateKey: '0x...',
   rpcUrl: 'https://rpc.ankr.com/eth_sepolia',
-  groqApiKey: 'gsk_...'
-})
+  groqApiKey: 'gsk_...',
+});
 
 // Ask the agent anything
-const result = await agent.run('What is my ETH balance?')
+const result = await agent.run('What is my ETH balance?');
 
 // Stream events
 await agent.run('Send 0.01 ETH to 0x...', (event) => {
-  if (event.type === 'tool_call') console.log('Calling:', event.name)
-  if (event.type === 'done') console.log('Result:', event.content)
-})
+  if (event.type === 'tool_call') console.log('Calling:', event.name);
+  if (event.type === 'done') console.log('Result:', event.content);
+});
 
 // Direct transfer
-const tx = await agent.transferETH('0x...', '0.01')
-console.log('Sent:', tx.etherscanUrl)
+const tx = await agent.transferETH('0x...', '0.01');
+console.log('Sent:', tx.etherscanUrl);
 
 // Read contract state
-const state = await agent.getState()
-console.log('Balance:', state.balance, 'ETH')
+const state = await agent.getState();
+console.log('Balance:', state.balance, 'ETH');
 
 // Start as MCP server for IDE
-agent.startMCPServer()
+agent.startMCPServer();
 ```

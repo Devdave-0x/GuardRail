@@ -1,17 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import type { ExecutedEvent } from '@/types';
 
-export interface ExecutedEvent {
-  txHash: string;
-  blockNumber: number;
-  timestamp: number;
-  target: string;
-  value: string;
-  selector: string;
-  action: string;
-  logIndex: number;
-}
+export type { ExecutedEvent };
 
 export function useEvents(limit = 50, interval = 60000) {
   const [events, setEvents] = useState<ExecutedEvent[]>([]);

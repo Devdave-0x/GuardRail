@@ -1,0 +1,25 @@
+node_modules
+package-lock.json
+
+# Build output
+dist
+.next
+out
+build
+coverage
+
+# Foundry
+contracts/lib
+contracts/out
+contracts/cache
+contracts/broadcast
+
+# Shipped scaffold. Formatting this changes what the CLI hands to users.
+packages/create-eth-agent/templates
+
+# Generated
+next-env.d.ts
+*.tsbuildinfo
+
+# Standalone Anna plugin, not part of the workspace build
+anna-executa

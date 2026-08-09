@@ -88,13 +88,16 @@ npm run setup
 ## Common errors
 
 ### Invalid private key
+
 - Key must be `0x` + 64 hex chars.
 - Don’t pass literal `PRIVATE_KEY`; pass `$PRIVATE_KEY` after sourcing `.env`.
 
 ### --rpc-url missing
+
 - `$RPC_URL` is empty because `.env` was not sourced.
 
 ### Provider/RPC rejected request
+
 - Switch RPC to `https://sepolia.drpc.org` or your own Alchemy endpoint.
 
 ---
@@ -102,12 +105,12 @@ npm run setup
 ## Also deployed on BOT Chain testnet
 
 This is the same audited `AgentWallet` contract already live on Sepolia
-(`0x4fbE2CeFEC5ef766634C83CFAd0338fEfBB65b35`) — this is a migration/multi-chain
+(`0x4fbE2CeFEC5ef766634C83CFAd0338fEfBB65b35`). This is a migration/multi-chain
 deployment, not a new project.
 
 **One intentional difference on this deployment:** `TIMELOCK` is set to `1 minutes`
 instead of the standard `10 minutes`, for faster demo/testnet iteration. It's a
-compile-time constant, so this only affects this specific BOT Chain build — the
+compile-time constant, so this only affects this specific BOT Chain build. The
 Sepolia deployment above is unaffected.
 
 - **Chain:** BOT Chain testnet (chain ID `968`)

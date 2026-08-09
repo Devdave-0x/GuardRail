@@ -4,14 +4,24 @@
   "description": "Ethereum AI agent framework with on-chain policy enforcement via AgentWallet",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist", "README.md"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
-    "ethereum", "ai-agent", "mcp", "web3", "solidity",
-    "viem", "sepolia", "agentkit", "autonomous-agent"
+    "ethereum",
+    "ai-agent",
+    "mcp",
+    "web3",
+    "solidity",
+    "viem",
+    "sepolia",
+    "agentkit",
+    "autonomous-agent"
   ],
   "license": "MIT",
   "dependencies": {

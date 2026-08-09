@@ -28,7 +28,9 @@ contracts/out/
 .DS_Store
 *.swp
 *.swo
-.vscode/*
-!.vscode/mcp.json
 
 test-project/
+
+# Ignored Files
+# docs/Screens/
+.vercel
