@@ -2,6 +2,7 @@
 
 Live app: https://guardrail-app.vercel.app
 Contract: [`0x3D157F7Df3551b1423CB804F818792A978a9635C`](https://scan.botchain.ai/address/0x3D157F7Df3551b1423CB804F818792A978a9635C) — BOT Chain mainnet, chain ID 677
+Demo video: https://youtu.be/BPsXDzNuyow
 
 ## Test data
 
