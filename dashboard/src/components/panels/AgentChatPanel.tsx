@@ -9,9 +9,10 @@ import {
   MdOutlineDeleteOutline,
 } from 'react-icons/md';
 import { Panel, Button } from '@/components/shared';
-import { getEtherscanLink, publicClient } from '@/lib/utils';
+import { getEtherscanLink } from '@/lib/utils';
+import { activeChain } from '@/lib/contract';
 import { useAccount, useSendTransaction } from 'wagmi';
-import { formatEther, isAddress, parseEther } from 'viem';
+import { isAddress, parseEther } from 'viem';
 
 interface Message {
   id: string;
@@ -112,6 +113,83 @@ export function AgentChatPanel() {
     }
   };
 
+  const streamGoal = async (goal: string, body: Record<string, unknown>) => {
+    const res = await fetch('/api/agent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ goal, ...body }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      addMessage({ role: 'error', content: `Error: ${err.error || 'Unknown error'}` });
+      return;
+    }
+
+    const reader = res.body!.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const raw = line.slice(6).trim();
+        if (!raw) continue;
+        try {
+          const chunk = JSON.parse(raw);
+          if (chunk.type === 'text') {
+            addAgentMessage(chunk.content || '');
+          } else if (chunk.type === 'status') {
+            addMessage({ role: 'status', content: chunk.content || '' });
+          } else if (chunk.type === 'tool') {
+            const argsText = chunk.args ? `\n${JSON.stringify(chunk.args, null, 2)}` : '';
+            addMessage({
+              role: 'tool',
+              content: `Tool call → ${chunk.name || 'unknown'}${argsText}`,
+              toolName: chunk.name,
+            });
+          } else if (chunk.type === 'tool_result') {
+            const resultText = chunk.result
+              ? JSON.stringify(chunk.result, null, 2)
+              : chunk.content || '';
+            addMessage({
+              role: 'tool_result',
+              content: `Result ← ${chunk.name || 'unknown'}\n${resultText}`,
+              toolName: chunk.name,
+            });
+          } else if (chunk.type === 'tx') {
+            addMessage({
+              role: 'tool',
+              content: `Transaction submitted`,
+              toolName: 'execute',
+              txHash: chunk.hash,
+            });
+          } else if (chunk.type === 'propose_tx') {
+            if (isAddress(chunk.to)) {
+              setPendingDirectTransfer({ to: chunk.to, amount: chunk.amount });
+              addMessage({
+                role: 'status',
+                content: `Review transfer: send ${chunk.amount} BOT to ${chunk.to}. Type "confirm" to proceed or "cancel".`,
+              });
+            }
+          } else if (chunk.type === 'error') {
+            addMessage({ role: 'error', content: chunk.content });
+          } else if (chunk.type === 'done') {
+            break;
+          }
+        } catch {
+          // malformed chunk
+        }
+      }
+    }
+  };
+
   const handleDirectModeGoal = async (goal: string) => {
     if (!isConnected || !connectedAddress) {
       addMessage({ role: 'error', content: 'Direct mode requires a connected wallet.' });
@@ -119,12 +197,6 @@ export function AgentChatPanel() {
     }
 
     const normalizedGoal = goal.trim().toLowerCase();
-    const conversational = /^(hi|hello|hey|yo|gm|gn|sup)\b/i.test(normalizedGoal);
-    const asksCapabilities =
-      /(what can you do|capabilities|help|how can you help|can you send|can you transfer)/i.test(
-        normalizedGoal,
-      );
-    const thanks = /^(thanks|thank you|thx)\b/i.test(normalizedGoal);
 
     if (pendingDirectTransfer) {
       if (normalizedGoal === 'confirm') {
@@ -163,79 +235,7 @@ export function AgentChatPanel() {
       return;
     }
 
-    const directEthTransfer = goal.match(
-      /\b(?:transfer|send)\s+([0-9]+(?:\.[0-9]+)?)\s*(?:eth|bot)\s+(?:to\s+)?(0x[a-fA-F0-9]{40})\b/i,
-    );
-    if (directEthTransfer) {
-      const [, amount, to] = directEthTransfer;
-      if (!isAddress(to)) {
-        addMessage({ role: 'error', content: 'Invalid recipient address.' });
-        return;
-      }
-
-      setPendingDirectTransfer({ to: to as `0x${string}`, amount });
-      addMessage({
-        role: 'status',
-        content: `Review transfer: send ${amount} BOT from ${connectedAddress} to ${to}. Type "confirm" to proceed or "cancel".`,
-      });
-      return;
-    }
-
-    const addressInGoal = goal.match(/0x[a-fA-F0-9]{40}/);
-    const asksForBalance =
-      /\b(?:check|get|read|show)?\s*(?:the\s+)?(?:eth\s+|bot\s+)?bal(?:ance)?\b/i.test(goal) ||
-      /\bbalance\b/i.test(goal);
-
-    if (addressInGoal && asksForBalance) {
-      const target = addressInGoal[0] as `0x${string}`;
-      const balance = await publicClient.getBalance({ address: target });
-      addMessage({
-        role: 'agent',
-        content: `Address ${target} has ${formatEther(balance)} BOT on BOT Chain.`,
-      });
-      return;
-    }
-
-    if (asksForBalance) {
-      const balance = await publicClient.getBalance({ address: connectedAddress });
-      addMessage({
-        role: 'agent',
-        content: `Connected wallet ${connectedAddress} balance is ${formatEther(balance)} BOT on BOT Chain.`,
-      });
-      return;
-    }
-
-    if (thanks) {
-      addMessage({
-        role: 'agent',
-        content: 'Anytime! I’m here. If you want, I can help you craft the exact send command.',
-      });
-      return;
-    }
-
-    if (asksCapabilities) {
-      addMessage({
-        role: 'agent',
-        content:
-          'Absolutely. In Direct mode I can:\n• Check your connected wallet balance\n• Check BOT balance of any address\n• Send BOT from your connected wallet (with confirm/cancel safety)\n\nTry: "send 0.001 BOT to 0x..."',
-      });
-      return;
-    }
-
-    if (conversational) {
-      addMessage({
-        role: 'agent',
-        content:
-          'Hey! I can help with direct BOT sends and balance checks. Tell me what you want to do.',
-      });
-      return;
-    }
-
-    addMessage({
-      role: 'agent',
-      content:
-        'I can help with direct wallet actions. Try: "send <amount> BOT to 0x...", "my BOT bal", or "bal of 0x...". Sends always require "confirm" before execution.',
-    });
+    await streamGoal(goal, { mode: 'direct', connectedAddress });
   };
 
   const sendGoal = async () => {
@@ -249,75 +249,8 @@ export function AgentChatPanel() {
     try {
       if (mode === 'direct') {
         await handleDirectModeGoal(goal);
-        return;
-      }
-
-      const res = await fetch('/api/agent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ goal }),
-      });
-
-      if (!res.ok) {
-        const err = await res.json();
-        addMessage({ role: 'error', content: `Error: ${err.error || 'Unknown error'}` });
-        setStreaming(false);
-        return;
-      }
-
-      const reader = res.body!.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
-
-        for (const line of lines) {
-          if (!line.startsWith('data: ')) continue;
-          const raw = line.slice(6).trim();
-          if (!raw) continue;
-          try {
-            const chunk = JSON.parse(raw);
-            if (chunk.type === 'text') {
-              addAgentMessage(chunk.content || '');
-            } else if (chunk.type === 'status') {
-              addMessage({ role: 'status', content: chunk.content || '' });
-            } else if (chunk.type === 'tool') {
-              const argsText = chunk.args ? `\n${JSON.stringify(chunk.args, null, 2)}` : '';
-              addMessage({
-                role: 'tool',
-                content: `Tool call → ${chunk.name || 'unknown'}${argsText}`,
-                toolName: chunk.name,
-              });
-            } else if (chunk.type === 'tool_result') {
-              const resultText = chunk.result
-                ? JSON.stringify(chunk.result, null, 2)
-                : chunk.content || '';
-              addMessage({
-                role: 'tool_result',
-                content: `Result ← ${chunk.name || 'unknown'}\n${resultText}`,
-                toolName: chunk.name,
-              });
-            } else if (chunk.type === 'tx') {
-              addMessage({
-                role: 'tool',
-                content: `Transaction submitted`,
-                toolName: 'execute',
-                txHash: chunk.hash,
-              });
-            } else if (chunk.type === 'error') {
-              addMessage({ role: 'error', content: chunk.content });
-            } else if (chunk.type === 'done') {
-              break;
-            }
-          } catch {
-            // malformed chunk
-          }
-        }
+      } else {
+        await streamGoal(goal, {});
       }
     } catch (err) {
       addMessage({ role: 'error', content: `Connection error: ${String(err)}` });
@@ -403,7 +336,8 @@ export function AgentChatPanel() {
                           rel="noopener noreferrer"
                           className="ml-2 inline-flex items-center gap-1 text-blue-bright hover:underline"
                         >
-                          View on Etherscan <MdOutlineOpenInNew size={10} aria-hidden="true" />
+                          View on {activeChain.blockExplorers.default.name}{' '}
+                          <MdOutlineOpenInNew size={10} aria-hidden="true" />
                           <span className="sr-only"> (opens in a new tab)</span>
                         </a>
                       )}

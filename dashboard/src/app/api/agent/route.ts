@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
-import { runAgent } from '../../../../.agent-runtime/bridge.js';
+import { isAddress } from 'viem';
+import { runAgent, runDirectAgent } from '../../../../.agent-runtime/bridge.js';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -37,9 +38,16 @@ export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
   try {
-    const { goal } = await req.json();
+    const { goal, mode, connectedAddress } = await req.json();
     if (!goal || typeof goal !== 'string') {
       return new Response(JSON.stringify({ error: 'Missing goal' }), { status: 400 });
+    }
+
+    const isDirect = mode === 'direct';
+    if (isDirect && (typeof connectedAddress !== 'string' || !isAddress(connectedAddress))) {
+      return new Response(JSON.stringify({ error: 'Missing or invalid connectedAddress' }), {
+        status: 400,
+      });
     }
 
     const encoder = new TextEncoder();
@@ -61,7 +69,13 @@ export async function POST(req: NextRequest) {
         };
 
         try {
-          await runAgent(goal, (chunk: object) => sendChunk(chunk));
+          if (isDirect) {
+            await runDirectAgent(goal, connectedAddress as `0x${string}`, (chunk: object) =>
+              sendChunk(chunk),
+            );
+          } else {
+            await runAgent(goal, (chunk: object) => sendChunk(chunk));
+          }
         } catch (error) {
           const content = error instanceof Error ? error.message : String(error);
           sendChunk({ type: 'error', content });
