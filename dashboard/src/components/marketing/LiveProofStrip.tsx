@@ -23,13 +23,13 @@ export async function LiveProofStrip() {
   return (
     <section
       aria-label="Live contract status"
-      className="relative h-full w-full border-y border-border bg-bg-panel"
+      className="relative h-full w-full animate-fade-in border-y border-border bg-bg-panel motion-reduce:animate-none"
     >
       <div className="mx-auto flex w-full max-w-container flex-col gap-6 px-section-px py-8 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-2">
           <span
             aria-hidden="true"
-            className={`h-1.5 w-1.5 rounded-full ${stats.unavailable ? 'bg-orange' : 'animate-pulse bg-green'}`}
+            className={`h-1.5 w-1.5 rounded-full ${stats.unavailable ? 'bg-orange' : 'animate-pulse-green bg-green'}`}
           />
           <span className="font-mono text-xs uppercase tracking-wider text-text-muted">
             {stats.unavailable ? 'Chain unreachable' : 'Live on BOT Chain testnet'}

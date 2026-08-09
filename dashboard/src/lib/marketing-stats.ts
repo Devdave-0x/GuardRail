@@ -159,4 +159,4 @@ export const MARKETING_NAV: readonly NavItem[] = [
   { label: 'Developers', href: '#quickstart' },
 ];
 
-export const GITHUB_URL = 'https://github.com/Chibey-max/Ethereum-Agentic';
+export const GITHUB_URL = 'https://github.com/Devdave-0x/GuardRail';

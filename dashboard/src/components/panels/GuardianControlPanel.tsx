@@ -2,16 +2,16 @@
 
 import { useEffect, useState } from 'react';
 import {
-  AlertTriangle,
-  Bot,
-  Pause,
-  Play,
-  Shield,
-  ShieldAlert,
-  ShieldCheck,
-  Send,
-  Zap,
-} from 'lucide-react';
+  MdOutlineWarning,
+  MdOutlineMemory,
+  MdOutlinePause,
+  MdOutlinePlayArrow,
+  MdOutlineShield,
+  MdOutlineSecurityUpdateWarning,
+  MdOutlineSecurityUpdateGood,
+  MdOutlineSend,
+  MdOutlineBolt,
+} from 'react-icons/md';
 import { Panel, Badge, Button, Input } from '@/components/shared';
 import { useContractState } from '@/hooks/useContractState';
 import { useAccount, useWriteContract } from 'wagmi';
@@ -141,7 +141,7 @@ export function GuardianControlPanel() {
         loading={loading}
       >
         <div className="p-6 text-center">
-          <ShieldAlert size={32} className="mx-auto mb-3 text-text-muted" />
+          <MdOutlineSecurityUpdateWarning size={32} className="mx-auto mb-3 text-text-muted" />
           <p className="font-mono text-caption text-text-muted">
             Connect guardian wallet to access controls
           </p>
@@ -159,7 +159,7 @@ export function GuardianControlPanel() {
         loading={loading}
       >
         <div className="p-6 text-center">
-          <ShieldAlert size={32} className="mx-auto mb-3 text-text-muted" />
+          <MdOutlineSecurityUpdateWarning size={32} className="mx-auto mb-3 text-text-muted" />
           <p className="font-mono text-caption text-text-muted">
             Connect guardian wallet to access controls
           </p>
@@ -177,7 +177,7 @@ export function GuardianControlPanel() {
         loading={loading}
       >
         <div className="p-6 text-center">
-          <ShieldAlert size={32} className="mx-auto mb-3 text-orange" />
+          <MdOutlineSecurityUpdateWarning size={32} className="mx-auto mb-3 text-orange" />
           <p className="font-mono text-caption text-text-muted">
             Connected: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
           </p>
@@ -197,7 +197,7 @@ export function GuardianControlPanel() {
       <div className="flex flex-col gap-4 p-4">
         {/* Guardian badge */}
         <div className="flex items-center gap-2">
-          <ShieldCheck size={14} className="text-green" />
+          <MdOutlineSecurityUpdateGood size={14} className="text-green" />
           <Badge variant="green">Guardian Connected</Badge>
         </div>
 
@@ -227,21 +227,21 @@ export function GuardianControlPanel() {
             {data?.paused ? (
               <Button variant="primary" onClick={handleUnpause} loading={isPending} size="sm">
                 <span className="inline-flex items-center gap-1">
-                  <Play size={12} /> Unpause Contract
+                  <MdOutlinePlayArrow size={12} /> Unpause Contract
                 </span>
               </Button>
             ) : (
               <Button variant="danger" onClick={handlePause} loading={isPending} size="sm">
                 <span className="inline-flex items-center gap-1">
-                  <Pause size={12} /> Pause Contract
+                  <MdOutlinePause size={12} /> Pause Contract
                 </span>
               </Button>
             )}
           </div>
           {data?.paused && (
             <div className="flex items-center gap-2 font-mono text-caption text-red">
-              <AlertTriangle size={12} className="animate-blink" /> CONTRACT IS PAUSED: agent cannot
-              execute
+              <MdOutlineWarning size={12} className="animate-blink" /> CONTRACT IS PAUSED: agent
+              cannot execute
             </div>
           )}
         </div>
@@ -257,19 +257,19 @@ export function GuardianControlPanel() {
             >
               {s === 'withdraw' ? (
                 <span className="inline-flex items-center gap-1">
-                  <Send size={12} /> Withdraw
+                  <MdOutlineSend size={12} /> Withdraw
                 </span>
               ) : s === 'agent' ? (
                 <span className="inline-flex items-center gap-1">
-                  <Bot size={12} /> Transfer Agent
+                  <MdOutlineMemory size={12} /> Transfer Agent
                 </span>
               ) : s === 'guardian' ? (
                 <span className="inline-flex items-center gap-1">
-                  <Shield size={12} /> Transfer Guardian
+                  <MdOutlineShield size={12} /> Transfer Guardian
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1">
-                  <Zap size={12} /> Limits
+                  <MdOutlineBolt size={12} /> Limits
                 </span>
               )}
             </Button>
@@ -332,7 +332,8 @@ export function GuardianControlPanel() {
         {section === 'guardian' && (
           <div className="flex animate-slide-in flex-col gap-3 rounded border border-red/30 bg-red/5 p-3">
             <p className="inline-flex items-center gap-1 font-mono text-caption text-red">
-              <AlertTriangle size={12} /> CAUTION: New guardian must accept before this takes effect
+              <MdOutlineWarning size={12} /> CAUTION: New guardian must accept before this takes
+              effect
             </p>
             <Input
               label="New Guardian Address"

@@ -5,12 +5,13 @@ import {
   GuardsSection,
   HeroSection,
   HowItWorksSection,
-  IdentitySection,
   LiveProofStrip,
   ProblemSection,
   QuickstartSection,
+  ScenarioSection,
   StatsSection,
   ToolsSection,
+  TrustSection,
 } from '@/components/marketing';
 import { JsonLd, organizationSchema, softwareApplicationSchema } from '@/components/shared/JsonLd';
 import { createMetadata } from '@/lib/seo';
@@ -37,11 +38,12 @@ export default function HomePage() {
       <ProblemSection />
       <HowItWorksSection />
       <GuardsSection />
+      <ScenarioSection />
       <StatsSection />
       <DashboardPreviewSection />
       <QuickstartSection />
       <ToolsSection />
-      <IdentitySection />
+      <TrustSection />
       <FinalCtaSection />
     </>
   );

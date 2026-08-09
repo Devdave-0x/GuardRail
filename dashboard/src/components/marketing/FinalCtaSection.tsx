@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { Section } from '@/components/shared/Section';
+import { Badge } from '@/components/shared';
 import { SpecularButton } from '@/components/reactbits/SpecularButton';
-import { GITHUB_URL } from '@/lib/marketing-stats';
+import { DEPLOYMENTS, GITHUB_URL, TIMELOCK_MINUTES } from '@/lib/marketing-stats';
 import { useSectionReveal } from '@/hooks';
 
 // === Component
@@ -31,6 +32,18 @@ export function FinalCtaSection() {
           Free, open source, and already live on two testnets. Deploy your own AgentWallet or
           connect to the existing one.
         </p>
+
+        {/*
+          Grounds the close in the actual mechanism instead of only conviction copy — this
+          is what's actually armed on the deployment you're about to open, not a claim.
+        */}
+        <div data-reveal className="flex flex-wrap items-center justify-center gap-2">
+          <Badge variant="green" pulse>
+            Guardian: armed
+          </Badge>
+          <Badge variant="blue">Timelock: {TIMELOCK_MINUTES}min</Badge>
+          <Badge variant="gray">{DEPLOYMENTS.length} testnets live</Badge>
+        </div>
 
         <div
           data-reveal

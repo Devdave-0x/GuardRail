@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { Copy, Check, ExternalLink } from 'lucide-react';
+import { MdContentCopy, MdOutlineCheck, MdOutlineOpenInNew } from 'react-icons/md';
 import { formatAddress, getEtherscanLink, cn } from '@/lib/utils';
 import { useCopyToClipboard } from '@/hooks/useCopyToClipboard';
 import { useCountdown } from '@/hooks/useCountdown';
@@ -211,7 +211,11 @@ export function AddressDisplay({
           aria-label={copied ? 'Address copied' : `Copy address ${address}`}
           className="rounded p-0.5 text-text-muted transition-colors hover:text-green"
         >
-          {copied ? <Check size={11} aria-hidden="true" /> : <Copy size={11} aria-hidden="true" />}
+          {copied ? (
+            <MdOutlineCheck size={11} aria-hidden="true" />
+          ) : (
+            <MdContentCopy size={11} aria-hidden="true" />
+          )}
         </button>
         {etherscan && (
           <a
@@ -220,7 +224,7 @@ export function AddressDisplay({
             rel="noopener noreferrer"
             className="rounded p-0.5 text-text-muted transition-colors hover:text-blue-bright"
           >
-            <ExternalLink size={11} aria-hidden="true" />
+            <MdOutlineOpenInNew size={11} aria-hidden="true" />
             <span className="sr-only">
               View {formatAddress(address)} on the explorer (opens in a new tab)
             </span>

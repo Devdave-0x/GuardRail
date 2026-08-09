@@ -1,7 +1,13 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Zap, ExternalLink, Bot, Trash2 } from 'lucide-react';
+import {
+  MdOutlineSend,
+  MdOutlineBolt,
+  MdOutlineOpenInNew,
+  MdOutlineMemory,
+  MdOutlineDeleteOutline,
+} from 'react-icons/md';
 import { Panel, Button } from '@/components/shared';
 import { getEtherscanLink, publicClient } from '@/lib/utils';
 import { useAccount, useSendTransaction } from 'wagmi';
@@ -378,10 +384,10 @@ export function AgentChatPanel() {
                 <div className={`min-w-0 flex-1 ${msgContainer[msg.role]}`}>
                   <div className="flex items-start gap-2">
                     {msg.role === 'agent' && (
-                      <Bot size={12} className="mt-0.5 shrink-0 text-green" />
+                      <MdOutlineMemory size={12} className="mt-0.5 shrink-0 text-green" />
                     )}
                     {msg.role === 'status' && (
-                      <Zap size={12} className="mt-0.5 shrink-0 text-green" />
+                      <MdOutlineBolt size={12} className="mt-0.5 shrink-0 text-green" />
                     )}
                     <div className="min-w-0">
                       {msg.toolName && (
@@ -397,7 +403,7 @@ export function AgentChatPanel() {
                           rel="noopener noreferrer"
                           className="ml-2 inline-flex items-center gap-1 text-blue-bright hover:underline"
                         >
-                          View on Etherscan <ExternalLink size={10} aria-hidden="true" />
+                          View on Etherscan <MdOutlineOpenInNew size={10} aria-hidden="true" />
                           <span className="sr-only"> (opens in a new tab)</span>
                         </a>
                       )}
@@ -427,7 +433,7 @@ export function AgentChatPanel() {
           </Button>
           <Button size="sm" variant="ghost" onClick={clearChat}>
             <span className="inline-flex items-center gap-1">
-              <Trash2 size={12} /> Clear Chat
+              <MdOutlineDeleteOutline size={12} /> Clear Chat
             </span>
           </Button>
           {mode === 'direct' && !isConnected && (
@@ -462,7 +468,7 @@ export function AgentChatPanel() {
             disabled={!input.trim() || streaming}
             className="p-1 text-text-muted transition-colors hover:text-green disabled:opacity-30"
           >
-            <Send size={13} />
+            <MdOutlineSend size={13} />
           </button>
         </div>
       </div>

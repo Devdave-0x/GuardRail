@@ -23,8 +23,11 @@ export const SpotlightCard: React.FC<SpotlightCardProps> = ({
   children,
   className = '',
   spotlightColor = 'rgba(0, 255, 136, 0.15)',
-  backgroundColor = '#0f0f0f',
-  borderColor = '#1e1e1e',
+  // Theme-reactive neutral, not the old frozen #0f0f0f/#1e1e1e (broke in light mode) and
+  // not an accent-colored border either (the per-card red/orange/yellow tint read as too
+  // high-contrast). Flat and matching the surrounding panel is the look that was wanted.
+  backgroundColor = 'var(--bg-panel)',
+  borderColor = 'var(--border)',
 }) => {
   const divRef = useRef<HTMLDivElement | null>(null);
   const [isFocused, setIsFocused] = useState<boolean>(false);
@@ -57,7 +60,7 @@ export const SpotlightCard: React.FC<SpotlightCardProps> = ({
       onBlur={handleBlur}
       onMouseEnter={() => setOpacity(0.6)}
       onMouseLeave={() => setOpacity(0)}
-      className={`relative overflow-hidden rounded-3xl border p-8 ${className}`}
+      className={`relative overflow-hidden rounded-3xl border p-8 transition-transform duration-300 ease-out hover:-translate-y-1 ${className}`}
       style={{ backgroundColor, borderColor }}
     >
       <div

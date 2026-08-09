@@ -1,4 +1,4 @@
-import type { LucideIcon } from 'lucide-react';
+import type { IconType } from 'react-icons';
 
 // Contract state types
 export interface ContractState {
@@ -110,7 +110,7 @@ export interface GuardFeature {
   id: string;
   title: string;
   description: string;
-  /* lucide-react icon name, resolved by the consuming component. */
+  /* Icon name from react-icons/md, resolved by the consuming component. */
   icon: string;
   accent: Accent;
 }
@@ -139,8 +139,8 @@ export interface Problem {
   id: string;
   title: string;
   body: string;
-  /* lucide-react icon component, imported by the section that renders it. */
-  icon: LucideIcon;
+  /* react-icons icon component, imported by the section that renders it. */
+  icon: IconType;
   accent: Accent;
 }
 
@@ -154,14 +154,14 @@ export interface Capability {
   id: string;
   title: string;
   body: string;
-  icon: LucideIcon;
+  icon: IconType;
   accent: Accent;
 }
 
 export interface McpTool {
   name: string;
   description: string;
-  /* lucide-react icon name, resolved by the consuming component. */
+  /* Icon name from react-icons/md, resolved by the consuming component. */
   icon: string;
   accent: Accent;
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { RefreshCw } from 'lucide-react';
+import { MdOutlineRefresh } from 'react-icons/md';
 import { Panel, Badge, AddressDisplay, Stat } from '@/components/shared';
 import { AnimatedNumber } from '@/components/shared/AnimatedNumber';
 import { useContractState } from '@/hooks/useContractState';
@@ -22,7 +22,7 @@ export function OverviewPanel() {
           aria-label="Refresh contract state"
           className="rounded p-1 text-text-muted transition-colors hover:text-green"
         >
-          <RefreshCw size={12} aria-hidden="true" />
+          <MdOutlineRefresh size={12} aria-hidden="true" />
         </button>
       }
     >

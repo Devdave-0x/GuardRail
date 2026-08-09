@@ -1,5 +1,25 @@
+/*
+  Builds a Tailwind color value that can carry an opacity modifier (`bg-green/10`) on top
+  of a CSS custom property. A plain `var(--green)` can't take `/NN` — Tailwind needs to
+  inject the alpha itself, which means it needs the color as separate `R G B` channels
+  (the `-rgb` variables in globals.css), not a hex string it can't unpack. Falls back to
+  `defaultOpacity` for the bare `muted`/`faint`-style tokens, which are always meant to be
+  translucent rather than opacity-modified at the call site.
+*/
+function withOpacity(rgbVariable, defaultOpacity = 1) {
+  // CSS Color 4 slash syntax, not `rgba(var(--x-rgb), N)` — the -rgb custom properties are
+  // a space-separated triplet ("0 255 136"), and substituting that into legacy comma-syntax
+  // rgba() produces `rgba(0 255 136, .4)`, which is invalid CSS. An invalid value doesn't
+  // fall back to the hex color, it drops the whole declaration, so the browser used
+  // whatever `border-color` cascaded from underneath — Tailwind preflight's `currentColor` —
+  // which is why every accent border/bg was silently rendering as bright white instead of
+  // its actual color.
+  return ({ opacityValue }) => `rgb(var(${rgbVariable}) / ${opacityValue ?? defaultOpacity})`;
+}
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class',
   content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
   theme: {
     // Only two breakpoints by design. `md` is deliberately absent so it cannot be
@@ -34,33 +54,33 @@ module.exports = {
         'stack-gap': 'var(--stack-gap)',
       },
       colors: {
-        bg: '#0a0a0a',
-        'bg-panel': '#0f0f0f',
-        'bg-elevated': '#141414',
-        'bg-hover': '#1a1a1a',
-        border: '#1e1e1e',
-        'border-bright': '#2a2a2a',
+        bg: withOpacity('--bg-rgb'),
+        'bg-panel': withOpacity('--bg-panel-rgb'),
+        'bg-elevated': 'var(--bg-elevated)',
+        'bg-hover': 'var(--bg-hover)',
+        border: withOpacity('--border-rgb'),
+        'border-bright': 'var(--border-bright)',
         green: {
-          DEFAULT: '#00ff88',
-          dim: '#00cc6a',
-          muted: '#00ff8840',
-          faint: '#00ff8815',
+          DEFAULT: withOpacity('--green-rgb'),
+          dim: 'var(--green-dim)',
+          muted: withOpacity('--green-rgb', 0.25),
+          faint: withOpacity('--green-rgb', 0.08),
         },
         blue: {
-          DEFAULT: '#0070f3',
-          bright: '#3b82f6',
+          DEFAULT: withOpacity('--blue-rgb'),
+          bright: withOpacity('--blue-bright-rgb'),
         },
         orange: {
-          DEFAULT: '#ff6b35',
-          muted: '#ff6b3540',
+          DEFAULT: withOpacity('--orange-rgb'),
+          muted: withOpacity('--orange-rgb', 0.25),
         },
         red: {
-          DEFAULT: '#ff3333',
-          muted: '#ff333340',
+          DEFAULT: withOpacity('--red-rgb'),
+          muted: withOpacity('--red-rgb', 0.25),
         },
         yellow: {
-          DEFAULT: '#ffd700',
-          muted: '#ffd70030',
+          DEFAULT: withOpacity('--yellow-rgb'),
+          muted: withOpacity('--yellow-rgb', 0.19),
         },
         /*
           Extra accent hues so a set of sibling icons can each carry their own colour
@@ -78,10 +98,18 @@ module.exports = {
           DEFAULT: '#f472b6',
         },
         text: {
-          primary: '#f4f4f5',
-          secondary: '#a1a1aa',
-          muted: '#7d7d87',
-          green: '#00ff88',
+          primary: 'var(--text-primary)',
+          secondary: 'var(--text-secondary)',
+          muted: 'var(--text-muted)',
+          green: 'var(--green)',
+        },
+        /*
+          Never flips with the theme — see --fixed-light in globals.css. Only for text
+          sitting directly on the hero video, which is always dark regardless of theme.
+          Everything else on a themed background should use `text-*` above instead.
+        */
+        fixed: {
+          light: withOpacity('--fixed-light-rgb'),
         },
       },
       /*
@@ -95,22 +123,22 @@ module.exports = {
       */
       fontSize: {
         display: [
-          'clamp(2rem, 1.2rem + 4vw, 4rem)',
+          'clamp(2.25rem, 1.3rem + 4.2vw, 4.25rem)',
           { lineHeight: '1.05', letterSpacing: '-0.02em' },
         ],
         h1: [
-          'clamp(1.75rem, 1.1rem + 3.2vw, 3rem)',
+          'clamp(1.875rem, 1.15rem + 3.4vw, 3.25rem)',
           { lineHeight: '1.1', letterSpacing: '-0.02em' },
         ],
         h2: [
-          'clamp(1.375rem, 1rem + 1.9vw, 2.25rem)',
+          'clamp(1.5rem, 1.05rem + 2vw, 2.5rem)',
           { lineHeight: '1.15', letterSpacing: '-0.01em' },
         ],
-        h3: ['clamp(1.125rem, 0.95rem + 0.9vw, 1.5rem)', { lineHeight: '1.25' }],
-        lead: ['clamp(0.9375rem, 0.85rem + 0.5vw, 1.125rem)', { lineHeight: '1.6' }],
-        body: ['clamp(0.8125rem, 0.78rem + 0.2vw, 0.9375rem)', { lineHeight: '1.65' }],
-        caption: ['clamp(0.6875rem, 0.66rem + 0.15vw, 0.8125rem)', { lineHeight: '1.5' }],
-        micro: ['clamp(0.625rem, 0.61rem + 0.08vw, 0.6875rem)', { lineHeight: '1.4' }],
+        h3: ['clamp(1.25rem, 1rem + 1vw, 1.625rem)', { lineHeight: '1.25' }],
+        lead: ['clamp(1rem, 0.9rem + 0.55vw, 1.25rem)', { lineHeight: '1.6' }],
+        body: ['clamp(0.875rem, 0.82rem + 0.22vw, 1rem)', { lineHeight: '1.65' }],
+        caption: ['clamp(0.75rem, 0.7rem + 0.17vw, 0.875rem)', { lineHeight: '1.5' }],
+        micro: ['clamp(0.6875rem, 0.65rem + 0.1vw, 0.75rem)', { lineHeight: '1.4' }],
       },
       height: {
         /* Fixed scroll height for the agent chat log. */
@@ -121,20 +149,28 @@ module.exports = {
         logo: '0.2em',
       },
       fontFamily: {
-        mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace'],
+        mono: [
+          'var(--font-jetbrains-mono)',
+          'JetBrains Mono',
+          'Fira Code',
+          'Consolas',
+          'monospace',
+        ],
         sans: [
-          'var(--font-space-grotesk)',
-          'Space Grotesk',
+          'var(--font-hanken-grotesk)',
+          'Hanken Grotesk',
           'system-ui',
           '-apple-system',
           'sans-serif',
         ],
+        serif: ['var(--font-serif)', 'Fraunces', 'Georgia', 'serif'],
       },
       boxShadow: {
         green: '0 0 20px rgba(0, 255, 136, 0.15)',
         cta: '0 0 0 1px rgba(0, 255, 136, 0.25), 0 6px 24px -4px rgba(0, 255, 136, 0.35)',
         'green-sm': '0 0 8px rgba(0, 255, 136, 0.2)',
         panel: '0 1px 0 #1e1e1e, 0 -1px 0 #1e1e1e',
+        nav: 'var(--shadow-nav)',
       },
       animation: {
         'pulse-green': 'pulse-green 2s ease-in-out infinite',

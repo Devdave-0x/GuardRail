@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ExternalLink, RefreshCw } from 'lucide-react';
+import { MdOutlineOpenInNew, MdOutlineRefresh } from 'react-icons/md';
 import { AnimatePresence, motion } from 'motion/react';
 import { Panel, Badge } from '@/components/shared';
 import { useEvents } from '@/hooks/useEvents';
@@ -41,7 +41,7 @@ export function TransactionHistoryPanel() {
           onClick={refetch}
           className="p-1 text-text-muted transition-colors hover:text-green"
         >
-          <RefreshCw size={12} />
+          <MdOutlineRefresh size={12} />
         </button>
       }
     >
@@ -126,7 +126,7 @@ export function TransactionHistoryPanel() {
                           className="group flex items-center gap-1 transition-colors hover:text-blue-bright"
                         >
                           {formatAddress(event.target)}
-                          <ExternalLink
+                          <MdOutlineOpenInNew
                             size={9}
                             aria-hidden="true"
                             className="opacity-0 transition-opacity focus-within:opacity-100 group-hover:opacity-100"
@@ -166,7 +166,7 @@ export function TransactionHistoryPanel() {
                             className="group flex items-center gap-1 text-blue-bright hover:underline"
                           >
                             {event.txHash.slice(0, 8)}...
-                            <ExternalLink
+                            <MdOutlineOpenInNew
                               size={9}
                               aria-hidden="true"
                               className="opacity-0 transition-opacity focus-within:opacity-100 group-hover:opacity-100"

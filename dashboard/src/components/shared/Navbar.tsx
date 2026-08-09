@@ -3,11 +3,12 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAccount, useBalance } from 'wagmi';
-import { ShieldCheck, Timer } from 'lucide-react';
+import { MdOutlineSecurityUpdateGood, MdOutlineTimer } from 'react-icons/md';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { formatEther } from 'viem';
 import { AppLogo } from '@/components/shared/AppLogo';
 import { ScrollProgress } from '@/components/shared/ScrollProgress';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { CONTRACT_ADDRESS } from '@/lib/contract';
 import { cn } from '@/lib/utils';
 
@@ -39,7 +40,7 @@ export function Navbar() {
       className={cn(
         'sticky top-0 z-50 w-full transition-colors duration-300',
         // bg-surface at rest lets the ambient layer through; solid once content scrolls under.
-        scrolled ? 'bg-bg/90 backdrop-blur' : 'bg-surface',
+        scrolled ? 'bg-bg/70 backdrop-blur-xl backdrop-saturate-150' : 'bg-surface',
       )}
     >
       <div className="mx-auto flex h-14 w-full max-w-container items-center justify-between gap-4 px-section-px lg:h-16">
@@ -73,6 +74,7 @@ export function Navbar() {
               {parseFloat(formatEther(balance.value)).toFixed(4)} BOT
             </span>
           )}
+          <ThemeToggle />
           <ConnectButton
             chainStatus="icon"
             showBalance={false}
@@ -96,13 +98,13 @@ export function Navbar() {
               |
             </span>
             <span className="inline-flex items-center gap-1">
-              <Timer size={11} aria-hidden="true" /> TIMELOCK:10MIN
+              <MdOutlineTimer size={11} aria-hidden="true" /> TIMELOCK:10MIN
             </span>
             <span aria-hidden="true" className="hidden text-border-bright sm:inline">
               |
             </span>
             <span className="hidden items-center gap-1 sm:inline-flex">
-              <ShieldCheck size={11} aria-hidden="true" /> REENTRANCY:GUARDED
+              <MdOutlineSecurityUpdateGood size={11} aria-hidden="true" /> REENTRANCY:GUARDED
             </span>
           </div>
         </div>

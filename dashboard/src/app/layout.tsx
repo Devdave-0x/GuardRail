@@ -1,6 +1,28 @@
 import type { Metadata, Viewport } from 'next';
+import { Hanken_Grotesk, Fraunces, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { BASE_KEYWORDS, SITE } from '@/lib/seo';
+import { ThemeProvider } from '@/components/theme/ThemeProvider';
+
+// Matches the font stack referenced from stax.best: Hanken Grotesk (UI), Fraunces
+// (display serif), JetBrains Mono (data/mono). Space Grotesk is gone — it doesn't match.
+const hankenGrotesk = Hanken_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-hanken-grotesk',
+  display: 'swap',
+});
+
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  variable: '--font-serif',
+  display: 'swap',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-jetbrains-mono',
+  display: 'swap',
+});
 
 /*
   Root metadata. Every field here is inherited by both route groups; pages override with
@@ -37,12 +59,18 @@ export const viewport: Viewport = {
 */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
+    <html
+      lang="en"
+      className={`dark ${hankenGrotesk.variable} ${fraunces.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
+    >
       <body className="bg-bg font-sans text-text-primary antialiased">
-        <a href="#main" className="skip-link sr-only">
-          Skip to main content
-        </a>
-        {children}
+        <ThemeProvider>
+          <a href="#main" className="skip-link sr-only">
+            Skip to main content
+          </a>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

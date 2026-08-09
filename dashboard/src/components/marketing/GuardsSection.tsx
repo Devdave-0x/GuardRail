@@ -1,14 +1,14 @@
 'use client';
 
 import {
-  CalendarClock,
-  Coins,
-  Gauge,
-  ListChecks,
-  ShieldAlert,
-  Timer,
-  type LucideIcon,
-} from 'lucide-react';
+  MdOutlineCalendarToday,
+  MdOutlineAttachMoney,
+  MdOutlineSpeed,
+  MdOutlineCheckBox,
+  MdOutlineSecurityUpdateWarning,
+  MdOutlineTimer,
+} from 'react-icons/md';
+import type { IconType } from 'react-icons';
 import { Section } from '@/components/shared/Section';
 import { SectionHeading } from '@/components/shared/SectionHeading';
 import { SpotlightCard } from '@/components/reactbits/SpotlightCard';
@@ -22,13 +22,13 @@ import { useSectionReveal } from '@/hooks';
   GuardFeature carries an icon name rather than a component so the data file stays free
   of JSX imports. Resolved here, where the icons are actually rendered.
 */
-const ICONS: Record<string, LucideIcon> = {
-  gauge: Gauge,
-  'calendar-clock': CalendarClock,
-  'list-checks': ListChecks,
-  coins: Coins,
-  'shield-alert': ShieldAlert,
-  timer: Timer,
+const ICONS: Record<string, IconType> = {
+  gauge: MdOutlineSpeed,
+  'calendar-clock': MdOutlineCalendarToday,
+  'list-checks': MdOutlineCheckBox,
+  coins: MdOutlineAttachMoney,
+  'shield-alert': MdOutlineSecurityUpdateWarning,
+  timer: MdOutlineTimer,
 };
 
 // === Component
@@ -50,7 +50,7 @@ export function GuardsSection() {
 
         <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {GUARDS.map((guard) => {
-            const Icon = ICONS[guard.icon] ?? ShieldAlert;
+            const Icon = ICONS[guard.icon] ?? MdOutlineSecurityUpdateWarning;
             const accent = accentFor(guard.accent);
             return (
               <li key={guard.id} data-reveal>

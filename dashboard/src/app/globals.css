@@ -2,23 +2,91 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+/*
+  Every color a Tailwind utility can carry an opacity modifier on (`bg-green/10`,
+  `border-red/40`, `bg-bg/90`, ...) needs an `-rgb` triplet alongside its hex value.
+  Tailwind can only apply `/NN` to a color function it can inject an alpha channel into
+  (`rgba(var(--x-rgb), NN)`); it silently drops the modifier — no CSS rule at all — for a
+  color that's just `var(--x)`. tailwind.config.js's `withOpacity()` reads these.
+*/
+:root,
+.dark {
   --bg: #0a0a0a;
+  --bg-rgb: 10 10 10;
   --bg-panel: #0f0f0f;
+  --bg-panel-rgb: 15 15 15;
   --bg-elevated: #141414;
   --bg-hover: #1a1a1a;
   --border: #1e1e1e;
+  --border-rgb: 30 30 30;
   --border-bright: #2a2a2a;
   --green: #00ff88;
+  --green-rgb: 0 255 136;
   --green-dim: #00cc6a;
   --orange: #ff6b35;
+  --orange-rgb: 255 107 53;
   --red: #ff3333;
+  --red-rgb: 255 51 51;
   --blue: #0070f3;
+  --blue-rgb: 0 112 243;
   --blue-bright: #3b82f6;
+  --blue-bright-rgb: 59 130 246;
   --yellow: #ffd700;
+  --yellow-rgb: 255 215 0;
   --text-primary: #f4f4f5;
   --text-secondary: #a1a1aa;
   --text-muted: #7d7d87;
+  /*
+    The floating nav's shadow, not a static value — the same shadow reads as correct depth
+    in dark mode and as a muddy grey smear in light mode (or the reverse at a lighter
+    weight), so it's tuned per theme rather than shared.
+  */
+  --shadow-nav: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 255, 136, 0.08);
+
+  /*
+    Fixed, not flipping. Declared once here and never redeclared in `.light` below, so
+    the value stays constant regardless of theme — unlike --text-primary etc., which
+    `.light` does override.
+
+    This is for the one place text sits directly on the hero video rather than on the
+    page's own (theme-flipping) background: the video is always dark, full stop, it
+    doesn't participate in the light/dark toggle. Text over it needs to always be light
+    for the same reason a flipping token would be wrong there — if the headline used
+    --text-primary, it would correctly go near-black in light mode and then be nearly
+    invisible against the still-dark video behind it. See HeroCopy.tsx.
+  */
+  --fixed-light: #fafaf9;
+  --fixed-light-rgb: 250 250 249;
+}
+
+/* Light theme. Neutral scale flips; accents keep their dark-mode hue, just mapped 1:1. */
+.light {
+  --bg: #fafaf9;
+  --bg-rgb: 250 250 249;
+  --bg-panel: #ffffff;
+  --bg-panel-rgb: 255 255 255;
+  --bg-elevated: #f4f4f5;
+  --bg-hover: #ececee;
+  --border: #e4e4e7;
+  --border-rgb: 228 228 231;
+  --border-bright: #d4d4d8;
+  --green: #00b368;
+  --green-rgb: 0 179 104;
+  --green-dim: #00a05c;
+  --orange: #d94f1c;
+  --orange-rgb: 217 79 28;
+  --red: #d92626;
+  --red-rgb: 217 38 38;
+  --blue: #0058c4;
+  --blue-rgb: 0 88 196;
+  --blue-bright: #2563eb;
+  --blue-bright-rgb: 37 99 235;
+  --yellow: #a87900;
+  --yellow-rgb: 168 121 0;
+  --text-primary: #18181b;
+  --text-secondary: #52525b;
+  --text-muted: #71717a;
+  --shadow-nav: 0 4px 20px rgba(24, 24, 27, 0.1), 0 0 0 1px rgba(24, 24, 27, 0.04);
 }
 
 /*
@@ -73,7 +141,8 @@ body {
   background-color: var(--bg);
   color: var(--text-primary);
   font-family:
-    'Space Grotesk',
+    var(--font-hanken-grotesk),
+    'Hanken Grotesk',
     system-ui,
     -apple-system,
     sans-serif;
@@ -219,7 +288,7 @@ body::before {
   background: var(--bg-panel);
   border: 1px solid var(--green);
   color: var(--green);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-jetbrains-mono), 'JetBrains Mono', monospace;
   font-size: 0.75rem;
 }
 
@@ -536,11 +605,11 @@ button {
 
 input,
 textarea {
-  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  font-family: var(--font-jetbrains-mono), 'JetBrains Mono', 'Fira Code', Consolas, monospace;
 }
 
 .font-mono {
-  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  font-family: var(--font-jetbrains-mono), 'JetBrains Mono', 'Fira Code', Consolas, monospace;
 }
 
 /* CRT flicker - very subtle */
@@ -559,4 +628,68 @@ textarea {
 
 .crt {
   animation: crt-flicker 8s infinite;
+}
+
+/*
+  Theme toggle ripple. ThemeToggle stores the button's centre in --theme-toggle-x/y on
+  :root before flipping the class, then wraps that flip in document.startViewTransition().
+  The browser snapshots old/new states either side of the flip; we override the default
+  cross-fade so the new theme instead wipes outward from the button as a circle.
+
+  Named ::view-transition-new(root) rather than the bare pseudo so this never fights a
+  future named transition elsewhere on the page.
+*/
+@keyframes sun-reveal {
+  from {
+    clip-path: circle(0% at var(--theme-toggle-x, 50%) var(--theme-toggle-y, 50%));
+  }
+  to {
+    clip-path: circle(140% at var(--theme-toggle-x, 50%) var(--theme-toggle-y, 50%));
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root) {
+    animation: none;
+  }
+
+  ::view-transition-new(root) {
+    animation: sun-reveal 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    animation-fill-mode: both;
+  }
+}
+
+/*
+  Animated underline for nav-style links. `transform: scaleX` rather than animating
+  `width`, so this is a compositor-only transition and never triggers layout on hover.
+  transform-origin flips per direction so the line draws in on enter and draws out
+  toward the same edge the cursor left from, rather than just collapsing in place.
+*/
+.link-underline {
+  position: relative;
+}
+
+.link-underline::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: -2px;
+  left: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.link-underline:hover::after,
+.link-underline:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .link-underline::after {
+    transition: none;
+  }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { KeyRound, MessageSquareWarning, Repeat } from 'lucide-react';
+import { MdOutlineKey, MdOutlineWarningAmber, MdOutlineRepeat } from 'react-icons/md';
 import { Section } from '@/components/shared/Section';
 import { SectionHeading } from '@/components/shared/SectionHeading';
 import { SpotlightCard } from '@/components/reactbits/SpotlightCard';
@@ -14,21 +14,21 @@ const PROBLEMS: Problem[] = [
   {
     id: 'raw-key',
     accent: 'red',
-    icon: KeyRound,
+    icon: MdOutlineKey,
     title: 'A raw key is all or nothing',
     body: 'Hand an agent a private key and it can drain the wallet in one call. There is no middle setting between no access and total access.',
   },
   {
     id: 'prompt-rules',
     accent: 'orange',
-    icon: MessageSquareWarning,
+    icon: MdOutlineWarningAmber,
     title: 'Prompt rules are suggestions',
     body: 'A limit written in a system prompt holds until the model is confused, jailbroken, or simply wrong. Nothing enforces it.',
   },
   {
     id: 'no-undo',
     accent: 'yellow',
-    icon: Repeat,
+    icon: MdOutlineRepeat,
     title: 'On-chain mistakes are final',
     body: 'There is no chargeback and no support ticket. The only workable control is one that runs before the transaction settles.',
   },

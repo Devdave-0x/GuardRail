@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, Copy } from 'lucide-react';
+import { MdOutlineCheck, MdContentCopy } from 'react-icons/md';
 import { AnimatePresence, motion } from 'motion/react';
 import type { ReactNode } from 'react';
 import type { TerminalLine } from '@/types';
@@ -98,9 +98,9 @@ export function Terminal({
                 className="block"
               >
                 {copied ? (
-                  <Check size={13} aria-hidden="true" className="text-green" />
+                  <MdOutlineCheck size={13} aria-hidden="true" className="text-green" />
                 ) : (
-                  <Copy size={13} aria-hidden="true" />
+                  <MdContentCopy size={13} aria-hidden="true" />
                 )}
               </motion.span>
             </AnimatePresence>
