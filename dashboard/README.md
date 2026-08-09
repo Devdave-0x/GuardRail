@@ -85,7 +85,7 @@ src/
 | Overview            | Contract address, BOT balance, roles, network, pause status                                                                                                                  |
 | Spending Limits     | Per-TX + daily BOT limits, progress bar, pending limit changes                                                                                                               |
 | Transaction History | Live `Executed` event feed from BOT Chain with explorer links                                                                                                                |
-| Whitelist Manager   | Queue/apply/cancel call policy with 1min timelock (this BOT Chain deployment; shortened from the standard 10min for faster demo iteration)                                   |
+| Whitelist Manager   | Queue/apply/cancel call policy with a 10min timelock (this BOT Chain mainnet deployment)                                                                                     |
 | Token Policy        | ERC-20 daily limits, spend tracking, guardian set/revoke, plus auto-discovery of known policies via `TokenPolicySet`/`TokenPolicyRevoked` event scan, not just manual lookup |
 | Agent Chat          | Stream goals to runtime, see tool calls + tx hashes                                                                                                                          |
 | Guardian Control    | Pause/unpause, withdraw, transfer roles, queue limit changes                                                                                                                 |
@@ -96,14 +96,12 @@ Daily-spend figures account for `AgentWallet`'s lazy 24h reset (`ethLastReset`),
 
 The Agent Chat panel calls `POST /api/agent`.
 
-The dashboard API route runs in Node runtime and **spawns a separate runtime bridge process** (`runtime/src/dashboard-agent.ts`) to execute agent goals, then streams chunked JSON/SSE-like events back to the UI.
-
-This process boundary avoids Next.js module-format conflicts and keeps runtime execution isolated from dashboard bundling.
+The dashboard API route runs in Node runtime and calls the runtime's agent loop **in-process** via a static import of the compiled runtime bridge (`runtime/src/bridge.ts`, copied into `dashboard/.agent-runtime` at build time), then streams chunked JSON/SSE-like events back to the UI. The route also supports a `mode: 'direct'` request body, which routes through a separate lightweight LLM tool set (`runDirectAgent`) for Direct Wallet Mode, where the user's own connected wallet signs transfers instead of the server-held agent key.
 
 End-to-end flow:
 
 ```text
-dashboard UI -> /api/agent -> runtime bridge process -> AgentWallet/MCP logic -> streamed chunks -> dashboard UI
+dashboard UI -> /api/agent -> in-process agent bridge -> AgentWallet/MCP logic -> streamed chunks -> dashboard UI
 ```
 
 ## Design System
