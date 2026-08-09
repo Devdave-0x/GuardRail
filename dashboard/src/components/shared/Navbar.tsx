@@ -9,7 +9,7 @@ import { formatEther } from 'viem';
 import { AppLogo } from '@/components/shared/AppLogo';
 import { ScrollProgress } from '@/components/shared/ScrollProgress';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
-import { CONTRACT_ADDRESS } from '@/lib/contract';
+import { CONTRACT_ADDRESS, activeChain } from '@/lib/contract';
 import { cn } from '@/lib/utils';
 
 // === Component
@@ -52,7 +52,7 @@ export function Navbar() {
             |
           </span>
           <span className="hidden font-mono text-micro uppercase tracking-wider text-text-muted sm:inline">
-            BOT Chain Testnet
+            {activeChain.name}
           </span>
         </div>
 

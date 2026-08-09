@@ -1,8 +1,8 @@
 import { createPublicClient, fallback, http, formatEther } from 'viem';
-import { RPC_URLS, botChainTestnet } from './contract';
+import { RPC_URLS, activeChain } from './contract';
 
 export const publicClient = createPublicClient({
-  chain: botChainTestnet,
+  chain: activeChain,
   transport: fallback(RPC_URLS.map((url) => http(url))),
 });
 
@@ -44,7 +44,7 @@ export function formatCountdown(unlockTimeMs: number): string {
 }
 
 export function getEtherscanLink(hash: string, type: 'tx' | 'address' = 'tx'): string {
-  const base = 'https://scan.bohr.life';
+  const base = activeChain.blockExplorers.default.url;
   return type === 'tx' ? `${base}/tx/${hash}` : `${base}/address/${hash}`;
 }
 

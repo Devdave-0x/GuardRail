@@ -9,7 +9,7 @@ import {
   walletConnectWallet,
 } from '@rainbow-me/rainbowkit/wallets';
 import { fallback, http } from 'viem';
-import { RPC_URLS, botChainTestnet } from './contract';
+import { RPC_URLS, activeChain } from './contract';
 
 const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID?.trim();
 const hasWalletConnectProjectId = Boolean(
@@ -26,9 +26,9 @@ const popularWallets = [
 export const wagmiConfig = getDefaultConfig({
   appName: 'GuardRail Dashboard',
   projectId: walletConnectProjectId || 'eth-agent-local-dev',
-  chains: [botChainTestnet],
+  chains: [activeChain],
   transports: {
-    [botChainTestnet.id]: fallback(RPC_URLS.map((url) => http(url))),
+    [activeChain.id]: fallback(RPC_URLS.map((url) => http(url))),
   },
   wallets: [
     {

@@ -5,12 +5,12 @@
 > Connect your AI assistant to an on-chain wallet with
 > enforced spending limits, whitelisting, and guardian controls.
 
-**Supports Ethereum Sepolia and BOT Chain testnet**: same audited `AgentWallet` contract, the runtime targets whichever chain you configure.
+**Supports Ethereum Sepolia, BOT Chain testnet, and BOT Chain mainnet**: same audited `AgentWallet` contract, the runtime targets whichever chain you configure.
 
 ## How it works
 
 ```text
-User prompt → MCP Server → AgentWallet.sol → [Sepolia | BOT Chain testnet]
+User prompt → MCP Server → AgentWallet.sol → [Sepolia | BOT Chain testnet | BOT Chain]
                               ↑
                     enforces: spending limits
                               whitelist
@@ -96,19 +96,20 @@ AgentWallet enforces all agent actions on-chain:
 - Whitelisted target addresses and function selectors
 - Token-specific daily limits
 - Guardian pause/unpause kill switch
-- Timelock on limit increases and new whitelist entries (10 minutes on Sepolia; 1 minute on the BOT Chain testnet deployment, shortened for faster demo iteration, since `TIMELOCK` is a compile-time constant, baked in per deployment)
+- Timelock on limit increases and new whitelist entries — `TIMELOCK` is a compile-time constant, baked in per deployment, so it differs across the three live deployments below (10 minutes on Sepolia and on BOT Chain mainnet; 1 minute on the BOT Chain testnet deployment, shortened for faster demo iteration)
 - 2-step role transfers
 
-The runtime automatically targets the configured chain via `CHAIN_ID`. Sepolia and BOT Chain testnet are supported today (`runtime/src/chain.ts`), and more EVM chains can be added there without touching the contract or agent logic.
+The runtime automatically targets the configured chain via `CHAIN_ID`. Sepolia, BOT Chain testnet, and BOT Chain mainnet are supported today (`runtime/src/chain.ts`), and more EVM chains can be added there without touching the contract or agent logic.
 
 ## Deployments
 
-The same audited `AgentWallet` contract is live on two networks:
+The same audited `AgentWallet` contract is live on three networks:
 
-| Network           | Chain ID | Contract Address                             | Explorer                                                                                     |
-| ----------------- | -------- | -------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| Ethereum Sepolia  | 11155111 | `0x4fbE2CeFEC5ef766634C83CFAd0338fEfBB65b35` | [Etherscan](https://sepolia.etherscan.io/address/0x4fbE2CeFEC5ef766634C83CFAd0338fEfBB65b35) |
-| BOT Chain testnet | 968      | `0x2e86509caAdFbEbbe223E51ee7d70Fcb7ba60B01` | [scan.bohr.life](https://scan.bohr.life/address/0x2e86509caAdFbEbbe223E51ee7d70Fcb7ba60B01)  |
+| Network           | Chain ID | Contract Address                             | Explorer                                                                                        |
+| ----------------- | -------- | -------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Ethereum Sepolia  | 11155111 | `0x4fbE2CeFEC5ef766634C83CFAd0338fEfBB65b35` | [Etherscan](https://sepolia.etherscan.io/address/0x4fbE2CeFEC5ef766634C83CFAd0338fEfBB65b35)    |
+| BOT Chain testnet | 968      | `0x2e86509caAdFbEbbe223E51ee7d70Fcb7ba60B01` | [scan.bohr.life](https://scan.bohr.life/address/0x2e86509caAdFbEbbe223E51ee7d70Fcb7ba60B01)     |
+| BOT Chain mainnet | 677      | `0x3D157F7Df3551b1423CB804F818792A978a9635C` | [scan.botchain.ai](https://scan.botchain.ai/address/0x3D157F7Df3551b1423CB804F818792A978a9635C) |
 
 Deploy your own: see contracts/README.md
 
@@ -169,7 +170,7 @@ echo '{"jsonrpc":"2.0","method":"describe","id":1}' | node anna-executa/index.js
 
 ## Roadmap
 
-- [x] Multi-chain support: Sepolia + BOT Chain testnet live; Base, Arbitrum, Optimism next
+- [x] Multi-chain support: Sepolia + BOT Chain testnet + BOT Chain mainnet live; Base, Arbitrum, Optimism next
 - [ ] Role-based agent teams (treasury, HR, ops)
 - [ ] Visual policy builder: no-code limit configuration
 - [ ] Telegram/Slack bot interface
@@ -240,9 +241,10 @@ npm run build
 ## Requirements
 
 - Node.js 18+
-- Testnet funds for your target chain:
+- Funds for your target chain:
   - Sepolia: testnet ETH (https://sepoliafaucet.com)
   - BOT Chain testnet: testnet BOT, chain ID `968`, RPC `https://rpc.bohr.life`, faucet `faucet.botchain.ai/basic`
+  - BOT Chain mainnet: real BOT, chain ID `677`, RPC `https://rpc.botchain.ai`, available via the BOT DEX (`dex.botchain.ai`)
 - Deployed AgentWallet contract
 - At least one AI provider key required:
   - Groq (recommended, free): console.groq.com

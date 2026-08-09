@@ -8,14 +8,26 @@ import type { GuardFeature, MarketingStat, McpTool, NavItem } from '@/types';
 
 // === Chains
 
-export const CHAIN_COUNT = 2;
+export const CHAIN_COUNT = 3;
 
+/*
+  DEPLOYMENTS[1] is read directly by HeroCopy, TrustSection, Footer, and LiveProofStrip as
+  "the BOT Chain deployment" — now BOT Chain mainnet, since that's the one actually live
+  and being demoed. The testnet deployment is still real and still listed in the root
+  README's full deployments table, just not the one the marketing site points at.
+*/
 export const DEPLOYMENTS = [
   {
     name: 'Ethereum Sepolia',
     chainId: 11155111,
     address: '0x4fbE2CeFEC5ef766634C83CFAd0338fEfBB65b35',
     explorer: 'https://sepolia.etherscan.io/address/0x4fbE2CeFEC5ef766634C83CFAd0338fEfBB65b35',
+  },
+  {
+    name: 'BOT Chain',
+    chainId: 677,
+    address: '0x3D157F7Df3551b1423CB804F818792A978a9635C',
+    explorer: 'https://scan.botchain.ai/address/0x3D157F7Df3551b1423CB804F818792A978a9635C',
   },
   {
     name: 'BOT Chain testnet',

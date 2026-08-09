@@ -29,8 +29,8 @@ export function FinalCtaSection() {
         </h2>
 
         <p data-reveal className="max-w-xl text-pretty font-mono text-body text-text-secondary">
-          Free, open source, and already live on two testnets. Deploy your own AgentWallet or
-          connect to the existing one.
+          Free, open source, and already live on BOT Chain mainnet, BOT Chain testnet, and Sepolia.
+          Deploy your own AgentWallet or connect to the existing one.
         </p>
 
         {/*
@@ -42,7 +42,7 @@ export function FinalCtaSection() {
             Guardian: armed
           </Badge>
           <Badge variant="blue">Timelock: {TIMELOCK_MINUTES}min</Badge>
-          <Badge variant="gray">{DEPLOYMENTS.length} testnets live</Badge>
+          <Badge variant="gray">{DEPLOYMENTS.length} networks live</Badge>
         </div>
 
         <div

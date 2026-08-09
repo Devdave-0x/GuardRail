@@ -19,7 +19,7 @@ import { useSectionReveal } from '@/hooks';
   Signed / Recorded / Open — structurally borrowed, but every claim points at something
   that's actually true of this deployment: the contract is verified (we ran
   forge verify-contract against Blockscout earlier), every guarded call emits a real
-  Executed event, and the explorer link is the live BOT Chain testnet deployment.
+  Executed event, and the explorer link is the live BOT Chain mainnet deployment.
 */
 const PILLARS = [
   {

@@ -13,10 +13,34 @@ export const botChainTestnet = defineChain({
   testnet: true,
 });
 
+// Chain ID, RPC, and explorer confirmed against BOT Chain's own dev docs
+// (dev-docs.botchain.ai/docs/Developers/quick-guide), not guessed.
+export const botChainMainnet = defineChain({
+  id: 677,
+  name: 'BOT Chain',
+  nativeCurrency: { name: 'BOT', symbol: 'BOT', decimals: 18 },
+  rpcUrls: {
+    default: { http: ['https://rpc.botchain.ai'] },
+  },
+  blockExplorers: {
+    default: { name: 'BOTScan', url: 'https://scan.botchain.ai' },
+  },
+});
+
 export const CONTRACT_ADDRESS = (process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
   '0x2e86509caAdFbEbbe223E51ee7d70Fcb7ba60B01') as `0x${string}`;
 
 export const CHAIN_ID = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || '968');
+
+/*
+  The chain object everything in the app should actually use — wagmi.ts, utils.ts, and
+  every panel that signs a transaction. Resolved from CHAIN_ID rather than importing
+  botChainTestnet by name directly, so switching NEXT_PUBLIC_CHAIN_ID (e.g. to 677 for
+  mainnet) is the only change needed anywhere in the dashboard. Falls back to testnet for
+  any unrecognized id rather than throwing, since a misconfigured env var shouldn't take
+  down the whole app.
+*/
+export const activeChain = CHAIN_ID === botChainMainnet.id ? botChainMainnet : botChainTestnet;
 
 const splitRpcUrls = (value?: string) =>
   (value || '')
@@ -33,6 +57,9 @@ export const QUICKNODE_RPC_URL = process.env.NEXT_PUBLIC_QUICKNODE_RPC_URL || ''
 const SERVER_RPC_URLS = splitRpcUrls(process.env.RPC_URLS || process.env.RPC_URL);
 const PUBLIC_RPC_URLS = splitRpcUrls(process.env.NEXT_PUBLIC_RPC_URLS);
 
+// The final fallback must track the active chain — this used to be hardcoded to
+// rpc.bohr.life (testnet) unconditionally, which would have silently sent mainnet
+// traffic to the testnet RPC if no other RPC env var were set.
 export const RPC_URLS = Array.from(
   new Set(
     [
@@ -41,7 +68,7 @@ export const RPC_URLS = Array.from(
       ALCHEMY_RPC_URL,
       ANKR_RPC_URL,
       QUICKNODE_RPC_URL,
-      'https://rpc.bohr.life',
+      activeChain.rpcUrls.default.http[0],
     ].filter(Boolean),
   ),
 );

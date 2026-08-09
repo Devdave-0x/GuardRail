@@ -9,7 +9,7 @@ contract DeployScript is Script {
         address agentAddr    = vm.envAddress("AGENT_ADDRESS");
         address guardianAddr = vm.envAddress("GUARDIAN_ADDRESS");
         vm.startBroadcast();
-        new AgentWallet(agentAddr, guardianAddr, 0.1 ether, 0.5 ether);
+        new AgentWallet(agentAddr, guardianAddr, 0.05 ether, 0.1 ether);
         vm.stopBroadcast();
     }
 }

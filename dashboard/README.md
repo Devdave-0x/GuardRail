@@ -1,18 +1,18 @@
 # GuardRail Dashboard
 
-Full-stack dashboard for the **AgentWallet** smart contract deployed on BOT Chain testnet.
+Full-stack dashboard for the **AgentWallet** smart contract deployed on BOT Chain mainnet.
 
 ## Contract Details
 
 | Field    | Value                                        |
 | -------- | -------------------------------------------- |
-| Contract | `0x2e86509caAdFbEbbe223E51ee7d70Fcb7ba60B01` |
-| Network  | BOT Chain testnet (chainId: 968)             |
-| RPC      | `https://rpc.bohr.life`                      |
-| Explorer | `https://scan.bohr.life`                     |
+| Contract | `0x3D157F7Df3551b1423CB804F818792A978a9635C` |
+| Network  | BOT Chain (chainId: 677)                     |
+| RPC      | `https://rpc.botchain.ai`                    |
+| Explorer | `https://scan.botchain.ai`                   |
 | Guardian | `0xd9100b701e21fC578BFD937AC2DbDfb5bbD42572` |
 
-The same `AgentWallet` contract is also live on Sepolia (see the root [README](../README.md)'s Deployments table), but this dashboard only targets BOT Chain and is not chain-switchable.
+The same `AgentWallet` contract is also live on Sepolia and BOT Chain testnet (see the root [README](../README.md)'s Deployments table), but this dashboard targets one chain at a time via `NEXT_PUBLIC_CHAIN_ID` and is not chain-switchable in the UI.
 
 ## Stack
 

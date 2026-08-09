@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createPublicClient, http, parseAbiItem } from 'viem';
-import { CONTRACT_ADDRESS, RPC_URLS, botChainTestnet } from '@/lib/contract';
+import { CONTRACT_ADDRESS, RPC_URLS, activeChain } from '@/lib/contract';
 
 export const dynamic = 'force-dynamic';
 
@@ -92,7 +92,7 @@ export async function GET(req: NextRequest) {
 
     const providerStates: ProviderState[] = RPC_URLS.map((url) => ({
       client: createPublicClient({
-        chain: botChainTestnet,
+        chain: activeChain,
         transport: http(url, { timeout: 12_000, retryCount: 0 }),
       }),
       // QuickNode discover plans can enforce very small eth_getLogs ranges.

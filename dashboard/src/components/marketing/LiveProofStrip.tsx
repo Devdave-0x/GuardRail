@@ -32,7 +32,7 @@ export async function LiveProofStrip() {
             className={`h-1.5 w-1.5 rounded-full ${stats.unavailable ? 'bg-orange' : 'animate-pulse-green bg-green'}`}
           />
           <span className="font-mono text-xs uppercase tracking-wider text-text-muted">
-            {stats.unavailable ? 'Chain unreachable' : 'Live on BOT Chain testnet'}
+            {stats.unavailable ? 'Chain unreachable' : `Live on ${DEPLOYMENTS[1].name}`}
           </span>
           <a
             href={DEPLOYMENTS[1].explorer}

@@ -6,7 +6,7 @@ import { useAccount, useWriteContract } from 'wagmi';
 import { CONTRACT_ADDRESS, AGENT_WALLET_ABI } from '@/lib/contract';
 import { useContractState } from '@/hooks/useContractState';
 import { parseEther, createPublicClient, fallback, http } from 'viem';
-import { RPC_URLS, botChainTestnet } from '@/lib/contract';
+import { RPC_URLS, activeChain } from '@/lib/contract';
 import { formatAddress } from '@/lib/utils';
 
 interface TokenPolicyEntry {
@@ -66,7 +66,7 @@ export function TokenPolicyPanel() {
     setLookupLoading(true);
     try {
       const client = createPublicClient({
-        chain: botChainTestnet,
+        chain: activeChain,
         transport: fallback(RPC_URLS.map((url) => http(url))),
       });
       const result = (await client.readContract({

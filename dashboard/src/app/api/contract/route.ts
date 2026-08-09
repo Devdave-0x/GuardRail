@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createPublicClient, http, formatEther } from 'viem';
-import { CONTRACT_ADDRESS, AGENT_WALLET_ABI, RPC_URLS, botChainTestnet } from '@/lib/contract';
+import { CONTRACT_ADDRESS, AGENT_WALLET_ABI, RPC_URLS, activeChain } from '@/lib/contract';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -32,8 +32,8 @@ function unavailableContractState(error: unknown) {
     dailySpentPercent: 0,
     pendingLimitChange: null,
     pendingCall: null,
-    network: 'BOT Chain Testnet',
-    chainId: 968,
+    network: activeChain.name,
+    chainId: activeChain.id,
     rpcUnavailable: true,
     error: errorMessage(error),
   };
@@ -42,7 +42,7 @@ function unavailableContractState(error: unknown) {
 async function readContractState() {
   const clients = RPC_URLS.map((url) =>
     createPublicClient({
-      chain: botChainTestnet,
+      chain: activeChain,
       transport: http(url, { timeout: 8_000, retryCount: 0 }),
     }),
   );
@@ -213,8 +213,8 @@ async function readContractState() {
           unlockTimeMs: Number(pcUnlockTime) * 1000,
         }
       : null,
-    network: 'BOT Chain Testnet',
-    chainId: 968,
+    network: activeChain.name,
+    chainId: activeChain.id,
   };
 }
 
