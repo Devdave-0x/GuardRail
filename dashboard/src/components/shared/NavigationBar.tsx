@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { MdMenu, MdClose } from 'react-icons/md';
 import { AnimatePresence, motion } from 'motion/react';
 import { AppLogo } from '@/components/shared/AppLogo';
@@ -27,7 +28,7 @@ import { cn } from '@/lib/utils';
   down.
 
   Left as a direct sibling in the marketing layout (see (marketing)/layout.tsx), not
-  nested inside anything with `overflow-hidden` — an overflow-hidden ancestor clips
+  nested inside anything with `overflow-hidden`. An overflow-hidden ancestor clips
   `position: fixed` descendants too once that ancestor scrolls past the viewport, even
   though `fixed` is nominally viewport-relative.
 */
@@ -39,6 +40,13 @@ export function NavigationBar() {
   const panelRef = useRef<HTMLDivElement | null>(null);
   const toggleRef = useRef<HTMLButtonElement | null>(null);
   const prefersReduced = usePrefersReducedMotion();
+  const router = useRouter();
+  /*
+    Tracks the /app navigation itself, not a click ripple. isPending stays true for the
+    entire gap between click and the new route committing, which is exactly the window
+    loading.tsx fills, so this label and that skeleton turn on and off together.
+  */
+  const [launching, startLaunch] = useTransition();
 
   useEffect(() => {
     lastScrollY.current = window.scrollY;
@@ -98,15 +106,19 @@ export function NavigationBar() {
     <div
       className="fixed left-1/2 top-4 z-50 flex w-[calc(100%-2rem)] max-w-7xl flex-col gap-2 sm:w-[calc(100%-4rem)]"
       style={{
-        // translateX centres the fixed element; translateY drives the hide/show slide.
-        // Both live in one `transform` so neither a Tailwind translate-x utility nor a
-        // second inline property fights this one for the same CSS property.
+        /*
+          translateX centres the fixed element; translateY drives the hide/show slide.
+          Both live in one `transform` so neither a Tailwind translate-x utility nor a
+          second inline property fights this one for the same CSS property.
+        */
         transform: `translateX(-50%) translateY(${navVisible ? 0 : -32}px)`,
         opacity: navVisible ? 1 : 0,
         pointerEvents: navVisible ? 'auto' : 'none',
-        // Slower and gentler than a button micro-interaction on purpose: this is a large,
-        // ever-present element repositioning itself, not a momentary control reacting to
-        // a click, so a slow decelerating curve reads as deliberate rather than snappy.
+        /*
+          Slower and gentler than a button micro-interaction on purpose: this is a large,
+          ever-present element repositioning itself, not a momentary control reacting to
+          a click, so a slow decelerating curve reads as deliberate rather than snappy.
+        */
         transition: prefersReduced
           ? 'none'
           : 'transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -146,9 +158,33 @@ export function NavigationBar() {
 
           <Link
             href="/app"
-            className="edge-glow rounded-full border border-green/50 bg-green/10 px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-green transition-colors hover:bg-green/20 lg:px-4 lg:py-2"
+            aria-busy={launching}
+            onClick={(event) => {
+              /*
+                Left click, no modifier: take over so isPending can drive the button's own
+                state. Modified/middle clicks fall through to the browser's own new-tab
+                handling untouched.
+              */
+              if (event.defaultPrevented || event.button !== 0) return;
+              if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+              event.preventDefault();
+              startLaunch(() => router.push('/app'));
+            }}
+            className={cn(
+              'edge-glow flex cursor-pointer items-center gap-1.5 rounded-full border border-green/50 bg-green/10 px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-green transition-all duration-300 ease-in-out hover:bg-green/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg lg:px-4 lg:py-2',
+              launching && 'pointer-events-none opacity-80',
+            )}
           >
-            Launch app
+            {launching ? (
+              <>
+                <span aria-hidden="true" className="animate-blink">
+                  █
+                </span>
+                Launching...
+              </>
+            ) : (
+              'Launch app'
+            )}
           </Link>
 
           <button
@@ -170,7 +206,7 @@ export function NavigationBar() {
       </div>
 
       {/*
-        Its own floating pill below the main bar, not a panel hinged to it — keeping the
+        Its own floating pill below the main bar, not a panel hinged to it, keeping the
         rounded-full bar's shape intact rather than flattening its bottom edge open.
       */}
       <AnimatePresence>

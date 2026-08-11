@@ -17,7 +17,12 @@ import { JsonLd, organizationSchema, softwareApplicationSchema } from '@/compone
 import { createMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = createMetadata({
-  title: 'Give your AI agent a wallet. Keep the keys to the brakes.',
+  /*
+    Kept under 580px (roughly 60 characters once " | GuardRail" is appended by the root
+    template) per page-speed guidance. Still carries the H1's core terms, "AI agent" and
+    "wallet", so title and heading reinforce rather than duplicate each other.
+  */
+  title: 'AI agent wallet with on-chain spending limits',
   path: '/',
   keywords: ['agent wallet demo', 'eth agent kit', 'create-eth-agent', 'agent guardrails'],
 });

@@ -80,6 +80,27 @@ The two groups have different chrome, different animation engines, and different
 Nothing in `(app)` may import from `(marketing)` or the reverse. Shared code goes in
 `src/components/shared/`.
 
+### Route-transition loading
+
+`(app)/loading.tsx` is the Suspense fallback Next shows while the `/app` segment itself is
+still arriving: first-visit chunk download, cold RSC render. It is a static skeleton that
+mirrors `DashboardPage`'s 12-column grid exactly (same order, same `lg:col-span-*`), so
+nothing reflows when real panels replace it. No shimmer sweep: a moving gradient is the
+glossy-AI-dashboard cliché this product's visual language rejects (see the "human over AI"
+direction in memory / design history); the skeleton bars use a plain `animate-pulse`
+breathe instead. `AppLayout`'s `Navbar`/`Footer` are not part of this boundary, they stay
+mounted through the transition, only the page body swaps.
+
+The "Launch app" link in `NavigationBar` (`(marketing)`) intercepts its own click and
+drives `router.push('/app')` inside `useTransition`, so `isPending` covers the same window
+`loading.tsx` fills. While pending, the button's own label switches to a blinking
+`Launching...` state (reusing the `animate-blink` cursor glyph from `Button`'s `loading`
+prop): this is the instant per-click feedback, and `loading.tsx` is what fills the gap
+after that. Once the real `DashboardPage` commits, the existing `panel-in` stagger (`Cell`
+in `app/page.tsx`) is the landing animation. `loading.tsx` intentionally does not add one
+of its own, so the wait and the arrival stay two clearly separate animations rather than
+one that fights itself.
+
 ---
 
 ## 3. Code style

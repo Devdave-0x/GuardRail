@@ -4,8 +4,10 @@ import './globals.css';
 import { BASE_KEYWORDS, SITE } from '@/lib/seo';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
 
-// Matches the font stack referenced from stax.best: Hanken Grotesk (UI), Fraunces
-// (display serif), JetBrains Mono (data/mono). Space Grotesk is gone — it doesn't match.
+/*
+  Matches the font stack referenced from stax.best: Hanken Grotesk (UI), Fraunces
+  (display serif), JetBrains Mono (data/mono). Space Grotesk is gone, it doesn't match.
+*/
 const hankenGrotesk = Hanken_Grotesk({
   subsets: ['latin'],
   variable: '--font-hanken-grotesk',

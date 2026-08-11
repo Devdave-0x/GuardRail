@@ -13,8 +13,10 @@ export const botChainTestnet = defineChain({
   testnet: true,
 });
 
-// Chain ID, RPC, and explorer confirmed against BOT Chain's own dev docs
-// (dev-docs.botchain.ai/docs/Developers/quick-guide), not guessed.
+/*
+  Chain ID, RPC, and explorer confirmed against BOT Chain's own dev docs
+  (dev-docs.botchain.ai/docs/Developers/quick-guide), not guessed.
+*/
 export const botChainMainnet = defineChain({
   id: 677,
   name: 'BOT Chain',
@@ -33,7 +35,7 @@ export const CONTRACT_ADDRESS = (process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
 export const CHAIN_ID = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || '968');
 
 /*
-  The chain object everything in the app should actually use — wagmi.ts, utils.ts, and
+  The chain object everything in the app should actually use: wagmi.ts, utils.ts, and
   every panel that signs a transaction. Resolved from CHAIN_ID rather than importing
   botChainTestnet by name directly, so switching NEXT_PUBLIC_CHAIN_ID (e.g. to 677 for
   mainnet) is the only change needed anywhere in the dashboard. Falls back to testnet for
@@ -57,9 +59,11 @@ export const QUICKNODE_RPC_URL = process.env.NEXT_PUBLIC_QUICKNODE_RPC_URL || ''
 const SERVER_RPC_URLS = splitRpcUrls(process.env.RPC_URLS || process.env.RPC_URL);
 const PUBLIC_RPC_URLS = splitRpcUrls(process.env.NEXT_PUBLIC_RPC_URLS);
 
-// The final fallback must track the active chain — this used to be hardcoded to
-// rpc.bohr.life (testnet) unconditionally, which would have silently sent mainnet
-// traffic to the testnet RPC if no other RPC env var were set.
+/*
+  The final fallback must track the active chain. This used to be hardcoded to
+  rpc.bohr.life (testnet) unconditionally, which would have silently sent mainnet
+  traffic to the testnet RPC if no other RPC env var were set.
+*/
 export const RPC_URLS = Array.from(
   new Set(
     [

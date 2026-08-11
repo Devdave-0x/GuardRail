@@ -13,7 +13,7 @@ const BOT_CHAIN_DEPLOYMENT = DEPLOYMENTS[1];
 
 /*
   The hero's own client boundary. HeroSection stays server-rendered for the LCP video;
-  this is the one piece of it that's stateful — the eyebrow/heading/copy/CTA arrive as a
+  this is the one piece of it that's stateful: the eyebrow/heading/copy/CTA arrive as a
   staggered rise instead of popping in with the rest of the document, so the hero doesn't
   read as inert next to a full-bleed video that's already moving.
 
@@ -71,7 +71,7 @@ export function HeroCopy() {
         </Link>
 
         {/*
-          Second CTA, not a demo video we don't have — points at something real: the
+          Second CTA, not a demo video we don't have, points at something real: the
           verified contract backing every guard the copy above describes.
         */}
         <a

@@ -6,7 +6,7 @@
   Every color a Tailwind utility can carry an opacity modifier on (`bg-green/10`,
   `border-red/40`, `bg-bg/90`, ...) needs an `-rgb` triplet alongside its hex value.
   Tailwind can only apply `/NN` to a color function it can inject an alpha channel into
-  (`rgba(var(--x-rgb), NN)`); it silently drops the modifier — no CSS rule at all — for a
+  (`rgba(var(--x-rgb), NN)`); it silently drops the modifier, no CSS rule at all, for a
   color that's just `var(--x)`. tailwind.config.js's `withOpacity()` reads these.
 */
 :root,
@@ -37,7 +37,7 @@
   --text-secondary: #a1a1aa;
   --text-muted: #7d7d87;
   /*
-    The floating nav's shadow, not a static value — the same shadow reads as correct depth
+    The floating nav's shadow, not a static value: the same shadow reads as correct depth
     in dark mode and as a muddy grey smear in light mode (or the reverse at a lighter
     weight), so it's tuned per theme rather than shared.
   */
@@ -45,13 +45,13 @@
 
   /*
     Fixed, not flipping. Declared once here and never redeclared in `.light` below, so
-    the value stays constant regardless of theme — unlike --text-primary etc., which
+    the value stays constant regardless of theme, unlike --text-primary etc., which
     `.light` does override.
 
     This is for the one place text sits directly on the hero video rather than on the
     page's own (theme-flipping) background: the video is always dark, full stop, it
     doesn't participate in the light/dark toggle. Text over it needs to always be light
-    for the same reason a flipping token would be wrong there — if the headline used
+    for the same reason a flipping token would be wrong there: if the headline used
     --text-primary, it would correctly go near-black in light mode and then be nearly
     invisible against the still-dark video behind it. See HeroCopy.tsx.
   */

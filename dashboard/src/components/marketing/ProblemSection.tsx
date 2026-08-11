@@ -23,7 +23,7 @@ const PROBLEMS: Problem[] = [
     accent: 'orange',
     icon: MdOutlineWarningAmber,
     title: 'Prompt rules are suggestions',
-    body: 'A limit written in a system prompt holds until the model is confused, jailbroken, or simply wrong. Nothing enforces it.',
+    body: 'A limit written in a system prompt holds until the model is confused, jailbroken, or simply wrong. Nothing enforces it, and nothing is holding the brakes.',
   },
   {
     id: 'no-undo',

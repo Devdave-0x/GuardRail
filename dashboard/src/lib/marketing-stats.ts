@@ -12,7 +12,7 @@ export const CHAIN_COUNT = 3;
 
 /*
   DEPLOYMENTS[1] is read directly by HeroCopy, TrustSection, Footer, and LiveProofStrip as
-  "the BOT Chain deployment" — now BOT Chain mainnet, since that's the one actually live
+  "the BOT Chain deployment", now BOT Chain mainnet, since that's the one actually live
   and being demoed. The testnet deployment is still real and still listed in the root
   README's full deployments table, just not the one the marketing site points at.
 */

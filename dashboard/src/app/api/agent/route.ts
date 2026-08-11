@@ -19,9 +19,9 @@ export const runtime = 'nodejs';
 
   The import above must be static, not `await import(...)`, and it has to be the compiled
   dist (via dashboard/.agent-runtime, a gitignored copy `prebuild` produces from
-  ../runtime/dist — see package.json), not the TS source. Both facts matter for the same
+  ../runtime/dist, see package.json), not the TS source. Both facts matter for the same
   reason: Next's file-tracer only shallowly includes a *dynamically* imported external
-  file itself, not that file's own further imports — bridge.js's `openai` dependency
+  file itself, not that file's own further imports. bridge.js's `openai` dependency
   (three hops down, via agent.js) silently went missing from the deployed function even
   though bridge.js itself was present. A static import lets webpack bundle the whole
   transitive graph normally, the same way it does for every other import in this app, so
@@ -33,7 +33,7 @@ export const runtime = 'nodejs';
   One tradeoff: agent.ts/account.ts read required env vars as top-level consts, so a
   missing one now throws at module load (function cold start) rather than being caught
   per-request inside the try/catch below. That's an acceptable trade for a working
-  deploy — the required vars are set as Vercel project env vars, not optional.
+  deploy: the required vars are set as Vercel project env vars, not optional.
 */
 
 export async function POST(req: NextRequest) {

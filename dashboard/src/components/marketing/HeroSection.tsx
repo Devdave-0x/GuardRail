@@ -8,7 +8,7 @@ import { HeroCopy } from './HeroCopy';
   Section), copy sits centred on top of it.
 
   The video has no audio track (stripped at encode time) and no controls, so `muted`
-  isn't fighting a real audio use case — it's required for autoplay in every browser.
+  isn't fighting a real audio use case, it's required for autoplay in every browser.
   `poster` is the video's own first frame, so there's no flash of a different image
   before playback starts.
 
@@ -30,7 +30,7 @@ export function HeroSection() {
           `isolate` is load-bearing, not decoration: Section is `relative` but never
           establishes its own stacking context (no z-index/opacity/transform of its own),
           so a bare `-z-10` child here escapes past Section's own background and lands
-          behind the page's other stacking contexts instead — specifically under
+          behind the page's other stacking contexts instead, specifically under
           AmbientBackground's fixed layers, which tint the video by whatever the page
           background happens to be. That tint is invisible in dark mode (video and page
           background are both near-black) and shows up as exactly the light-mode
@@ -51,11 +51,11 @@ export function HeroSection() {
             <source src="/hero/hero-video.mp4" type="video/mp4" />
           </video>
           {/*
-            Flat scrim, not a gradient — text needs to read against whatever the frame is
+            Flat scrim, not a gradient: text needs to read against whatever the frame is
             doing underneath, and a single opacity value is easier to keep in sync with the
             fixed white copy below than a fade that only protects part of the section.
 
-            Fixed black at a fixed opacity, not `bg-bg` and not theme-conditional — the
+            Fixed black at a fixed opacity, not `bg-bg` and not theme-conditional. The
             hero is meant to look identical in light and dark mode. The video and its
             scrim are the one surface in the app that deliberately doesn't reskin with the
             rest of the page.

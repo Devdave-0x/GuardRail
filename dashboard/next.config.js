@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Strips the `X-Powered-By: Next.js` response header, which discloses the framework
+  // for no benefit and is flagged by page-speed and security scanners alike.
+  poweredByHeader: false,
   eslint: {
     ignoreDuringBuilds: true,
   },
