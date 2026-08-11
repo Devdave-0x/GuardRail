@@ -9,7 +9,7 @@ import { useSectionReveal } from '@/hooks';
 
 /*
   Borrowed structurally from a "tell it your goal, see the outcome" pattern seen on other
-  agent-facing products — but every outcome here is a restatement of a real GUARDS entry
+  agent-facing products, but every outcome here is a restatement of a real GUARDS entry
   (src/lib/marketing-stats.ts), not invented copy. This is what AgentChatPanel actually
   does when you type a goal, just walked through in prose instead of live in the chat.
 */
@@ -24,7 +24,7 @@ const SCENARIOS: Scenario[] = [
     id: 'send',
     goal: 'Send 0.05 BOT to my exchange wallet.',
     outcome:
-      'Checked against the target whitelist and the per-transaction limit, then executed immediately — no timelock, because the recipient was already approved.',
+      'Checked against the target whitelist and the per-transaction limit, then executed immediately, no timelock, because the recipient was already approved.',
   },
   {
     id: 'automate',
@@ -36,13 +36,13 @@ const SCENARIOS: Scenario[] = [
     id: 'whitelist',
     goal: 'Add a new address to the whitelist.',
     outcome:
-      'Queued behind the timelock. You have a window to cancel before it takes effect — the agent cannot skip the wait.',
+      'Queued behind the timelock. You have a window to cancel before it takes effect, the agent cannot skip the wait.',
   },
   {
     id: 'stop',
     goal: "Something's wrong. Stop everything.",
     outcome:
-      'The guardian kill switch pauses every agent action instantly, no timelock, no vote — a separate key the agent never holds.',
+      'The guardian kill switch pauses every agent action instantly, no timelock, no vote: a separate key the agent never holds.',
   },
 ];
 
@@ -64,8 +64,8 @@ export function ScenarioSection() {
         </div>
 
         {/*
-          A rule-divided, left-aligned exchange — goal then outcome, always in the same
-          reading direction — rather than a card grid. This is the one section shaped like
+          A rule-divided, left-aligned exchange, goal then outcome, always in the same
+          reading direction, rather than a card grid. This is the one section shaped like
           a conversation transcript instead of a feature grid, on purpose: it should read
           as "here's what actually happens," not as another set of value props.
         */}

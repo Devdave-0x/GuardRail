@@ -52,7 +52,7 @@ export function ToolsSection() {
         </div>
 
         {/*
-          A reference table, not a card grid — this is API surface, and eight padded cards
+          A reference table, not a card grid: this is API surface, and eight padded cards
           made it look like eight more value props instead of what it is: a --help listing
           for the MCP tools your assistant can actually call.
         */}

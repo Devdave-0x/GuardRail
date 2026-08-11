@@ -27,8 +27,10 @@ export function ThemeToggle({ className }: { className?: string }) {
   const [mounted, setMounted] = useState(false);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
 
-  // resolvedTheme is undefined on first client render, before next-themes reads the
-  // stored preference. Rendering a neutral icon until then avoids a light/dark flash.
+  /*
+    resolvedTheme is undefined on first client render, before next-themes reads the
+    stored preference. Rendering a neutral icon until then avoids a light/dark flash.
+  */
   useEffect(() => setMounted(true), []);
 
   function handleClick(): void {

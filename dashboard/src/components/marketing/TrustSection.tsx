@@ -16,7 +16,7 @@ import { useSectionReveal } from '@/hooks';
 // === Data
 
 /*
-  Signed / Recorded / Open — structurally borrowed, but every claim points at something
+  Signed / Recorded / Open: structurally borrowed, but every claim points at something
   that's actually true of this deployment: the contract is verified (we ran
   forge verify-contract against Blockscout earlier), every guarded call emits a real
   Executed event, and the explorer link is the live BOT Chain mainnet deployment.
@@ -32,7 +32,7 @@ const PILLARS = [
     id: 'recorded',
     icon: MdOutlineReceiptLong,
     title: 'Recorded',
-    body: 'Every guarded call emits an Executed event on-chain — permanent, and queryable by anyone, not just by you.',
+    body: 'Every guarded call emits an Executed event on-chain, permanent, and queryable by anyone, not just by you.',
   },
   {
     id: 'open',
@@ -120,7 +120,7 @@ export function TrustSection() {
                 <li key={detail.id} className="flex items-start gap-2.5">
                   <Icon size={16} className="mt-0.5 shrink-0 text-blue-bright" aria-hidden="true" />
                   <p className="font-mono text-caption text-text-secondary">
-                    <span className="text-text-primary">{detail.label}</span> — {detail.body}
+                    <span className="text-text-primary">{detail.label}</span>: {detail.body}
                   </p>
                 </li>
               );

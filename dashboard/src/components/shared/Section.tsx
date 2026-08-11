@@ -73,13 +73,15 @@ export function Section({
       aria-labelledby={label ? undefined : headingId}
       aria-label={label}
       className={cn(
-        // `isolate` contains any -z-10 decoration inside this Section's own stacking
-        // context. Without it, `relative` alone doesn't establish one, so a negative
-        // z-index child (e.g. HeroSection's video) escapes past this element's own
-        // background and lands behind whatever the page's other stacking contexts are —
-        // in this app, AmbientBackground's fixed layers, which tint it by the page
-        // background and make it look different across themes even when its own classes
-        // are theme-independent.
+        /*
+          `isolate` contains any -z-10 decoration inside this Section's own stacking
+          context. Without it, `relative` alone doesn't establish one, so a negative
+          z-index child (e.g. HeroSection's video) escapes past this element's own
+          background and lands behind whatever the page's other stacking contexts are,
+          in this app, AmbientBackground's fixed layers, which tint it by the page
+          background and make it look different across themes even when its own classes
+          are theme-independent.
+        */
         'relative isolate h-full w-full',
         fullHeight && 'min-h-svh',
         background,

@@ -34,7 +34,7 @@ export function FinalCtaSection() {
         </p>
 
         {/*
-          Grounds the close in the actual mechanism instead of only conviction copy — this
+          Grounds the close in the actual mechanism instead of only conviction copy: this
           is what's actually armed on the deployment you're about to open, not a claim.
         */}
         <div data-reveal className="flex flex-wrap items-center justify-center gap-2">
@@ -57,7 +57,7 @@ export function FinalCtaSection() {
                 textColor="#00ff88"
                 radius={6}
               >
-                Launch the dashboard
+                Launch your wallet
               </SpecularButton>
             </Link>
           </div>

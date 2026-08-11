@@ -13,7 +13,7 @@ import { useSectionReveal } from '@/hooks';
   read. Live figures belong in LiveProofStrip, which states when the chain is
   unreachable rather than animating a zero.
 
-  Framed as a terminal readout rather than a stat band — the generic "big number, small
+  Framed as a terminal readout rather than a stat band: the generic "big number, small
   label" grid is the same shape whether it's showing contract limits or app-store
   downloads. Reusing Terminal's chrome ties it to the same mono/CLI vocabulary as
   QuickstartSection, so it reads as "here's what the deployment actually is," not as a
